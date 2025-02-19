@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/usuarios")
 @AllArgsConstructor
-public class UsuarioController {
+public class UsuarioController extends BaseController {
 
     @Autowired
     private final UsuarioService usuarioService;

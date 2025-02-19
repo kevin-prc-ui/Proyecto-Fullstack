@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/roles")
 @AllArgsConstructor
-public class RolController {
+public class RolController extends BaseController {
     private RolService rolService;
 
     @PostMapping
