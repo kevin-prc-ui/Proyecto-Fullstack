@@ -8,6 +8,9 @@ import com.webserdi.backend.service.RolService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @AllArgsConstructor
 public class RolServiceImpl implements RolService {
@@ -19,5 +22,13 @@ public class RolServiceImpl implements RolService {
         rol = rolRepository.save(rol);
 
         return RolMapper.mapToRolDto(rol);
+    }
+
+    @Override
+    public List<RolDto> getAllRoles() {
+        List<Rol> rol = rolRepository.findAll();
+        return rol.stream()
+                .map(RolMapper::mapToRolDto)
+                .collect(Collectors.toList());
     }
 }

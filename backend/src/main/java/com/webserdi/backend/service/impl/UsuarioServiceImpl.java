@@ -9,7 +9,6 @@ import com.webserdi.backend.repository.RolRepository;
 import com.webserdi.backend.repository.UsuarioRepository;
 import com.webserdi.backend.service.UsuarioService;
 import lombok.AllArgsConstructor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

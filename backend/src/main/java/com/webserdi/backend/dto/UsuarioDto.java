@@ -1,6 +1,5 @@
 package com.webserdi.backend.dto;
 
-import com.webserdi.backend.entity.Rol;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
