@@ -1,8 +1,4 @@
-@import "tailwindcss";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/preflight";
 
 .alert-danger {
     padding: 15px;
@@ -17,3 +13,12 @@
   width: fit-content;
   justify-content: center;
 }
+.Content {
+  text-align: center; 
+
+}
+
+.navbarStyle {
+  padding: .5rem 1rem !important;
+}
+

@@ -1,13 +1,14 @@
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import {Toaster} from 'sonner';
 import Dashboard from './pages/Dashboard';
-import Login from "./pages/Login";
+import Login from "./components/MicrosoftAuth/Content";
 import Tasks from './pages/Tasks';
 import Trash from './pages/Trash';
 import Users from './pages/Users';
+import { useSelector } from 'react-redux';
 
 function Layout(){
-  const user=""
+  const user=useSelector(state => state.auth)
   const location = useLocation()
 
   return user?(
