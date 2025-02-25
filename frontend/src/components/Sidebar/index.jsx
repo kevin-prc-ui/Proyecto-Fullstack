@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import React from "react";
 import {
   MdDashboard,
   MdOutlineAddTask,
@@ -50,22 +49,22 @@ const linkData = [
     icon: <MdOutlinePendingActions />,
   },
   {
-    label: "Team",
+    label: "Equipo",
     link: "users",
     icon: <FaUsers />,
   },
   {
-    label: "Trash",
+    label: "Eliminados",
     link: "trash",
     icon: <FaTrashAlt />,
-  },
+  }
 ];
 
 const Sidebar = () => {
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
   const path = location.pathname.split("/")[1];
-  const sidebarLinks = user?.isAdmin ? linkData : linkData.slice(0, 5);
+  const sidebarLinks = user?.isAdmin ? linkData : linkData.slice(0, linkData.length);
 
   //Constantes que otorgan la funcion de cerrar el sidebar (funcional para el sidebar en celulares).
   // const dispatch = useDispatch();
