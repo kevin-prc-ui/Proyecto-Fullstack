@@ -15,9 +15,9 @@ const authSlice= createSlice ({
             state.user = action.payload;
             localStorage.setItem("userInfo",JSON.stringify(action.payload))
         },
-        logout:(state,action) =>{
+        logout:(state, action) =>{
             state.user=null;
-            localStorage.removeItem("uesrInfo")
+            localStorage.removeItem("userInfo")
         },
         setOpenSidebar: (state,action) => {
             state.isSidebarOpen = action.payload;
