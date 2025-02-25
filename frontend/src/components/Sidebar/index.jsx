@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import {
   MdDashboard,
@@ -7,18 +8,19 @@ import {
   MdTaskAlt,
 } from "react-icons/md";
 import { FaTasks, FaTrashAlt, FaUsers } from "react-icons/fa";
-import { 
-  // useDispatch, 
-  useSelector } from "react-redux";
+import {
+  // useDispatch,
+  useSelector,
+} from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 // import { setOpenSidebar } from "../../redux/slices/authSlice.js";
 import clsx from "clsx";
-import { 
+import {
   Container,
   Nav,
   Navbar,
   Button,
-  // Offcanvas 
+  // Offcanvas
 } from "react-bootstrap";
 
 const linkData = [
@@ -69,7 +71,6 @@ const Sidebar = () => {
   // const dispatch = useDispatch();
   // const closeSidebar = () => dispatch(setOpenSidebar(false));
 
-
   const NavLink = ({ el }) => (
     <Nav.Item className="w-full mb-2">
       <Link
@@ -77,8 +78,8 @@ const Sidebar = () => {
         className={clsx(
           "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center text-gray-800 text-base hover:bg-[#2564ed2d]",
           "text-decoration-none",
-          path === el.link.split("/")[0] 
-            ? "bg-primary text-white" 
+          path === el.link.split("/")[0]
+            ? "bg-primary text-white"
             : "text-dark hover-bg-light"
         )}
       >
@@ -97,7 +98,6 @@ const Sidebar = () => {
             <span className="bg-primary p-2 rounded-circle">
               <MdOutlineAddTask className="text-white fs-4" />
             </span>
-
           </div>
         </Navbar.Brand>
 
@@ -112,7 +112,8 @@ const Sidebar = () => {
         <div className="w-100 border-top pt-3">
           <Button
             variant="link"
-            className="text-dark d-flex align-items-center gap-2 w-100">
+            className="text-dark d-flex align-items-center gap-2 w-100"
+          >
             <MdSettings className="fs-5" />
             <span className="fs-6">Settings</span>
           </Button>
