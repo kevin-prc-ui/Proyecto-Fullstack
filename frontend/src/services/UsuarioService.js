@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const REST_API_BASE_URL = "http://localhost:8080/api/";
+const REST_API_BASE_URL = "http://localhost:8080/api";
 
 export const listUsuarios = () =>
   axios
-    .get(REST_API_BASE_URL)
+    .get(REST_API_BASE_URL+"/usuarios")
     .then((response) => response)
     .catch((error) => {
       // Detectamos específicamente errores de conexión

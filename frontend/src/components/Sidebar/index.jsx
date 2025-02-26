@@ -157,7 +157,7 @@ const Sidebar = () => {
                           ? "bg-primary text-white"
                           : "text-dark"
                       )}
-                      style={{ animationDelay: `${index * 0.1}s` }}
+                      style={{ animationDelay: `${index * 0.05}s` }}
                     >
                       <span className="fs-5">{child.icon}</span>
                       <span className="fs-6">{child.label}</span>

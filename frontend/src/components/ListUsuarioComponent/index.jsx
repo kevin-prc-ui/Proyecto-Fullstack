@@ -5,7 +5,6 @@ import { listUsuarios } from "../../services/UsuarioService";
 function ListUsuarioComponent() {
   const [usuarios, setUsuarios] = useState([]);
   const [errorConexion, setErrorConexion] = useState(false);
-
   useEffect(() => {
     listUsuarios()
       .then((response) => {
@@ -13,7 +12,6 @@ function ListUsuarioComponent() {
         setErrorConexion(false);
       })
       .catch((error) => {
-        console.error(error);
         setErrorConexion(error.message === "Error de conexion con el servidor");
       });
   }, []);
