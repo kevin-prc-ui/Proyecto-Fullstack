@@ -118,28 +118,4 @@ function App() {
 //   );
 // };
 
-function App() {
-  return (
-    <main className="w-full min-h-screen bg-[#f3f4f6] ">
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index path="/" element={<Navigate to="/dashboard" />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/helpdesk/tasks" element={<Tasks />} />
-          <Route path="/helpdesk/completed/:status" element={<Tasks />} />
-          <Route path="/helpdesk/in-progress/:status" element={<Tasks />} />
-          <Route path="/helpdesk/todo/:status" element={<Tasks />} />
-          <Route path="/helpdesk/users" element={<Users />} />
-          <Route path="/helpdesk/trash" element={<Trash />} />
-          <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
-          <Route path="/knowledge/myfile" element={<MyFile />} />
-        </Route>
-        <Route path="/login" element={<Login />} />
-      </Routes>
-
-      <Toaster richColors />
-    </main>
-  );
-}
-
 export default App;
