@@ -56,7 +56,7 @@ const linkData = [
     children: [
       {
         label: "Inicio",
-        link: "knowledge/INGRESA TU RUTA AQUI VIEJO",
+        link: "knowledge/home",
         icon: <FaHome />,
       },
       {
@@ -66,32 +66,32 @@ const linkData = [
       },
       {
         label: "Archivo Compartido",
-        link: "knowledge/INGRESA TU RUTA AQUI VIEJO",
+        link: "knowledge/sharedfile",
         icon: <FaFolderOpen />,
       },
       {
         label: "Sitios",
-        link: "knowledge/INGRESA TU RUTA AQUI VIEJO",
+        link: "knowledge/sites",
         icon: <FaGlobe />,
       },
       {
         label: "Tareas",
-        link: "knowledge/INGRESA TU RUTA AQUI VIEJO",
+        link: "knowledge/task",
         icon: <FaTasks />,
       },
       {
         label: "Personas",
-        link: "knowledge/INGRESA TU RUTA AQUI VIEJO",
+        link: "knowledge/people",
         icon: <FaUsers />,
       },
       {
         label: "Repositorio",
-        link: "knowledge/INGRESA TU RUTA AQUI VIEJO",
+        link: "knowledge/repository",
         icon: <FaDatabase />,
       },
       {
         label: "Herramientas de Administración",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "knowledge/admintools",
         icon: <FaTools />,
       },
     ]

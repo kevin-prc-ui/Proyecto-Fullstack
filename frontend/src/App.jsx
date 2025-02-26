@@ -15,7 +15,14 @@ import Users from "./pages/Users";
 import Dashboard from "./pages/dashboard";
 import { setOpenSidebar } from "./redux/slices/authSlice";
 import { useIsAuthenticated } from "@azure/msal-react";
+import Home  from "./pages/Knowledge/Home";
 import MyFile  from "./pages/Knowledge/MyFile";
+import SharedFile  from "./pages/Knowledge/SharedFile";
+import Sites  from "./pages/Knowledge/Sites";
+import Task  from "./pages/Knowledge/Task";
+import People  from "./pages/Knowledge/People";
+import Repository  from "./pages/Knowledge/Repository";
+import AdminTools  from "./pages/Knowledge/AdminTools";
 
 function Layout() {
   // const isAuthenticated = useIsAuthenticated();
@@ -102,7 +109,14 @@ function App() {
           <Route path="/helpdesk/users" element={<Users />} />
           <Route path="/helpdesk/trash" element={<Trash />} />
           <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
+          <Route path="/knowledge/home" element={<Home />} />
           <Route path="/knowledge/myfile" element={<MyFile />} />
+          <Route path="/knowledge/sharedfile" element={<SharedFile />} />
+          <Route path="/knowledge/sites" element={<Sites />} />
+          <Route path="/knowledge/task" element={<Task />} />
+          <Route path="/knowledge/people" element={<People />} />
+          <Route path="/knowledge/repository" element={<Repository />} />
+          <Route path="/knowledge/admintools" element={<AdminTools />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>
