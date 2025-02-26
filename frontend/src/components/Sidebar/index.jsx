@@ -61,7 +61,7 @@ const linkData = [
       },
       {
         label: "Mis Archivos",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "myfile",
         icon: <FaFileAlt />,
       },
       {

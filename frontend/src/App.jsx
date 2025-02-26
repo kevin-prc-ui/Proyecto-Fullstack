@@ -15,6 +15,7 @@ import Users from "./pages/Users";
 import Dashboard from "./pages/dashboard";
 import { setOpenSidebar } from "./redux/slices/authSlice";
 import { useIsAuthenticated } from "@azure/msal-react";
+import MyFile  from "../src/pages/Knoledge/MyFile";
 
 function Layout() {
   const isAuthenticated = useIsAuthenticated();
@@ -101,6 +102,7 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/trash" element={<Trash />} />
           <Route path="/task/:id" element={<TaskDetails />} />
+          <Route path="myfile" element={<MyFile />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>
