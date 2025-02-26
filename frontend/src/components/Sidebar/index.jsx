@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+import { useState } from 'react';
 import {
   MdDashboard,
   MdOutlineAddTask,
@@ -7,68 +8,71 @@ import {
   MdTaskAlt,
 } from "react-icons/md";
 import { FaTasks, FaTrashAlt, FaUsers } from "react-icons/fa";
-import {
-  // useDispatch,
-  useSelector,
-} from "react-redux";
+import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-// import { setOpenSidebar } from "../../redux/slices/authSlice.js";
 import clsx from "clsx";
-import {
-  Container,
-  Nav,
-  Navbar,
-  Button,
-  // Offcanvas
-} from "react-bootstrap";
+import { Container, Nav, Navbar, Button } from "react-bootstrap";
 
 const linkData = [
   {
-    label: "Dashboard",
-    link: "dashboard",
+    label: "Helpdesk",
     icon: <MdDashboard />,
+    children: [
+      {
+        label: "Tickets",
+        link: "helpdesk/tasks",
+        icon: <FaTasks />,
+      },
+      {
+        label: "Completados",
+        link: "helpdesk/completed/completed",
+        icon: <MdTaskAlt />,
+      },
+      {
+        label: "En proceso",
+        link: "helpdesk/in-progress/in progress",
+        icon: <MdOutlinePendingActions />,
+      },
+      {
+        label: "Pendientes",
+        link: "helpdesk/todo/todo",
+        icon: <MdOutlinePendingActions />,
+      },
+      {
+        label: "Equipo",
+        link: "helpdesk/users",
+        icon: <FaUsers />,
+      },
+      {
+        label: "Eliminados",
+        link: "helpdesk/trash",
+        icon: <FaTrashAlt />,
+      }
+    ]
   },
   {
-    label: "Tickets",
-    link: "tasks",
-    icon: <FaTasks />,
-  },
-  {
-    label: "Completados",
-    link: "completed/completed",
-    icon: <MdTaskAlt />,
-  },
-  {
-    label: "En proceso",
-    link: "in-progress/in progress",
-    icon: <MdOutlinePendingActions />,
-  },
-  {
-    label: "Pendientes",
-    link: "todo/todo",
-    icon: <MdOutlinePendingActions />,
-  },
-  {
-    label: "Equipo",
-    link: "users",
-    icon: <FaUsers />,
-  },
-  {
-    label: "Eliminados",
-    link: "trash",
-    icon: <FaTrashAlt />,
+    label: "Alfresco",
+    icon: <MdDashboard />,
+    children: [
+      {
+        label: "Y PUROS CORRIDOS TUMBADOS",
+        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        icon: <FaTasks />,
+      }
+    ]
   }
 ];
 
 const Sidebar = () => {
+  const [expandedParent, setExpandedParent] = useState(null);
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
   const path = location.pathname.split("/")[1];
   const sidebarLinks = user?.isAdmin ? linkData : linkData.slice(0, linkData.length);
 
-  //Constantes que otorgan la funcion de cerrar el sidebar (funcional para el sidebar en celulares).
-  // const dispatch = useDispatch();
-  // const closeSidebar = () => dispatch(setOpenSidebar(false));
+  const toggleParent = (parentLabel) => {
+    setExpandedParent(prev => prev === parentLabel ? null : parentLabel);
+  };
 
   const NavLink = ({ el }) => (
     <Nav.Item className="w-full mb-2">
@@ -91,7 +95,6 @@ const Sidebar = () => {
   return (
     <Container fluid className="h-100 p-3 shadow">
       <Navbar expand="lg" className="flex-column h-100">
-        {/* Brand Section */}
         <Navbar.Brand href="/dashboard" className="mb-4">
           <div className="d-flex align-items-center gap-2">
             <span className="bg-primary p-2 rounded-circle">
@@ -100,35 +103,61 @@ const Sidebar = () => {
           </div>
         </Navbar.Brand>
 
-        {/* Navigation Links */}
         <Nav className="flex-column flex-grow-1 w-100">
-          {sidebarLinks.map((link) => (
-            <NavLink el={link} key={link.label} />
+          {sidebarLinks.map((parent) => (
+            <div key={parent.label} className="w-full">
+              {/* Parent Link */}
+              <div
+                className={clsx(
+                  "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center mb-2",
+                  "text-decoration-none cursor-pointer",
+                  parent.children?.some(child => child.link.split("/")[0] === path)
+                    ? "bg-primary text-white"
+                    : "text-dark hover:bg-[#2564ed2d]"
+                )}
+                onClick={() => toggleParent(parent.label)}
+              >
+                <span className="fs-5">{parent.icon}</span>
+                <span className="fs-6">{parent.label}</span>
+              </div>
+
+              {/* Animated Child Links */}
+              {expandedParent === parent.label && (
+                <div className="child-links ms-4 ps-2 border-start">
+                  {parent.children?.map((child, index) => (
+                    <Link
+                      key={child.label}
+                      to={child.link}
+                      className={clsx(
+                        "child-link",
+                        "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center mb-2",
+                        "text-decoration-none hover:bg-[#2564ed2d]",
+                        path === child.link.split("/")[0]
+                          ? "bg-primary text-white"
+                          : "text-dark"
+                      )}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <span className="fs-5">{child.icon}</span>
+                      <span className="fs-6">{child.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
+
+          {/* Settings Section */}
+          <div className="w-100 border-top pt-3 mt-auto">
+            <Button
+              variant=""
+              className="text-dark d-flex align-items-center gap-2 w-100">
+              <MdSettings className="fs-5" />
+              <span className="fs-6">Settings</span>
+            </Button>
+          </div>
         </Nav>
-
-        {/* Settings Section */}
-        <div className="w-100 border-top pt-3">
-          <Button
-            variant="link"
-            className="text-dark d-flex align-items-center gap-2 w-100">
-            <MdSettings className="fs-5" />
-            <span className="fs-6">Settings</span>
-          </Button>
-        </div>
       </Navbar>
-
-      {/* Mobile Close Button
-      <Navbar.Offcanvas
-        id="offcanvasNavbar"
-        placement="start"
-        show={false} // Control this with your Redux state
-        onHide={closeSidebar}
-      >
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title>TaskMse</Offcanvas.Title>
-        </Offcanvas.Header>
-      </Navbar.Offcanvas> */}
     </Container>
   );
 };
