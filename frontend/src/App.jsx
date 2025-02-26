@@ -7,12 +7,12 @@ import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import Login from "./pages/Login";
+import Loimport Login from "./pages/Login";
 import TaskDetails from "./pages/TaskDetails";
 import Tasks from "./pages/Tasks";
 import Trash from "./pages/Trash";
 import Users from "./pages/Users";
-import Dashboard from "./pages/dashboard";
+rd from "./pages/dashboard";
 import { setOpenSidebar } from "./redux/slices/authSlice";
 import { useIsAuthenticated } from "@azure/msal-react";
 import MyFile  from "../src/pages/Knoledge/MyFile";
@@ -94,7 +94,11 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route index path="/" element={<Navigate to="/dashboard" />} />
+<<<<<<< Updated upstream
           <Route path="/dashboard" element={<Dashboard />} />
+=======
+          <Route path="/helpdesk/dashboard" element={<Dashboard />} />
+>>>>>>> Stashed changes
           <Route path="/helpdesk/tasks" element={<Tasks />} />
           <Route path="/helpdesk/completed/:status" element={<Tasks />} />
           <Route path="/helpdesk/in-progress/:status" element={<Tasks />} />
