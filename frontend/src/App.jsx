@@ -95,7 +95,11 @@ function App() {
         <Route element={<Layout />}>
           <Route index path="/" element={<Navigate to="/dashboard" />} />
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           <Route path="/dashboard" element={<Dashboard />} />
+=======
+          <Route path="/helpdesk/dashboard" element={<Dashboard />} />
+>>>>>>> Stashed changes
 =======
           <Route path="/helpdesk/dashboard" element={<Dashboard />} />
 >>>>>>> Stashed changes
