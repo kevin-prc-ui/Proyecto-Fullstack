@@ -7,7 +7,7 @@ import {
   MdSettings,
   MdTaskAlt,
 } from "react-icons/md";
-import { FaTasks, FaTrashAlt, FaUsers } from "react-icons/fa";
+import { FaHome, FaFileAlt, FaFolderOpen, FaGlobe, FaTasks, FaUsers, FaDatabase, FaTools, FaTrashAlt } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
@@ -51,14 +51,49 @@ const linkData = [
     ]
   },
   {
-    label: "Alfresco",
+    label: "Knowledge Base",
     icon: <MdDashboard />,
     children: [
       {
-        label: "Y PUROS CORRIDOS TUMBADOS",
+        label: "Inicio",
+        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        icon: <FaHome />,
+      },
+      {
+        label: "Mis Archivos",
+        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        icon: <FaFileAlt />,
+      },
+      {
+        label: "Archivo Compartido",
+        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        icon: <FaFolderOpen />,
+      },
+      {
+        label: "Sitios",
+        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        icon: <FaGlobe />,
+      },
+      {
+        label: "Tareas",
         link: "documental/INGRESA TU RUTA AQUI VIEJO",
         icon: <FaTasks />,
-      }
+      },
+      {
+        label: "Personas",
+        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        icon: <FaUsers />,
+      },
+      {
+        label: "Repositorio",
+        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        icon: <FaDatabase />,
+      },
+      {
+        label: "Herramientas de Administración",
+        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        icon: <FaTools />,
+      },
     ]
   }
 ];
