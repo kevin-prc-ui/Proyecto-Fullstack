@@ -111,8 +111,7 @@ const Sidebar = () => {
         <div className="w-100 border-top pt-3">
           <Button
             variant="link"
-            className="text-dark d-flex align-items-center gap-2 w-100"
-          >
+            className="text-dark d-flex align-items-center gap-2 w-100">
             <MdSettings className="fs-5" />
             <span className="fs-6">Settings</span>
           </Button>
