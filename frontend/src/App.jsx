@@ -16,6 +16,9 @@ import Dashboard from "./pages/dashboard";
 import { setOpenSidebar } from "./redux/slices/authSlice";
 import { useIsAuthenticated } from "@azure/msal-react";
 import MyFile  from "../src/pages/Knoledge/MyFile";
+import Home  from "../src/pages/Knoledge/Home";
+import SharedFile  from "../src/pages/Knoledge/SharedFile";
+
 
 function Layout() {
   const isAuthenticated = useIsAuthenticated();

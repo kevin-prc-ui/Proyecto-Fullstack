@@ -56,7 +56,7 @@ const linkData = [
     children: [
       {
         label: "Inicio",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "home",
         icon: <FaHome />,
       },
       {
@@ -66,7 +66,7 @@ const linkData = [
       },
       {
         label: "Archivo Compartido",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "sharedfile",
         icon: <FaFolderOpen />,
       },
       {
