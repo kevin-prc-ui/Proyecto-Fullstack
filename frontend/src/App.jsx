@@ -15,14 +15,11 @@ import Users from "./pages/Users";
 import Dashboard from "./pages/dashboard";
 import { setOpenSidebar } from "./redux/slices/authSlice";
 import { useIsAuthenticated } from "@azure/msal-react";
-import MyFile  from "../src/pages/Knoledge/MyFile";
-import Home  from "../src/pages/Knoledge/Home";
-import SharedFile  from "../src/pages/Knoledge/SharedFile";
-
+import MyFile  from "./pages/Knowledge/MyFile";
 
 function Layout() {
-  const isAuthenticated = useIsAuthenticated();
-  const { user } = useSelector((state) => state.auth);
+  // const isAuthenticated = useIsAuthenticated();
+  // const { user } = useSelector((state) => state.auth);
 
   return (
     <div className="w-full h-screen flex flex-col md:flex-row">
@@ -105,6 +102,7 @@ function App() {
           <Route path="/helpdesk/users" element={<Users />} />
           <Route path="/helpdesk/trash" element={<Trash />} />
           <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
+          <Route path="/knowledge/myfile" element={<MyFile />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>
