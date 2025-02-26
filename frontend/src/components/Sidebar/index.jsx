@@ -20,32 +20,32 @@ const linkData = [
     children: [
       {
         label: "Tickets",
-        link: "helpdesk/tasks",
+        link: "tasks",
         icon: <FaTasks />,
       },
       {
         label: "Completados",
-        link: "helpdesk/completed/completed",
+        link: "completed/completed",
         icon: <MdTaskAlt />,
       },
       {
         label: "En proceso",
-        link: "helpdesk/in-progress/in progress",
+        link: "in-progress/in progress",
         icon: <MdOutlinePendingActions />,
       },
       {
         label: "Pendientes",
-        link: "helpdesk/todo/todo",
+        link: "todo/todo",
         icon: <MdOutlinePendingActions />,
       },
       {
         label: "Equipo",
-        link: "helpdesk/users",
+        link: "users",
         icon: <FaUsers />,
       },
       {
         label: "Eliminados",
-        link: "helpdesk/trash",
+        link: "trash",
         icon: <FaTrashAlt />,
       }
     ]
