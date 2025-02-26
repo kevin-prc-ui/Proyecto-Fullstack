@@ -123,7 +123,7 @@ const Sidebar = () => {
 
               {/* Animated Child Links */}
               {expandedParent === parent.label && (
-                <div className="child-links ms-4 ps-2 border-start border-2">
+                <div className="child-links ms-4 ps-2 border-start">
                   {parent.children?.map((child, index) => (
                     <Link
                       key={child.label}
