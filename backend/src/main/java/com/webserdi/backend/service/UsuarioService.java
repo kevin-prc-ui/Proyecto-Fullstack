@@ -8,6 +8,7 @@ public interface UsuarioService {
     UsuarioDto createUsuario(UsuarioDto usuarioDto);
     UsuarioDto getUsuarioById(Long usuarioId);
     List<UsuarioDto> getAllUsuarios();
+    //List<UsuarioDto> getAllUsuariosWithRoleName();
     UsuarioDto updateUsuario(Long usuarioId,UsuarioDto usuarioDto);
     void deleteUsuario(Long usuarioId);
 }

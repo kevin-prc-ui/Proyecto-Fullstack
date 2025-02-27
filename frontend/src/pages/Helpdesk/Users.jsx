@@ -1,8 +1,11 @@
 import React from 'react'
+import User from '../../components/Usuarios/ListUsuarios'
 
 const Users = () => {
   return (
-    <div>Users</div>
+    <>
+      <User/>
+    </>
   )
 }
 

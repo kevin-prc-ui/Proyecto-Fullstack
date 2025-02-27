@@ -20,32 +20,32 @@ const linkData = [
     children: [
       {
         label: "Tickets",
-        link: "tasks",
+        link: "/helpdesk/tasks",
         icon: <FaTasks />,
       },
       {
         label: "Completados",
-        link: "completed/completed",
+        link: "/helpdesk/completed/completed",
         icon: <MdTaskAlt />,
       },
       {
         label: "En proceso",
-        link: "in-progress/in progress",
+        link: "/helpdesk/in-progress/in-progress",
         icon: <MdOutlinePendingActions />,
       },
       {
         label: "Pendientes",
-        link: "todo/todo",
+        link: "/helpdesk/todo/todo",
         icon: <MdOutlinePendingActions />,
       },
       {
         label: "Equipo",
-        link: "users",
+        link: "/helpdesk/users",
         icon: <FaUsers />,
       },
       {
         label: "Eliminados",
-        link: "trash",
+        link: "/helpdesk/trash",
         icon: <FaTrashAlt />,
       }
     ]
@@ -56,42 +56,42 @@ const linkData = [
     children: [
       {
         label: "Inicio",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "/knowledge/home",
         icon: <FaHome />,
       },
       {
         label: "Mis Archivos",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "/knowledge/myfile",
         icon: <FaFileAlt />,
       },
       {
         label: "Archivo Compartido",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "/knowledge/sharedfile",
         icon: <FaFolderOpen />,
       },
       {
         label: "Sitios",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "/knowledge/sites",
         icon: <FaGlobe />,
       },
       {
         label: "Tareas",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "/knowledge/task",
         icon: <FaTasks />,
       },
       {
         label: "Personas",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "/knowledge/people",
         icon: <FaUsers />,
       },
       {
         label: "Repositorio",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "/knowledge/repository",
         icon: <FaDatabase />,
       },
       {
         label: "Herramientas de Administración",
-        link: "documental/INGRESA TU RUTA AQUI VIEJO",
+        link: "/knowledge/admintools",
         icon: <FaTools />,
       },
     ]
@@ -102,41 +102,20 @@ const Sidebar = () => {
   const [expandedParent, setExpandedParent] = useState(null);
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
-  const path = location.pathname.split("/")[1];
   const sidebarLinks = user?.isAdmin ? linkData : linkData.slice(0, linkData.length);
 
   const toggleParent = (parentLabel) => {
     setExpandedParent(prev => prev === parentLabel ? null : parentLabel);
   };
 
-  const NavLink = ({ el }) => (
-    <Nav.Item className="w-full mb-2">
-      <Link
-        to={el.link}
-        className={clsx(
-          "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center text-gray-800 text-base hover:bg-[#2564ed2d]",
-          "text-decoration-none",
-          path === el.link.split("/")[0]
-            ? "bg-primary text-white"
-            : "text-dark hover-bg-light"
-        )}
-      >
-        <span className="fs-5">{el.icon}</span>
-        <span className="fs-6">{el.label}</span>
-      </Link>
-    </Nav.Item>
-  );
+  // Updated active link check
+  const isActiveLink = (link) => {
+    return location.pathname.startsWith(link);
+  };
 
   return (
     <Container fluid className="h-100 p-3 shadow">
       <Navbar expand="lg" className="flex-column h-100">
-        <Navbar.Brand href="/dashboard" className="mb-4">
-          <div className="d-flex align-items-center gap-2">
-            <span className="bg-primary p-2 rounded-circle">
-              <MdOutlineAddTask className="text-white fs-4" />
-            </span>
-          </div>
-        </Navbar.Brand>
 
         <Nav className="flex-column flex-grow-1 w-100">
           {sidebarLinks.map((parent) => (
@@ -146,7 +125,7 @@ const Sidebar = () => {
                 className={clsx(
                   "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center mb-2",
                   "text-decoration-none cursor-pointer",
-                  parent.children?.some(child => child.link.split("/")[0] === path)
+                  parent.children?.some(child => location.pathname.includes(child.link))
                     ? "bg-primary text-white"
                     : "text-dark hover:bg-[#2564ed2d]"
                 )}
@@ -167,11 +146,11 @@ const Sidebar = () => {
                         "child-link",
                         "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center mb-2",
                         "text-decoration-none hover:bg-[#2564ed2d]",
-                        path === child.link.split("/")[0]
+                        isActiveLink(child.link)
                           ? "bg-primary text-white"
                           : "text-dark"
                       )}
-                      style={{ animationDelay: `${index * 0.1}s` }}
+                      style={{ animationDelay: `${index * 0.05}s` }}
                     >
                       <span className="fs-5">{child.icon}</span>
                       <span className="fs-6">{child.label}</span>

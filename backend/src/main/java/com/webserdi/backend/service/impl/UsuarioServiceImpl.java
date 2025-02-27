@@ -33,6 +33,10 @@ public class UsuarioServiceImpl implements UsuarioService {
         return UsuarioMapper.mapToUsuarioDto(usuario);
 
     }
+    /*@Override
+    public List<UsuarioDto> GetAllUsuariosWithRoleName() {
+
+    }*/
 
     @Override
     public List<UsuarioDto> getAllUsuarios() {

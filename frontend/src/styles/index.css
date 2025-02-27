@@ -12,6 +12,16 @@
   }
 }
 
+.bg-white{
+  min-width: 210px;
+}
+.bg-primary{
+  min-width: 160px;
+}
+.hover\:bg-\[\#2564ed2d\] {
+  min-width: 160px;
+}
+
 .child-link {
   animation: slideIn 0.1s ease-out forwards;
   opacity: 0;
@@ -37,7 +47,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
   font-family: "Nunito Sans", sans-serif;
 }
 
