@@ -5,7 +5,7 @@ import { listUsuarios, listRol } from "../../services/UsuarioService";
 function ListUsuarioComponent() {
   const [roles, setRol] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
-
+  
   const [errorConexion, setErrorConexion] = useState(false);
 
   useEffect(() => {
@@ -55,9 +55,7 @@ function ListUsuarioComponent() {
                 <td>{usuario.apellido}</td>
                 <td>{usuario.email}</td>
                 <td>{usuario.rolId}</td>
-                <td>{roles.nombre}</td>
-              </tr>
-            ))}
+              </tr>))}
           </tbody>
         </Table>
       )}
