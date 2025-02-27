@@ -1,8 +1,8 @@
-import { Transition } from "@headlessui/react";
-import clsx from "clsx";
-import { Fragment, useRef } from "react";
-import { IoClose } from "react-icons/io5";
-import { useDispatch, useSelector } from "react-redux";
+// import { Transition } from "@headlessui/react";
+// import clsx from "clsx";
+// import { Fragment, useRef } from "react";
+// import { IoClose } from "react-icons/io5";
+// import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import Navbar from "./components/Navbar";
@@ -13,8 +13,8 @@ import Tasks from "./pages/Helpdesk/Tasks";
 import Trash from "./pages/Helpdesk/Trash";
 import Users from "./pages/Helpdesk/Users";
 import Dashboard from "./pages/dashboard";
-import { setOpenSidebar } from "./redux/slices/authSlice";
-import { useIsAuthenticated } from "@azure/msal-react";
+// import { setOpenSidebar } from "./redux/slices/authSlice";
+// import { useIsAuthenticated } from "@azure/msal-react";
 import Home  from "./pages/Knowledge/Home";
 import MyFile  from "./pages/Knowledge/MyFile";
 import SharedFile  from "./pages/Knowledge/SharedFile";
@@ -23,6 +23,7 @@ import Task  from "./pages/Knowledge/Task";
 import People  from "./pages/Knowledge/People";
 import Repository  from "./pages/Knowledge/Repository";
 import AdminTools  from "./pages/Knowledge/AdminTools";
+import UsuariosComponent from "./components/Usuarios/UsuariosComponent";
 
 function Layout() {
   // const isAuthenticated = useIsAuthenticated();
@@ -106,9 +107,10 @@ function App() {
           <Route path="/helpdesk/completed/:status" element={<Tasks />} />
           <Route path="/helpdesk/in-progress/:status" element={<Tasks />} />
           <Route path="/helpdesk/todo/:status" element={<Tasks />} />
+          <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
           <Route path="/helpdesk/users" element={<Users />} />
           <Route path="/helpdesk/trash" element={<Trash />} />
-          <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
+          <Route path="/helpdesk/add-user" element={<UsuariosComponent />} />
           <Route path="/knowledge/home" element={<Home />} />
           <Route path="/knowledge/myfile" element={<MyFile />} />
           <Route path="/knowledge/sharedfile" element={<SharedFile />} />

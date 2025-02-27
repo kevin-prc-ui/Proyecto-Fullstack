@@ -1,5 +1,5 @@
 import React from 'react'
-import User from '../../components/ListUsuarioComponent'
+import User from '../../components/Usuarios/ListUsuarios'
 
 const Users = () => {
   return (

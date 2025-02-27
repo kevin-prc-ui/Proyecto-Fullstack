@@ -24,7 +24,6 @@ const Login = () => {
   return (
     <Button variant="secondary" onClick={() => handleLogin()}>
       Iniciar sesion
-      {/* // <Dropdown.Item as="button" onClick={() => handleLogin("popup")}>Sign in using Popup</Dropdown.Item> */}
     </Button>
   );
 };
@@ -45,7 +44,6 @@ const Logout = () => {
         </div>
         <Button variant="secondary" onClick={() => handleLogout()}>
           Cerrar sesion
-          {/* // <Dropdown.Item as="button" onClick={() => handleLogout("popup")}>Sign in using Popup</Dropdown.Item> */}
         </Button>
       </div>
     </>

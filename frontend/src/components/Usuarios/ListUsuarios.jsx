@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { Table } from "react-bootstrap";
-import { listUsuarios, listRol } from "../../services/UsuarioService";
-import { useIsAuthenticated } from '@azure/msal-react'
-
+import { Table, Button} from "react-bootstrap";
+import { listUsuarios } from "../../services/UsuarioService";
+import { useNavigate } from "react-router-dom";
+import { useIsAuthenticated } from "@azure/msal-react";
 
 function ListUsuarioComponent() {
-  const isAuth=useIsAuthenticated();
-  const [roles, setRol] = useState([]);
+  const isAuth = useIsAuthenticated();
   const [usuarios, setUsuarios] = useState([]);
-  
+  const navigator = useNavigate();
+
   const [errorConexion, setErrorConexion] = useState(false);
 
   useEffect(() => {
@@ -21,17 +21,12 @@ function ListUsuarioComponent() {
         setErrorConexion(error.message === "Error de conexion con el servidor");
       });
   }, []);
-  useEffect(() => {
-    listRol()
-      .then((response) => {
-        setRol(response.data);
-        setErrorConexion(false);
-      })
-      .catch((error) => {
-        setErrorConexion(error.message === "Error de conexion con el servidor");
-      });
-  }, []);
-  if (isAuth){
+
+  function addNewUser(){
+    navigator('/helpdesk/add-user')
+  }
+
+  if (isAuth) {
     return (
       <>
         <h2>Lista de empleados</h2>
@@ -40,8 +35,9 @@ function ListUsuarioComponent() {
             ⚠️ No se pudo establecer la conexión con la base de datos
           </div>
         ) : (
-          
-          <Table striped bordered hover >
+          <>
+          <Button variant="primary" className="mb-3" onClick={addNewUser} >Agregar usuario</Button>
+          <Table striped bordered hover>
             <thead>
               <tr>
                 <th>#</th>
@@ -59,11 +55,12 @@ function ListUsuarioComponent() {
                   <td>{usuario.apellido}</td>
                   <td>{usuario.email}</td>
                   <td>{usuario.rolId}</td>
-                </tr>))}
+                </tr>
+              ))}
             </tbody>
           </Table>
+          </>
         )}
-        
       </>
     );
   }

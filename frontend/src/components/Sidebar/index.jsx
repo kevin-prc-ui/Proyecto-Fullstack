@@ -116,13 +116,6 @@ const Sidebar = () => {
   return (
     <Container fluid className="h-100 p-3 shadow">
       <Navbar expand="lg" className="flex-column h-100">
-        <Navbar.Brand href="/dashboard" className="mb-4">
-          <div className="d-flex align-items-center gap-2">
-            <span className="bg-primary p-2 rounded-circle">
-              <MdOutlineAddTask className="text-white fs-4" />
-            </span>
-          </div>
-        </Navbar.Brand>
 
         <Nav className="flex-column flex-grow-1 w-100">
           {sidebarLinks.map((parent) => (
