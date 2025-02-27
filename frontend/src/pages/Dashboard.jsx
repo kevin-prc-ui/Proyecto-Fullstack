@@ -27,8 +27,7 @@ const Dashboard = () => {
     </div>
   );
 };
-
-const ProfileContent = () => {
+  const ProfileContent = () => {
   const { instance, accounts } = useMsal();
   const [graphData, setGraphData] = useState(null);
 

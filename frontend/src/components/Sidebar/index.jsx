@@ -56,7 +56,7 @@ const linkData = [
     children: [
       {
         label: "Inicio",
-        link: "knowledge/home",
+        link: "/knowledge/home",
         icon: <FaHome />,
       },
       {
@@ -66,32 +66,32 @@ const linkData = [
       },
       {
         label: "Archivo Compartido",
-        link: "knowledge/sharedfile",
+        link: "/knowledge/sharedfile",
         icon: <FaFolderOpen />,
       },
       {
         label: "Sitios",
-        link: "knowledge/sites",
+        link: "/knowledge/sites",
         icon: <FaGlobe />,
       },
       {
         label: "Tareas",
-        link: "knowledge/task",
+        link: "/knowledge/task",
         icon: <FaTasks />,
       },
       {
         label: "Personas",
-        link: "knowledge/people",
+        link: "/knowledge/people",
         icon: <FaUsers />,
       },
       {
         label: "Repositorio",
-        link: "knowledge/repository",
+        link: "/knowledge/repository",
         icon: <FaDatabase />,
       },
       {
         label: "Herramientas de Administración",
-        link: "knowledge/admintools",
+        link: "/knowledge/admintools",
         icon: <FaTools />,
       },
     ]
