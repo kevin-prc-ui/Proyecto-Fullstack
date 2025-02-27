@@ -1,14 +1,27 @@
 import { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
-import { listUsuarios } from "../../services/UsuarioService";
+import { listUsuarios, listRol } from "../../services/UsuarioService";
 
 function ListUsuarioComponent() {
+  const [roles, setRol] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
+
   const [errorConexion, setErrorConexion] = useState(false);
+
   useEffect(() => {
     listUsuarios()
       .then((response) => {
         setUsuarios(response.data);
+        setErrorConexion(false);
+      })
+      .catch((error) => {
+        setErrorConexion(error.message === "Error de conexion con el servidor");
+      });
+  }, []);
+  useEffect(() => {
+    listRol()
+      .then((response) => {
+        setRol(response.data);
         setErrorConexion(false);
       })
       .catch((error) => {
@@ -42,6 +55,7 @@ function ListUsuarioComponent() {
                 <td>{usuario.apellido}</td>
                 <td>{usuario.email}</td>
                 <td>{usuario.rolId}</td>
+                <td>{roles.nombre}</td>
               </tr>
             ))}
           </tbody>
