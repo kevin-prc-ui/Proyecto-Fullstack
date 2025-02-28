@@ -1,13 +1,16 @@
 import React from 'react'
+import "../../styles/estilos.css"
 
-const MyFile = () => {
+
+
+const Home = () => {
   return (
     <div>
       <h1>
-      Home
-      </h1>
+        Inicio
+      </h1>    
     </div>
   )
 }
 
-export default MyFile
+export default Home

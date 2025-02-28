@@ -1,11 +1,15 @@
 import React from 'react'
+import "../../styles/estilos.css"
 
-const MyFile = () => {
+
+const Sites = () => {
   return (
     <div>
-      sites
+      <h1>
+        Sitios
+      </h1>
     </div>
   )
 }
 
-export default MyFile
+export default Sites
