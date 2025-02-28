@@ -7,7 +7,7 @@ const MyButton = () => {
   const isAuthenticated = useIsAuthenticated();
   return(
     <>
-      <div className="navbar-collapse justify-content-end">
+      <div className="">
           {isAuthenticated ? <Logout /> : <Login />}
         </div>
     </>
@@ -39,9 +39,6 @@ const Logout = () => {
   return (
     <>
       <div className="flex">
-        <div className="px-md-5">
-          <div className="px-md-5">Bienvenido</div>
-        </div>
         <Button variant="secondary" onClick={() => handleLogout()}>
           Cerrar sesion
         </Button>

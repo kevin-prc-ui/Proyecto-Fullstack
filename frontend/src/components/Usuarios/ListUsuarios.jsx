@@ -3,6 +3,7 @@ import { Table, Button} from "react-bootstrap";
 import { listUsuarios } from "../../services/UsuarioService";
 import { useNavigate } from "react-router-dom";
 import { useIsAuthenticated } from "@azure/msal-react";
+import { BsFillPencilFill } from "react-icons/bs";
 
 function ListUsuarioComponent() {
   const isAuth = useIsAuthenticated();
@@ -25,6 +26,9 @@ function ListUsuarioComponent() {
   function addNewUser(){
     navigator('/helpdesk/add-user')
   }
+  function updateUser(id){
+    navigator(`/helpdesk/edit-user/${id}`)
+  }
 
   if (isAuth) {
     return (
@@ -45,6 +49,7 @@ function ListUsuarioComponent() {
                 <th>Apellido</th>
                 <th>Email</th>
                 <th>Rol</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -55,6 +60,9 @@ function ListUsuarioComponent() {
                   <td>{usuario.apellido}</td>
                   <td>{usuario.email}</td>
                   <td>{usuario.rolId}</td>
+                  <td>
+                    <button className="btn btn-outline-secondary p-md-1" onClick={() => updateUser(usuario.id)}><BsFillPencilFill /></button>
+                  </td>
                 </tr>
               ))}
             </tbody>
