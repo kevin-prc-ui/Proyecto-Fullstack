@@ -179,7 +179,7 @@ const Sidebar = () => {
     </Container>
   );
   }
-  else return (
+  return (
     <Container fluid className="h-100 p-3 shadow">
       <Navbar expand="lg" className="flex-column h-100">
 
