@@ -98,7 +98,7 @@ function Layout() {
 
 function App() {
   return (
-    <main className="w-full min-h-screen bg-[#f3f4f6] ">
+    <main className="w-full min-h-screen bg-[#f3f7ff] ">
       <Routes>
         <Route element={<Layout />}>
           <Route index path="/" element={<Navigate to="/dashboard" />} />

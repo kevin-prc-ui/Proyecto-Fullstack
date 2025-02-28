@@ -7,7 +7,7 @@ const Index = () => {
 
   return (
     <>
-      <Navbar bg="light" variant="light" className="navbarStyle">
+      <Navbar bg="white shadow" variant="white" className="navbarStyle">
         <a className="navbar-brand" href="/">
           <img
             src="https://serdiaceros.com.mx/wp-content/uploads/2022/08/SERDI-logo-web-1.png"
