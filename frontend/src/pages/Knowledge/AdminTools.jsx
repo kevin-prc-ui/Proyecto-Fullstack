@@ -1,13 +1,15 @@
 import React from 'react'
+import "../../styles/estilos.css"
 
-const MyFile = () => {
+
+const AdminTools = () => {
   return (
     <div>
       <h1>
-      admin
+        Herramientas de Administracion
       </h1>
     </div>
   )
 }
 
-export default MyFile
+export default AdminTools
