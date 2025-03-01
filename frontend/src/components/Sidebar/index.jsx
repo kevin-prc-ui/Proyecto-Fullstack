@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import {
   MdDashboard,
-  MdOutlineAddTask,
   MdOutlinePendingActions,
   MdSettings,
   MdTaskAlt,
@@ -118,7 +117,7 @@ const Sidebar = () => {
 
   if (isAuth) {
     return (
-    <Container fluid className="h-100 p-3 shadow">
+    <Container fluid className="h-100 p-3">
       <Navbar expand="lg" className="flex-column h-100">
 
         <Nav className="flex-column flex-grow-1 w-100">
