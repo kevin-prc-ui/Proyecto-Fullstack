@@ -1,0 +1,68 @@
+.user-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .user-table th,
+  .user-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .user-table th {
+    background-color: #f0f0f0;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .user-table tbody tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .user-table .sortable-header {
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .user-table .sortable-header:hover {
+    color: #007bff;
+  }
+  
+  .user-table .action-buttons {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .user-table .action-buttons button {
+    margin: 0 5px;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .user-table .action-buttons .edit-button {
+    background-color: transparent;
+    color: #6c757d;
+  }
+  
+  .user-table .action-buttons .delete-button {
+    background-color: transparent;
+    color: #dc3545;
+  }
+  
+  .user-table .action-buttons .edit-button:hover {
+    background-color: #e2e6ea;
+  }
+  
+  .user-table .action-buttons .delete-button:hover {
+    background-color: #f8d7da;
+  }
+
+  #search-icon {
+    background-color: #e2e6ea;
+    border: none;
+  }
