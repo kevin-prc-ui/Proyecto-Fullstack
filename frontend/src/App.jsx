@@ -46,6 +46,39 @@ function Layout() {
   );
 }
 
+function App() {
+  return (
+    <main className="w-full min-h-screen bg-[#f3f7ff] ">
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/helpdesk/tasks" element={<Tasks />} />
+          <Route path="/helpdesk/completed/:status" element={<Tasks />} />
+          <Route path="/helpdesk/in-progress/:status" element={<Tasks />} />
+          <Route path="/helpdesk/todo/:status" element={<Tasks />} />
+          <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
+          <Route path="/helpdesk/users" element={<Users />} />
+          <Route path="/helpdesk/trash" element={<Trash />} />
+          <Route path="/helpdesk/add-user" element={<UsersComponent />} />
+          <Route path="/helpdesk/edit-user/:id" element={<UsersComponent />} />
+          <Route path="/knowledge/home" element={<Home />} />
+          <Route path="/knowledge/myfile" element={<MyFile />} />
+          <Route path="/knowledge/sharedfile" element={<SharedFile />} />
+          <Route path="/knowledge/sites" element={<Sites />} />
+          <Route path="/knowledge/task" element={<Task />} />
+          <Route path="/knowledge/people" element={<People />} />
+          <Route path="/knowledge/repository" element={<Repository />} />
+          <Route path="/knowledge/admintools" element={<AdminTools />} />
+        </Route>
+        <Route path="/login" element={<Login />} />
+      </Routes>
+
+      <Toaster richColors />
+    </main>
+  );
+}
+
 //Logica para el sidebar en celulares no implementada aun
 // const MobileSidebar = () => {
 //   const { isSidebarOpen } = useSelector((state) => state.auth);
@@ -97,38 +130,5 @@ function Layout() {
 //     </>
 //   );
 // };
-
-function App() {
-  return (
-    <main className="w-full min-h-screen bg-[#f3f7ff] ">
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index path="/" element={<Navigate to="/dashboard" />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/helpdesk/tasks" element={<Tasks />} />
-          <Route path="/helpdesk/completed/:status" element={<Tasks />} />
-          <Route path="/helpdesk/in-progress/:status" element={<Tasks />} />
-          <Route path="/helpdesk/todo/:status" element={<Tasks />} />
-          <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
-          <Route path="/helpdesk/users" element={<Users />} />
-          <Route path="/helpdesk/trash" element={<Trash />} />
-          <Route path="/helpdesk/add-user" element={<UsersComponent />} />
-          <Route path="/helpdesk/edit-user/:id" element={<UsersComponent />} />
-          <Route path="/knowledge/home" element={<Home />} />
-          <Route path="/knowledge/myfile" element={<MyFile />} />
-          <Route path="/knowledge/sharedfile" element={<SharedFile />} />
-          <Route path="/knowledge/sites" element={<Sites />} />
-          <Route path="/knowledge/task" element={<Task />} />
-          <Route path="/knowledge/people" element={<People />} />
-          <Route path="/knowledge/repository" element={<Repository />} />
-          <Route path="/knowledge/admintools" element={<AdminTools />} />
-        </Route>
-        <Route path="/login" element={<Login />} />
-      </Routes>
-
-      <Toaster richColors />
-    </main>
-  );
-}
 
 export default App;
