@@ -38,7 +38,6 @@ const UsersComponent = () => {
     if (!validateForm()) return;
     e.preventDefault();
     const user = { nombre, apellido, email, rolId };
-    console.log(user);
     
     if (id){
       updateUser(id,user).then((response)=>{
@@ -183,9 +182,14 @@ const UsersComponent = () => {
                       <div className="invalid-feedback">{errors.rolId}</div>
                     )}
                   </div>
-                  <Button className="btn btn-success" onClick={saveOrUpdateUser}>
-                    Enviar
-                  </Button>
+                  <div className="flex justify-content-evenly">
+                    <Button className="btn btn-success" onClick={saveOrUpdateUser}>
+                      Enviar
+                    </Button>
+                    <Button className="btn btn-danger" onClick={() => navigator('/helpdesk/users')}>
+                      Cancelar
+                    </Button>
+                  </div>
                 </form>
               </div>
             </div>

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Table, Button, Spinner, Alert } from "react-bootstrap";
-import { listUsers } from "../../services/UsuarioService";
+import { deleteUser, listUsers } from "../../services/UsuarioService";
 import { useNavigate } from "react-router-dom";
 import { useIsAuthenticated } from "@azure/msal-react";
-import { BsFillPencilFill } from "react-icons/bs";
+import { BsFillPencilFill, BsFillTrash3Fill } from "react-icons/bs";
+
 
 function ListUsuarioComponent() {
   const isAuth = useIsAuthenticated();
@@ -14,26 +15,43 @@ function ListUsuarioComponent() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      try {
-        const response = await listUsers();
-        setUsuarios(response.data);
-      } catch (error) {
-        setErrorConexion(true);
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false);
-      }
+      getAllUsers();
     };
 
     if (isAuth) fetchUsers();
   }, [isAuth]); // Agregamos isAuth como dependencia
 
+  async function getAllUsers(){
+    try {
+      const response = await listUsers();
+      setUsuarios(response.data);
+    } catch (error) {
+      setErrorConexion(true);
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function addNewUser() {
-    navigator('/helpdesk/add-user');
+    navigator("/helpdesk/add-user");
   }
 
   function updateUser(id) {
     navigator(`/helpdesk/edit-user/${id}`);
+  }
+
+  function removeUser(id){
+    if (window.confirm("¿Estás seguro que deseas eliminar este usuario?")) {
+      deleteUser(id)
+        .then(() => {
+          setUsuarios(usuarios.filter((usuario) => usuario.id !== id));
+        })
+        .catch((error) => {
+          console.error("Error deleting user:", error);
+          alert("Ocurrió un error al eliminar el usuario. Intente nuevamente.");
+        });
+    }
   }
 
   if (!isAuth) {
@@ -52,12 +70,10 @@ function ListUsuarioComponent() {
 
   return (
     <>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Lista de empleados</h2>
-        <Button variant="primary" onClick={addNewUser}>
-          Agregar usuario
-        </Button>
-      </div>
+      <h2>Lista de empleados</h2>
+      <Button className="mb-4" variant="primary" onClick={addNewUser}>
+        Agregar usuario
+      </Button>
 
       {errorConexion ? (
         <Alert variant="danger">
@@ -86,12 +102,20 @@ function ListUsuarioComponent() {
                 <td>{usuario.email}</td>
                 <td>{usuario.rolId}</td>
                 <td>
-                  <Button 
-                    variant="outline-warning" 
+                  <Button
+                    style={{ marginRight: "5px" }}
+                    variant="outline-secondary"
                     onClick={() => updateUser(usuario.id)}
                     aria-label="Editar usuario"
                   >
                     <BsFillPencilFill />
+                  </Button>
+                  <Button
+                    variant="outline-danger"
+                    onClick={() => removeUser(usuario.id)}
+                    aria-label="Eliminar usuario"
+                  >
+                    <BsFillTrash3Fill />
                   </Button>
                 </td>
               </tr>
