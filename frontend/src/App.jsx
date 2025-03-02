@@ -23,7 +23,7 @@ import Task  from "./pages/Knowledge/Task";
 import People  from "./pages/Knowledge/People";
 import Repository  from "./pages/Knowledge/Repository";
 import AdminTools  from "./pages/Knowledge/AdminTools";
-import UsuariosComponent from "./components/Usuarios/UsuariosComponent";
+import UsuariosComponent from "./components/Users/UsersComponent";
 
 function Layout() {
   // const isAuthenticated = useIsAuthenticated();
