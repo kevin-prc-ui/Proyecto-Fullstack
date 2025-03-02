@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import {
   MdDashboard,
-  MdOutlineAddTask,
   MdOutlinePendingActions,
   MdSettings,
   MdTaskAlt,
@@ -12,6 +11,7 @@ import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
 import { Container, Nav, Navbar, Button } from "react-bootstrap";
+import { useIsAuthenticated } from '@azure/msal-react';
 
 const linkData = [
   {
@@ -103,6 +103,8 @@ const Sidebar = () => {
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
   const sidebarLinks = user?.isAdmin ? linkData : linkData.slice(0, linkData.length);
+  const isAuth = useIsAuthenticated();
+
 
   const toggleParent = (parentLabel) => {
     setExpandedParent(prev => prev === parentLabel ? null : parentLabel);
@@ -113,8 +115,9 @@ const Sidebar = () => {
     return location.pathname.startsWith(link);
   };
 
-  return (
-    <Container fluid className="h-100 p-3 shadow">
+  if (isAuth) {
+    return (
+    <Container fluid className="h-100 p-3">
       <Navbar expand="lg" className="flex-column h-100">
 
         <Nav className="flex-column flex-grow-1 w-100">
@@ -174,6 +177,46 @@ const Sidebar = () => {
       </Navbar>
     </Container>
   );
+  }
+  return (
+    <Container fluid className="h-100 p-3 shadow">
+      <Navbar expand="lg" className="flex-column h-100">
+
+        <Nav className="flex-column flex-grow-1 w-100">
+          {sidebarLinks.map((parent) => (
+            <div key={parent.label} className="w-full">
+              {/* Parent Link */}
+              <div
+                className={clsx(
+                  "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center mb-2",
+                  "text-decoration-none cursor-pointer",
+                  parent.children?.some(child => location.pathname.includes(child.link))
+                    ? "bg-primary text-white"
+                    : "text-dark hover:bg-[#2564ed2d]"
+                )}
+                onClick={() => toggleParent(parent.label)}
+              >
+                <span className="fs-5">{parent.icon}</span>
+                <span className="fs-6">{parent.label}</span>
+              </div>
+            </div>
+          ))}
+
+          {/* Settings Section */}
+          <div className="w-100 border-top pt-3 mt-auto">
+            <Button
+              variant=""
+              className="text-dark d-flex align-items-center gap-2 w-100">
+              <MdSettings className="fs-5" />
+              <span className="fs-6">Settings</span>
+            </Button>
+          </div>
+        </Nav>
+      </Navbar>
+    </Container>
+  );
+
+  
 };
 
 export default Sidebar;

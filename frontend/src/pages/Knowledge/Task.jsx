@@ -1,11 +1,15 @@
 import React from 'react'
+import "../../styles/estilos.css"
 
-const MyFile = () => {
+
+const Task = () => {
   return (
     <div>
-      task
+      <h1>
+        Tareas
+      </h1>
     </div>
   )
 }
 
-export default MyFile
+export default Task
