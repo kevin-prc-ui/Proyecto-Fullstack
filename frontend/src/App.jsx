@@ -111,6 +111,7 @@ function App() {
           <Route path="/helpdesk/users" element={<Users />} />
           <Route path="/helpdesk/trash" element={<Trash />} />
           <Route path="/helpdesk/add-user" element={<UsuariosComponent />} />
+          <Route path="/helpdesk/edit-user/:id" element={<UsuariosComponent />} />
           <Route path="/knowledge/home" element={<Home />} />
           <Route path="/knowledge/myfile" element={<MyFile />} />
           <Route path="/knowledge/sharedfile" element={<SharedFile />} />
