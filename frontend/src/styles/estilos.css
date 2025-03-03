@@ -1,68 +1,175 @@
-.user-table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .user-table th,
-  .user-table td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .user-table th {
-    background-color: #f0f0f0;
-    font-weight: 600;
-    color: #333;
-  }
-  
-  .user-table tbody tr:hover {
-    background-color: #f5f5f5;
-  }
-  
-  .user-table .sortable-header {
-    cursor: pointer;
-    user-select: none;
-  }
-  
-  .user-table .sortable-header:hover {
-    color: #007bff;
-  }
-  
-  .user-table .action-buttons {
-    display: flex;
-    justify-content: center;
-  }
-  
-  .user-table .action-buttons button {
-    margin: 0 5px;
-    padding: 6px 10px;
-    border: none;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .user-table .action-buttons .edit-button {
-    background-color: transparent;
-    color: #6c757d;
-  }
-  
-  .user-table .action-buttons .delete-button {
-    background-color: transparent;
-    color: #dc3545;
-  }
-  
-  .user-table .action-buttons .edit-button:hover {
-    background-color: #e2e6ea;
-  }
-  
-  .user-table .action-buttons .delete-button:hover {
-    background-color: #f8d7da;
-  }
+/* Estilos generales */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
 
-  #search-icon {
-    background-color: #e2e6ea;
-    border: none;
-  }
+h1 {
+  margin-top: 0;
+  text-align: center;
+}
+
+/* Contenedores */
+.sites-container {
+  padding: 20px;
+}
+
+/* Botones */
+.toggle-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-button:hover {
+  background-color: #0056b3;
+}
+
+/* Listas */
+.sites-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 300px;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.sites-list li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.sites-list li:last-child {
+  border-bottom: none;
+}
+
+.sites-list li:hover {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+/* Tabla de usuarios */
+.user-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-table th,
+.user-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.user-table th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+  color: #333;
+}
+
+.user-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+.user-table .sortable-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.user-table .sortable-header:hover {
+  color: #007bff;
+}
+
+.user-table .action-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.user-table .action-buttons button {
+  margin: 0 5px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.user-table .action-buttons .edit-button {
+  background-color: transparent;
+  color: #6c757d;
+}
+
+.user-table .action-buttons .delete-button {
+  background-color: transparent;
+  color: #dc3545;
+}
+
+.user-table .action-buttons .edit-button:hover {
+  background-color: #e2e6ea;
+}
+
+.user-table .action-buttons .delete-button:hover {
+  background-color: #f8d7da;
+}
+
+/* Barra de búsqueda */
+.search-bar {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.search-input {
+  padding: 12px 20px;
+  width: 100%;
+  border: 2px solid #007bff;
+  border-radius: 5px 1px 1px 5px;
+  outline: none;
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+}
+
+.search-button {
+  padding: 12px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 1px 5px 5px 1px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.search-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.search-button:active {
+  transform: scale(0.95);
+}
+
+/* Ícono de búsqueda */
+#search-icon {
+  background-color: #e2e6ea;
+  border: none;
+}
