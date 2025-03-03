@@ -223,7 +223,6 @@ function ListUsuarioComponent() {
                 <td>
                   <div className="action-buttons">
                     <Button
-                      variant="outline-secondary"
                       onClick={() => updateUser(usuario.id)}
                       aria-label="Editar usuario"
                       className="edit-button"
@@ -231,7 +230,6 @@ function ListUsuarioComponent() {
                       <BsFillPencilFill />
                     </Button>
                     <Button
-                      variant="outline-danger"
                       onClick={() => removeUser(usuario.id)}
                       aria-label="Eliminar usuario"
                       className="delete-button"
