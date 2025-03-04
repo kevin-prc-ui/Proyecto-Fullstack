@@ -14,89 +14,90 @@ const Home = () => {
 
       {/* Contenedores */}
       <div className="grid-layout">
-        {/* Contenedor 1: Mi Sites */}
+        {/* Contenedor 1: Mis Sitios */}
         <div className="grid-item">
+          <h2>Mis Sitios</h2>
           <div className="filter-container">
             <select
               className="filter"
               onChange={(e) => handleFilterChange("Sites", e.target.value)}
             >
-              <option value="all">All</option>
-              <option value="favorites">My Favorites</option>
-              <option value="recent">Recent</option>
+              <option value="all">Todos</option>
+              <option value="favorites">Mis Favoritos</option>
+              <option value="recent">Recientes</option>
             </select>
           </div>
-          <h2>Mi Sites</h2>
           <p>Aquí puedes gestionar tus sitios web.</p>
         </div>
 
-        {/* Contenedor 2: Mi Activities */}
+        {/* Contenedor 2: Mis Actividades */}
         <div className="grid-item">
-          <div className="filter-container">
-            <div className="filter-group">
-              <select
-                className="filter"
-                onChange={(e) => handleFilterChange("Activities - Following", e.target.value)}
-              >
-                <option value="">I'm Following</option>
-                <option value="user1">User 1</option>
-                <option value="user2">User 2</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <select
-                className="filter"
-                onChange={(e) => handleFilterChange("Activities - Comments", e.target.value)}
-              >
-                <option value="">Comments</option>
-                <option value="recent">Recent Comments</option>
-                <option value="old">Old Comments</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <select
-                className="filter"
-                onChange={(e) => handleFilterChange("Activities - Last 28 Days", e.target.value)}
-              >
-                <option value="">In the Last 28 Days</option>
-                <option value="week1">Week 1</option>
-                <option value="week2">Week 2</option>
-              </select>
-            </div>
+          <h2>Mis Actividades</h2>
+          <div className="filter-container activities-filters">
+            <select
+              className="filter small-filter"
+              onChange={(e) => handleFilterChange("Activities - Following", e.target.value)}
+            >
+              <option value="Following">Siguiendo</option>
+              <option value="Myactivities">Mis actividades</option>
+              <option value="elses">Actividades de otros</option>
+              <option value="Everyones">Actividades de todos</option>
+            </select>
+            <select
+              className="filter small-filter"
+              onChange={(e) => handleFilterChange("Activities - Comments", e.target.value)}
+            >
+              <option value="all">Todos los elementos</option>
+              <option value="Comments">Comentarios</option>
+              <option value="content">Contenido</option>
+              <option value="memberships">Membresías</option>
+            </select>
+            <select
+              className="filter small-filter"
+              onChange={(e) => handleFilterChange("Activities - Last 28 Days", e.target.value)}
+            >
+              <option value="today">Hoy</option>
+              <option value="week1">Últimos 7 días</option>
+              <option value="week2">Últimos 14 días</option>
+              <option value="week3">Últimos 28 días</option>
+            </select>
           </div>
-          <h2>Mi Activities</h2>
           <p>Revisa y organiza tus actividades recientes.</p>
         </div>
 
-        {/* Contenedor 3: Mi Task */}
+        {/* Contenedor 3: Mis Tareas */}
         <div className="grid-item">
+          <h2>Mis Tareas</h2>
           <div className="filter-container">
             <select
               className="filter"
               onChange={(e) => handleFilterChange("Tasks", e.target.value)}
             >
-              <option value="">Overdue Tasks</option>
-              <option value="task1">Task 1</option>
-              <option value="task2">Task 2</option>
+              <option value="Active">Tareas Activas</option>
+              <option value="Completed">Tareas Completadas</option>
+              <option value="High">Tareas de Alta Prioridad</option>
+              <option value="TasksToday">Tareas para Hoy</option>
+              <option value="TasksAssigned">Tareas Asignadas a Mí</option>
+              <option value="Unassigned">Tareas sin Asignar (Tareas en Grupo)</option>
+              <option value="Overdue">Tareas Vencidas</option>
             </select>
           </div>
-          <h2>Mi Task</h2>
           <p>Administra tus tareas pendientes.</p>
         </div>
 
-        {/* Contenedor 4: My Documents */}
+        {/* Contenedor 4: Mis Documentos */}
         <div className="grid-item">
+          <h2>Mis Documentos</h2>
           <div className="filter-container">
             <select
               className="filter"
               onChange={(e) => handleFilterChange("Documents", e.target.value)}
             >
-              <option value="recently-modified">I've Recently Modified</option>
-              <option value="editing">I'm Editing</option>
-              <option value="favorites">My Favorites</option>
+              <option value="recently-modified">Modificados Recientemente</option>
+              <option value="editing">Editando Actualmente</option>
+              <option value="favorites">Mis Favoritos</option>
             </select>
           </div>
-          <h2>My Documents</h2>
           <p>Accede y gestiona tus documentos.</p>
         </div>
       </div>
