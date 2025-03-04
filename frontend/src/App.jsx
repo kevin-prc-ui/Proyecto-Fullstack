@@ -1,8 +1,3 @@
-// import { Transition } from "@headlessui/react";
-// import clsx from "clsx";
-// import { Fragment, useRef } from "react";
-// import { IoClose } from "react-icons/io5";
-// import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import Navbar from "./components/Navbar";
@@ -13,8 +8,6 @@ import Tasks from "./pages/Helpdesk/Tasks";
 import Trash from "./pages/Helpdesk/Trash";
 import Users from "./pages/Helpdesk/Users";
 import Dashboard from "./pages/dashboard";
-// import { setOpenSidebar } from "./redux/slices/authSlice";
-// import { useIsAuthenticated } from "@azure/msal-react";
 import Home  from "./pages/Knowledge/Home";
 import MyFile  from "./pages/Knowledge/MyFile";
 import SharedFile  from "./pages/Knowledge/SharedFile";
@@ -26,13 +19,10 @@ import AdminTools  from "./pages/Knowledge/AdminTools";
 import UsersComponent from "./components/Users/UsersComponent";
 import Footer from "./components/Footer";
 
-// Update the Layout component
 function Layout() {
   return (
-     // const isAuthenticated = useIsAuthenticated();
-  // const { user } = useSelector((state) => state.auth);
-    <div className="w-full h-screen flex flex-col md:flex-row">
-      <div className="w-1/6 h-screen bg-white sticky top-0 hidden md:block">
+    <div className="w-full h-screen flex flex-col md:flex-row" data-theme={'dark'}>
+      <div className="w-1/6 h-screen bg-white sticky top-0 hidden md:block" >
         <Sidebar />
       </div>
       <div className="flex-1 flex flex-col overflow-y-auto">
@@ -73,62 +63,8 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>
-
       <Toaster richColors />
     </main>
   );
 }
-
-//Logica para el sidebar en celulares no implementada aun
-// const MobileSidebar = () => {
-//   const { isSidebarOpen } = useSelector((state) => state.auth);
-//   const mobileMenuRef = useRef(null);
-//   const dispatch = useDispatch();
-
-//   const closeSidebar = () => {
-//     dispatch(setOpenSidebar(false));
-//   };
-
-//   return (
-//     <>
-//       <Transition
-//         show={isSidebarOpen}
-//         as={Fragment}
-//         enter='transition-opacity duration-700'
-//         enterFrom='opacity-x-10'
-//         enterTo='opacity-x-100'
-//         leave='transition-opacity duration-700'
-//         leaveFrom='opacity-x-100'
-//         leaveTo='opacity-x-0'
-//       >
-//         {(ref) => (
-//           <div
-//             ref={(node) => (mobileMenuRef.current = node)}
-//             className={clsx(
-//               "md:hidden w-full h-full bg-black/40 transition-all duration-700 transform ",
-//               isSidebarOpen ? "translate-x-0" : "translate-x-full"
-//             )}
-//             onClick={() => closeSidebar()}
-//           >
-//             <div className='bg-white w-3/4 h-full'>
-//               <div className='w-full flex justify-end px-5 mt-5'>
-//                 <button
-//                   onClick={() => closeSidebar()}
-//                   className='flex justify-end items-end'
-//                 >
-//                   <IoClose size={25} />
-//                 </button>
-//               </div>
-
-//               <div className='-mt-10'>
-//                 <Sidebar />
-//               </div>
-//             </div>
-//           </div>
-//         )}
-//       </Transition>
-//     </>
-//   );
-// };
-
 export default App;

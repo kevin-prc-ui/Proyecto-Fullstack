@@ -1,6 +1,7 @@
 package com.webserdi.backend.controller;
 
 import com.webserdi.backend.dto.UsuarioDto;
+import com.webserdi.backend.dto.UsuarioPermisoDto;
 import com.webserdi.backend.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,5 +58,11 @@ public class UsuarioController implements WebMvcConfigurer {
     public ResponseEntity<String> deleteUsuario(@PathVariable("id")Long usuarioId) {
         usuarioService.deleteUsuario(usuarioId);
         return ResponseEntity.ok("Empleado eliminado");
+    }
+
+    @PutMapping("/permissions")
+    public ResponseEntity<UsuarioDto> assignPermissions(@RequestBody UsuarioPermisoDto permisoDto) {
+        UsuarioDto updatedUser = usuarioService.assignPermissionsToUser(permisoDto);
+        return ResponseEntity.ok(updatedUser);
     }
 }

@@ -1,9 +1,9 @@
-import User from '../../components/Users/ListUsers'
+import ListedUsers from '../../components/Users/ListUsers'
 
 const Users = () => {
   return (
     <>
-      <User/>
+      <ListedUsers/>
     </>
   )
 }
