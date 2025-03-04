@@ -41,7 +41,7 @@ h1 {
   padding: 8px;
   border-radius: 4px;
   border: 1px solid #ccc;
-  width: 100%;
+  width: 100%; /* Ancho por defecto */
   font-size: 14px;
   margin-bottom: 10px;
 }
@@ -50,21 +50,24 @@ h1 {
   margin-bottom: 10px;
 }
 
-/* Estilos específicos para los filtros de Mi Activities */
+/* Estilos específicos para los filtros pequeños */
+.small-filter {
+  width: auto; /* Ancho automático (mismo que Mis Actividades) */
+  padding: 6px 10px; /* Tamaño más pequeño */
+  font-size: 12px; /* Texto más pequeño */
+}
+
+/* Estilos para los filtros de Mis Actividades */
 .activities-filters {
   display: flex;
   gap: 10px; /* Espacio entre los filtros */
 }
 
-.activities-filters .small-filter {
+/* Asegurar que los filtros pequeños tengan el mismo tamaño y largo */
+.filter-container .small-filter {
   width: auto; /* Ancho automático */
   padding: 6px 10px; /* Tamaño más pequeño */
   font-size: 12px; /* Texto más pequeño */
-}
-
-/* Estilos para el resto de los filtros */
-.filter-container:not(.activities-filters) .filter {
-  width: 100%; /* Filtros normales ocupan el 100% del ancho */
 }
 
 /* Botones */
@@ -226,3 +229,14 @@ h1 {
   background-color: #e2e6ea;
   border: none;
 }
+
+
+
+
+
+
+
+
+
+
+
