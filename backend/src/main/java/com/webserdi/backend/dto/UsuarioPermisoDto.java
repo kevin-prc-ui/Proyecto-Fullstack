@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UsuarioPermisoDto {
-    private Long userId;
+    private Long id;
     private List<String> permisos;
 }

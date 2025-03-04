@@ -14,7 +14,10 @@ import com.webserdi.backend.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 //Esta anotacion le dice al spring container que genere el spring bean para esta clase UsuarioServiceImpl
@@ -23,23 +26,8 @@ import java.util.stream.Collectors;
 public class UsuarioServiceImpl implements UsuarioService {
     private final PermisoRepository permisoRepository;
     private final UsuarioMapper usuarioMapper;
-
     private final RolRepository rolRepository;
     private final UsuarioRepository usuarioRepository;
-
-    @Override
-    public UsuarioDto assignPermissionsToUser(UsuarioPermisoDto permissionsDTO) {
-        Usuario usuario = usuarioRepository.findById(permissionsDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        List<Permiso> permisos = permisoRepository.findByNombreIn(permissionsDTO.getPermisos());
-
-        usuario.getPermisos().clear();
-        usuario.getPermisos().addAll(permisos);
-
-        Usuario updatedUser = usuarioRepository.save(usuario);
-        return usuarioMapper.mapToUsuarioDto(updatedUser);
-    }
 
     @Override
     public UsuarioDto createUsuario(UsuarioDto usuarioDto) {
@@ -70,20 +58,46 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioDto updateUsuario(Long usuarioId,UsuarioDto usuarioDto) {
+    public UsuarioDto updateUsuario(Long usuarioId, UsuarioDto usuarioDto) {
         Usuario savedUsuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(()->
-                        new ResourceNotFoundException("No existe el usuario con el id" + usuarioDto.getId()));
-        Rol rol = rolRepository.findById(usuarioDto.getRolId())
-                .orElseThrow(()->
-                        new RuntimeException("No existe el rol con el id " + usuarioDto.getRolId()));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Usuario no encontrado con id: " + usuarioId));
+
+        // Actualizar datos básicos
         savedUsuario.setNombre(usuarioDto.getNombre());
         savedUsuario.setApellido(usuarioDto.getApellido());
         savedUsuario.setEmail(usuarioDto.getEmail());
+
+        // Actualizar rol
+        Rol rol = rolRepository.findById(usuarioDto.getRolId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Rol no encontrado con id: " + usuarioDto.getRolId()));
         savedUsuario.setRol(rol);
-        savedUsuario = usuarioRepository.save(savedUsuario);
-        return UsuarioMapper.mapToUsuarioDto(savedUsuario);
+
+        // Actualizar permisos
+        if(usuarioDto.getPermisos() != null && !usuarioDto.getPermisos().isEmpty()) {
+            List<Permiso> nuevosPermisos = permisoRepository.findByNombreIn(
+                    new ArrayList<>(usuarioDto.getPermisos())
+            );
+
+            // Validar que todos los permisos existen
+            if(nuevosPermisos.size() != usuarioDto.getPermisos().size()) {
+                Set<String> permisosNoEncontrados = new HashSet<>(usuarioDto.getPermisos());
+                nuevosPermisos.forEach(p -> permisosNoEncontrados.remove(p.getNombre()));
+
+                throw new ResourceNotFoundException(
+                        "Los siguientes permisos no existen: " + String.join(", ", permisosNoEncontrados)
+                );
+            }
+
+            savedUsuario.getPermisos().clear();
+            savedUsuario.getPermisos().addAll(new HashSet<>(nuevosPermisos));
+        }
+
+        Usuario usuarioActualizado = usuarioRepository.save(savedUsuario);
+        return usuarioMapper.mapToUsuarioDto(usuarioActualizado);
     }
+
 
     @Override
     public void deleteUsuario(Long usuarioId) {
