@@ -1,10 +1,10 @@
-import { Button, Alert } from "react-bootstrap";
+import { Button, Alert, Form, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { createUser, getUserById, updateUser } from "../../services/UsuarioService";
 import { useNavigate, useParams } from "react-router-dom";
 
 // Importando constantes y funciones de utilidad
-import { DEFAULT_ERROR_MESSAGE, USER_ROLES_ARRAY, handleApiError } from "../../utils/utils";
+import { USER_ROLES_ARRAY, handleApiError } from "../../utils/utils";
 
 /**
  * Componente para agregar o editar un usuario.
@@ -15,6 +15,9 @@ const UsersComponent = () => {
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
   const [rolId, setRolId] = useState("");
+  const [selectedPermisos, setSelectedPermisos] = useState([]);
+  const [permisosDisponibles, setPermisosDisponibles] = useState([]);
+
 
   // Estado para almacenar los errores de validación
   const [errors, setErrors] = useState({
@@ -27,6 +30,20 @@ const UsersComponent = () => {
   const { id } = useParams(); // Obtiene el ID del usuario de los parámetros de la URL
   const navigator = useNavigate(); // Hook para la navegación
   const [loading, setLoading] = useState(false);
+
+  //Efecto para cargar los permisos disponibles
+  useEffect(() => {
+    const fetchPermisos = async () => {
+      try {
+        const response = await fetch('/api/permisos');
+        const data = await response.json();
+        setPermisosDisponibles(data);
+      } catch (error) {
+        handleApiError(error, "Error al cargar los permisos");
+      }
+    };
+    fetchPermisos();
+  }, []);
 
   /**
    * Efecto que se ejecuta al montar el componente y cuando cambia el ID.
@@ -41,6 +58,7 @@ const UsersComponent = () => {
           setApellido(response.data.apellido);
           setEmail(response.data.email);
           setRolId(response.data.rolId.toString()); // Convierte el rolId a string
+          setSelectedPermisos(response.data.permisos || []);
         })
         .catch((error) => {
           handleApiError(error, "Error al obtener los datos del usuario")
@@ -49,13 +67,22 @@ const UsersComponent = () => {
     }
   }, [id]);
 
+  const handlePermissionChange = (permisoNombre) => {
+    setSelectedPermisos(prev => {
+      if (prev.includes(permisoNombre)) {
+        return prev.filter(p => p !== permisoNombre);
+      }
+      return [...prev, permisoNombre];
+    });
+  };
+
   /**
    * Guarda o actualiza un usuario.
    * @param {Event} e - Evento del formulario.
    */
   const saveOrUpdateUser = async (e) => {
     e.preventDefault(); // Evita el comportamiento por defecto del formulario
-    const userData = { nombre, apellido, email, rolId };
+    const userData = { nombre, apellido, email, rolId, permisos:selectedPermisos};
     // Verifica si el formulario es válido
     if (!isFormValid(userData)) return; // Si no es valido, retorna sin ejecutar la peticion
     setLoading(true)
@@ -138,6 +165,7 @@ const UsersComponent = () => {
             <div className="card-body">
               {/* Formulario */}
               <form>
+                {/* Nombre */}
                 <div className="form-group mb-2">
                   <label className="form-label">Nombre:</label>
                   <input
@@ -155,6 +183,7 @@ const UsersComponent = () => {
                     <div className="invalid-feedback">{errors.nombre}</div>
                   )}
                 </div>
+                {/* Apellido */}
                 <div className="form-group mb-2">
                   <label className="form-label">Apellido:</label>
                   <input
@@ -172,6 +201,7 @@ const UsersComponent = () => {
                     <div className="invalid-feedback">{errors.apellido}</div>
                   )}
                 </div>
+                {/* Email */}
                 <div className="form-group mb-2">
                   <label className="form-label">Email:</label>
                   <input
@@ -189,6 +219,7 @@ const UsersComponent = () => {
                     <div className="invalid-feedback">{errors.email}</div>
                   )}
                 </div>
+                {/* Rol */}
                 <div className="form-group mb-2">
                   <label className="form-label">Rol:</label>
                   <select
@@ -209,6 +240,7 @@ const UsersComponent = () => {
                     <div className="invalid-feedback">{errors.rolId}</div>
                   )}
                 </div>
+                {/* Botones */}
                 {loading && (
                   <Alert variant="info" className="mt-3">
                       Cargando...
@@ -227,6 +259,28 @@ const UsersComponent = () => {
                   >
                     Cancelar
                   </Button>
+                </div>
+                {/* Permisos */}
+                <div className="flex justify-content-evenly">
+                <div className="form-group mb-4">
+              <Form.Group>
+                <Form.Label>Permisos:</Form.Label>
+                <Row>
+                  {permisosDisponibles.map((permiso) => (
+                    <Col key={permiso.nombre} md={6}>
+                      <Form.Check 
+                        type="checkbox"
+                        id={permiso.nombre}
+                        label={permiso.nombre}
+                        checked={selectedPermisos.includes(permiso.nombre)}
+                        onChange={() => handlePermissionChange(permiso.nombre)}
+                        className="mb-2"
+                      />
+                    </Col>
+                  ))}
+                </Row>
+              </Form.Group>
+            </div>
                 </div>
               </form>
             </div>

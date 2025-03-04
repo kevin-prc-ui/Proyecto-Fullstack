@@ -18,6 +18,10 @@ export const formatUserRole = (rolId) => {
     }
 };
 
+export const formatPermisos = (array) => {
+  console.log(array[1])
+}
+
   
   /**
    * Constantes que contiene todos los roles de la aplicacion

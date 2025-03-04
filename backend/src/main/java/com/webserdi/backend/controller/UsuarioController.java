@@ -59,10 +59,4 @@ public class UsuarioController implements WebMvcConfigurer {
         usuarioService.deleteUsuario(usuarioId);
         return ResponseEntity.ok("Empleado eliminado");
     }
-
-    @PutMapping("/permissions")
-    public ResponseEntity<UsuarioDto> assignPermissions(@RequestBody UsuarioPermisoDto permisoDto) {
-        UsuarioDto updatedUser = usuarioService.assignPermissionsToUser(permisoDto);
-        return ResponseEntity.ok(updatedUser);
-    }
 }

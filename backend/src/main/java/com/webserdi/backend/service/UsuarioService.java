@@ -12,5 +12,4 @@ public interface UsuarioService {
     //List<UsuarioDto> getAllUsuariosWithRoleName();
     UsuarioDto updateUsuario(Long usuarioId,UsuarioDto usuarioDto);
     void deleteUsuario(Long usuarioId);
-    UsuarioDto assignPermissionsToUser(UsuarioPermisoDto PermisoDto);
 }

@@ -208,6 +208,7 @@ function ListUsuarioComponent() {
                 {sortColumn === "email" && (sortOrder === "asc" ? " ▲" : " ▼")}
               </th>
               <th>Rol</th>
+              <th>Permisos</th>
               <th>Acciones</th>
               
             </tr>
@@ -219,6 +220,7 @@ function ListUsuarioComponent() {
                 <td>{usuario.apellido}</td>
                 <td>{usuario.email}</td>
                 <td>{formatUserRole(usuario.rolId)}</td>
+                <td>{usuario.permisos.join(", ")}</td>
                 <td>
                   <div className="action-buttons">
                     <Button
