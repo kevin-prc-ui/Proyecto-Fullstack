@@ -41,4 +41,5 @@ public class Usuario {
             inverseJoinColumns = @JoinColumn(name = "permiso_id")
     )
     private Set<Permiso> permisos = new HashSet<>();
+
 }
