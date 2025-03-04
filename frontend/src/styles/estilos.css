@@ -50,6 +50,23 @@ h1 {
   margin-bottom: 10px;
 }
 
+/* Estilos específicos para los filtros de Mi Activities */
+.activities-filters {
+  display: flex;
+  gap: 10px; /* Espacio entre los filtros */
+}
+
+.activities-filters .small-filter {
+  width: auto; /* Ancho automático */
+  padding: 6px 10px; /* Tamaño más pequeño */
+  font-size: 12px; /* Texto más pequeño */
+}
+
+/* Estilos para el resto de los filtros */
+.filter-container:not(.activities-filters) .filter {
+  width: 100%; /* Filtros normales ocupan el 100% del ancho */
+}
+
 /* Botones */
 .toggle-button {
   display: block;
