@@ -1,9 +1,9 @@
 package com.webserdi.backend.dto;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,4 +15,13 @@ public class UsuarioDto {
     private String apellido;
     private String email;
     private int rolId;
+    private Set<String> permisos;
+
+    public Set<String> getPermisos() {
+        return permisos;
+    }
+
+    public void setPermisos(Set<String> permisos) {
+        this.permisos = permisos;
+    }
 }

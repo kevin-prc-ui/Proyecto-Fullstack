@@ -14,10 +14,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Documento {
-    @Id
+public class Sistema {
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private int id;
     private String nombre;
-    private String ruta;
 }

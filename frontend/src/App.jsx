@@ -21,8 +21,8 @@ import Footer from "./components/Footer";
 
 function Layout() {
   return (
-    <div className="w-full h-screen flex flex-col md:flex-row">
-      <div className="w-1/6 h-screen bg-white sticky top-0 hidden md:block">
+    <div className="w-full h-screen flex flex-col md:flex-row" data-theme={'dark'}>
+      <div className="w-1/6 h-screen bg-white sticky top-0 hidden md:block" >
         <Sidebar />
       </div>
       <div className="flex-1 flex flex-col overflow-y-auto">

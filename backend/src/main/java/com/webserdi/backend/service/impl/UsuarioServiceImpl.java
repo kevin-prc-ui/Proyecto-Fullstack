@@ -1,10 +1,13 @@
 package com.webserdi.backend.service.impl;
 
 import com.webserdi.backend.dto.UsuarioDto;
+import com.webserdi.backend.dto.UsuarioPermisoDto;
+import com.webserdi.backend.entity.Permiso;
 import com.webserdi.backend.entity.Rol;
 import com.webserdi.backend.entity.Usuario;
 import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.mapper.UsuarioMapper;
+import com.webserdi.backend.repository.PermisoRepository;
 import com.webserdi.backend.repository.RolRepository;
 import com.webserdi.backend.repository.UsuarioRepository;
 import com.webserdi.backend.service.UsuarioService;
@@ -18,10 +21,26 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService {
+    private final PermisoRepository permisoRepository;
+    private final UsuarioMapper usuarioMapper;
 
     private final RolRepository rolRepository;
     private final UsuarioRepository usuarioRepository;
-    
+
+    @Override
+    public UsuarioDto assignPermissionsToUser(UsuarioPermisoDto permissionsDTO) {
+        Usuario usuario = usuarioRepository.findById(permissionsDTO.getUserId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        List<Permiso> permisos = permisoRepository.findByNombreIn(permissionsDTO.getPermisos());
+
+        usuario.getPermisos().clear();
+        usuario.getPermisos().addAll(permisos);
+
+        Usuario updatedUser = usuarioRepository.save(usuario);
+        return usuarioMapper.mapToUsuarioDto(updatedUser);
+    }
+
     @Override
     public UsuarioDto createUsuario(UsuarioDto usuarioDto) {
         Rol rol = rolRepository.findById(usuarioDto.getRolId())
@@ -33,10 +52,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         return UsuarioMapper.mapToUsuarioDto(usuario);
 
     }
-    /*@Override
-    public List<UsuarioDto> GetAllUsuariosWithRoleName() {
-
-    }*/
 
     @Override
     public List<UsuarioDto> getAllUsuarios() {

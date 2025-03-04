@@ -195,7 +195,6 @@ function ListUsuarioComponent() {
         <Table striped bordered hover responsive className="user-table">
           <thead className="table-dark">
             <tr>
-              <th onClick={() => handleSort("id")}>#</th>
               <th onClick={() => handleSort("nombre")} className="sortable-header">
                 Nombre
                 {sortColumn === "nombre" && (sortOrder === "asc" ? " ▲" : " ▼")}
@@ -210,12 +209,12 @@ function ListUsuarioComponent() {
               </th>
               <th>Rol</th>
               <th>Acciones</th>
+              
             </tr>
           </thead>
           <tbody>
             {sortedUsuarios.map((usuario) => (
               <tr key={usuario.id}>
-                <td>{usuario.id}</td>
                 <td>{usuario.nombre}</td>
                 <td>{usuario.apellido}</td>
                 <td>{usuario.email}</td>
@@ -223,6 +222,7 @@ function ListUsuarioComponent() {
                 <td>
                   <div className="action-buttons">
                     <Button
+                      variant="outline-secondary"
                       onClick={() => updateUser(usuario.id)}
                       aria-label="Editar usuario"
                       className="edit-button"
@@ -230,6 +230,7 @@ function ListUsuarioComponent() {
                       <BsFillPencilFill />
                     </Button>
                     <Button
+                      variant="outline-danger"
                       onClick={() => removeUser(usuario.id)}
                       aria-label="Eliminar usuario"
                       className="delete-button"

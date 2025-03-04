@@ -1,9 +1,13 @@
 package com.webserdi.backend.mapper;
 
 import com.webserdi.backend.dto.UsuarioDto;
+import com.webserdi.backend.entity.Permiso;
 import com.webserdi.backend.entity.Usuario;
+import org.springframework.stereotype.Component;
 
-
+import java.util.Set;
+import java.util.stream.Collectors;
+@Component
 public class UsuarioMapper {
     public static Usuario mapToUsuario(UsuarioDto usuarioDto) {
         Usuario usuario = new Usuario();
@@ -11,6 +15,7 @@ public class UsuarioMapper {
         usuario.setEmail(usuarioDto.getEmail());
         usuario.setNombre(usuarioDto.getNombre());
         usuario.setApellido(usuarioDto.getApellido());
+        // Los permisos se manejan en el servicio específico
         return usuario;
     }
 
@@ -20,8 +25,10 @@ public class UsuarioMapper {
         usuarioDto.setEmail(usuario.getEmail());
         usuarioDto.setNombre(usuario.getNombre());
         usuarioDto.setApellido(usuario.getApellido());
-        usuarioDto.setRolId(usuario.getRol().getId());
+        usuarioDto.setPermisos(usuario.getPermisos().stream()
+                .map(Permiso::getNombre)
+                .collect(Collectors.toSet()));
+
         return usuarioDto;
     }
-
 }
