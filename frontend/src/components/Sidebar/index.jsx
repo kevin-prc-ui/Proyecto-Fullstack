@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import {
   MdDashboard,
+  MdOutlineAddTask,
   MdOutlinePendingActions,
   MdSettings,
   MdTaskAlt,
@@ -117,7 +118,7 @@ const Sidebar = () => {
 
   if (isAuth) {
     return (
-    <Container fluid className="h-100 p-3">
+    <Container fluid className="h-100 p-3 shadow">
       <Navbar expand="lg" className="flex-column h-100">
 
         <Nav className="flex-column flex-grow-1 w-100">
@@ -142,7 +143,7 @@ const Sidebar = () => {
               {expandedParent === parent.label && (
                 <div className="child-links ms-4 ps-2 border-start">
                   {parent.children?.map((child, index) => (
-                    <Link
+                    <Button
                       key={child.label}
                       to={child.link}
                       className={clsx(
@@ -157,7 +158,7 @@ const Sidebar = () => {
                     >
                       <span className="fs-5">{child.icon}</span>
                       <span className="fs-6">{child.label}</span>
-                    </Link>
+                    </Button>
                   ))}
                 </div>
               )}
@@ -218,5 +219,7 @@ const Sidebar = () => {
 
   
 };
+
+
 
 export default Sidebar;

@@ -1,15 +1,9 @@
-<<<<<<< Updated upstream
 import React from 'react';
 import "../../styles/estilos.css";
-=======
-import React from 'react'
-import "../../styles/estilos.css"
->>>>>>> Stashed changes
 
 
 const Repository = () => {
   return (
-<<<<<<< Updated upstream
     <div className="container">
       {/* Barra superior con botones */}
       <div className="top-bar">
@@ -27,15 +21,4 @@ const Repository = () => {
   );
 };
 
-export default MyFile;
-=======
-    <div>
-      <h1>
-        Repositorio
-      </h1>
-    </div>
-  )
-}
-
-export default Repository
->>>>>>> Stashed changes
+export default Repository;
