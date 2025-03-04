@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useState } from 'react';
 import "../../styles/estilos.css";
 
@@ -34,3 +35,20 @@ const Sites = () => {
 };
 
 export default Sites;
+=======
+import React from 'react'
+import "../../styles/estilos.css"
+
+
+const Sites = () => {
+  return (
+    <div>
+      <h1>
+        Sitios
+      </h1>
+    </div>
+  )
+}
+
+export default Sites
+>>>>>>> Stashed changes

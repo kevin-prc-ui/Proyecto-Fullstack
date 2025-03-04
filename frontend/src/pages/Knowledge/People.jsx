@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useState } from 'react';
 import "../../styles/estilos.css";
 
@@ -39,3 +40,20 @@ const People = () => {
 };
 
 export default People;
+=======
+import React from 'react'
+import "../../styles/estilos.css"
+
+
+const People = () => {
+  return (
+    <div>
+      <h1>
+        Personas
+      </h1>
+    </div>
+  )
+}
+
+export default People
+>>>>>>> Stashed changes
