@@ -7,7 +7,6 @@ import com.webserdi.backend.entity.Permiso;
 import com.webserdi.backend.entity.Rol;
 
 @Component
-
 public class RolMapper {
     public static Rol mapToRol(RolDto rolDto) {
         Rol rol = new Rol();

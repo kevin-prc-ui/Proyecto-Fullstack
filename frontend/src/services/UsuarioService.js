@@ -21,3 +21,12 @@ export const getUserById = (userId) => axios.get(REST_API_BASE_URL +'/'+userId);
 export const updateUser = (userId,user) => axios.put(REST_API_BASE_URL+"/edit/"+userId, user);
 
 export const deleteUser = (userId) => axios.delete(REST_API_BASE_URL +'/delete/'+userId);
+export const getUserPermissions = async () => {
+  const token = localStorage.getItem("authToken"); //if you are using token
+  const response = await axios.get(`${REST_API_BASE_URL}/users/permissions`,{
+      headers: {
+          Authorization: `Bearer ${token}`,
+      },
+  });
+  return response;
+};

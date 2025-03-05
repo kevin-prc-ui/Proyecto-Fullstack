@@ -5,7 +5,6 @@ import com.webserdi.backend.entity.Permiso;
 import com.webserdi.backend.entity.Usuario;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 @Component
 public class UsuarioMapper {
@@ -25,6 +24,7 @@ public class UsuarioMapper {
         usuarioDto.setEmail(usuario.getEmail());
         usuarioDto.setNombre(usuario.getNombre());
         usuarioDto.setApellido(usuario.getApellido());
+        usuarioDto.setRolId(usuario.getRol().getId());
         usuarioDto.setPermisos(usuario.getPermisos().stream()
                 .map(Permiso::getNombre)
                 .collect(Collectors.toSet()));

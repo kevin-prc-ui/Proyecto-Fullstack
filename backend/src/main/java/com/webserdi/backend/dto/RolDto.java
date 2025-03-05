@@ -16,14 +16,6 @@ public class RolDto {
     private int id;
     private String nombre;
     private Set<String> permisos;
-
-    public Set<String> getPermisos() {
-        return permisos;
-    }
-
-    public void setPermisos(Set<String> permisos) {
-        this.permisos = permisos;
-    }
 }
 
 

@@ -1,7 +1,6 @@
 package com.webserdi.backend.service.impl;
 
 import com.webserdi.backend.dto.UsuarioDto;
-import com.webserdi.backend.dto.UsuarioPermisoDto;
 import com.webserdi.backend.entity.Permiso;
 import com.webserdi.backend.entity.Rol;
 import com.webserdi.backend.entity.Usuario;
@@ -95,7 +94,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         Usuario usuarioActualizado = usuarioRepository.save(savedUsuario);
-        return usuarioMapper.mapToUsuarioDto(usuarioActualizado);
+        return UsuarioMapper.mapToUsuarioDto(usuarioActualizado);
     }
 
 

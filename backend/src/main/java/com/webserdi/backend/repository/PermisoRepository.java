@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface PermisoRepository extends JpaRepository<Permiso,Long> {
     Optional<Permiso> findByNombre(String nombre);
     List<Permiso> findByNombreIn(List<String> nombres);
+    List<Permiso> findByModuloId(Long moduloId);
+
 }

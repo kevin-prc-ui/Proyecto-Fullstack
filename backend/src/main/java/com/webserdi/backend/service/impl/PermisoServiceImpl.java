@@ -18,17 +18,17 @@ public class PermisoServiceImpl implements PermisoService {
 
     @Override
     public PermisoDto createPermiso(PermisoDto permisoDto) {
-        Permiso permiso = PermisoMapper.mapToPermiso(permisoDto);
+        Permiso permiso = PermisoMapper.toEntity(permisoDto);
         permiso = permisoRepository.save(permiso);
 
-        return PermisoMapper.mapToPermisoDto(permiso);
+        return PermisoMapper.toDto(permiso);
     }
 
     @Override
     public List<PermisoDto> getAllPermisos() {
         List<Permiso> permiso = permisoRepository.findAll();
         return permiso.stream()
-                .map(PermisoMapper::mapToPermisoDto)
+                .map(PermisoMapper::toDto)
                 .collect(Collectors.toList());
     }
 }

@@ -9,9 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PermisoDto {
+public class ModuloDto {
     private Long id;
     private String nombre;
-    private Long moduloId;  // Nuevo campo
-
 }
