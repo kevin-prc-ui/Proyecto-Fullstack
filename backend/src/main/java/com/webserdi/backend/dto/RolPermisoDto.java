@@ -13,7 +13,6 @@ import java.util.List;
 
 public class RolPermisoDto {
     private int id;
-    
     private List<String> permisos;
    
 }
