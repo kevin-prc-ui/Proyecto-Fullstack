@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import "../../styles/estilos.css";
-
 const People = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
