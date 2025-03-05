@@ -19,7 +19,7 @@ const Home = () => {
           <h2>Mis Sitios</h2>
           <div className="filter-container">
             <select
-              className="filter"
+              className="filter small-filter"
               onChange={(e) => handleFilterChange("Sites", e.target.value)}
             >
               <option value="all">Todos</option>
@@ -70,7 +70,7 @@ const Home = () => {
           <h2>Mis Tareas</h2>
           <div className="filter-container">
             <select
-              className="filter"
+              className="filter small-filter"
               onChange={(e) => handleFilterChange("Tasks", e.target.value)}
             >
               <option value="Active">Tareas Activas</option>
@@ -90,7 +90,7 @@ const Home = () => {
           <h2>Mis Documentos</h2>
           <div className="filter-container">
             <select
-              className="filter"
+              className="filter small-filter"
               onChange={(e) => handleFilterChange("Documents", e.target.value)}
             >
               <option value="recently-modified">Modificados Recientemente</option>
