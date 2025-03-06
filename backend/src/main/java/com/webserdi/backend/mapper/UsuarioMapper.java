@@ -12,6 +12,7 @@ public class UsuarioMapper {
         Usuario usuario = new Usuario();
         usuario.setId(usuarioDto.getId());
         usuario.setEmail(usuarioDto.getEmail());
+        usuario.setEnabled(usuarioDto.isEnabled());
         usuario.setNombre(usuarioDto.getNombre());
         usuario.setApellido(usuarioDto.getApellido());
         // Los permisos se manejan en el servicio específico
@@ -22,6 +23,7 @@ public class UsuarioMapper {
         UsuarioDto usuarioDto = new UsuarioDto();
         usuarioDto.setId(usuario.getId());
         usuarioDto.setEmail(usuario.getEmail());
+        usuarioDto.setEnabled(usuario.isEnabled());
         usuarioDto.setNombre(usuario.getNombre());
         usuarioDto.setApellido(usuario.getApellido());
         usuarioDto.setRolId(usuario.getRol().getId());
@@ -31,4 +33,5 @@ public class UsuarioMapper {
 
         return usuarioDto;
     }
+
 }

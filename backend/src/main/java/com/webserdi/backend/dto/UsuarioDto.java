@@ -14,6 +14,7 @@ public class UsuarioDto {
     private String nombre;
     private String apellido;
     private String email;
+    private boolean enabled;
     private int rolId;
     private Set<String> permisos;
 }

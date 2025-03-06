@@ -3,6 +3,7 @@ package com.webserdi.backend.controller;
 import com.webserdi.backend.dto.ModuloDto;
 import com.webserdi.backend.dto.PermisoDto;
 import com.webserdi.backend.service.ModuloService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -12,13 +13,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/modulos")
+@AllArgsConstructor
 public class ModuloController {
 
     private final ModuloService moduloService;
-
-    public ModuloController(ModuloService moduloService) {
-        this.moduloService = moduloService;
-    }
 
     @PostMapping
     public ResponseEntity<ModuloDto> crearModulo(@Validated @RequestBody ModuloDto moduloDTO) {

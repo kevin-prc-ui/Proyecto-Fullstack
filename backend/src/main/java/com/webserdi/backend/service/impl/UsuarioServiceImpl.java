@@ -1,10 +1,12 @@
 package com.webserdi.backend.service.impl;
 
+import com.webserdi.backend.dto.PermisoDto;
 import com.webserdi.backend.dto.UsuarioDto;
 import com.webserdi.backend.entity.Permiso;
 import com.webserdi.backend.entity.Rol;
 import com.webserdi.backend.entity.Usuario;
 import com.webserdi.backend.exception.ResourceNotFoundException;
+import com.webserdi.backend.mapper.PermisoMapper;
 import com.webserdi.backend.mapper.UsuarioMapper;
 import com.webserdi.backend.repository.PermisoRepository;
 import com.webserdi.backend.repository.RolRepository;
@@ -97,12 +99,19 @@ public class UsuarioServiceImpl implements UsuarioService {
         return UsuarioMapper.mapToUsuarioDto(usuarioActualizado);
     }
 
-
     @Override
     public void deleteUsuario(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId).
                 orElseThrow(()->
                         new ResourceNotFoundException("No existe el usuario con el id" + usuarioId));
         usuarioRepository.deleteById(usuarioId);
+    }
+
+    @Override
+    public List<PermisoDto> getAllPermisos(){
+        List<Permiso> permisos = permisoRepository.findAll();
+        return permisos.stream()
+                .map(PermisoMapper::toDto)
+                .collect(Collectors.toList());
     }
 }
