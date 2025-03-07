@@ -1,5 +1,6 @@
 package com.webserdi.backend.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.webserdi.backend.dto.PermisoDto;
 import com.webserdi.backend.dto.UsuarioDto;
 import com.webserdi.backend.dto.UsuarioPermisoDto;
@@ -27,6 +28,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/users")
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class UsuarioController implements WebMvcConfigurer {
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
@@ -50,6 +52,12 @@ public class UsuarioController implements WebMvcConfigurer {
     public ResponseEntity<UsuarioDto> createUsuario(@RequestBody UsuarioDto usuarioDto) {
         UsuarioDto createdUsuario = usuarioService.createUsuario(usuarioDto);
         return ResponseEntity.ok(createdUsuario);
+    }
+
+    @PostMapping("/check-or-create")
+    public ResponseEntity<UsuarioDto> checkOrCreateUser(@RequestBody UsuarioDto usuarioDto) {
+        UsuarioDto checkOrCreateUser = usuarioService.checkOrCreateUser(usuarioDto);
+        return ResponseEntity.ok(checkOrCreateUser);
     }
 
     @GetMapping("{id}")
@@ -81,28 +89,6 @@ public class UsuarioController implements WebMvcConfigurer {
         return ResponseEntity.ok(permisos);
     }
 
-    @PostMapping("/check-or-create")
-    @Transactional
-    public ResponseEntity<UsuarioDto> checkOrCreateUser(@RequestBody UsuarioDto usuarioDto) {
-        return usuarioRepository.findByEmail(usuarioDto.getEmail())
-                .map(usuario -> ResponseEntity.ok(usuarioMapper.mapToUsuarioDto(usuario)))
-                .orElseGet(() -> {
-                    Rol rol = rolRepository.findById(usuarioDto.getRolId())
-                            .orElseThrow(() -> new ResourceNotFoundException("Rol no encontrado"));
 
-                    Usuario nuevoUsuario = new Usuario();
-                    nuevoUsuario.setEmail(usuarioDto.getEmail());
-                    nuevoUsuario.setNombre(usuarioDto.getNombre());
-                    nuevoUsuario.setApellido(usuarioDto.getApellido());
-                    nuevoUsuario.setEnabled(usuarioDto.isEnabled());
-                    nuevoUsuario.setRol(rol);
 
-                    // Asignar permisos
-                    Set<Permiso> permisos = permisoRepository.findByNombreIn(usuarioDto.getPermisos());
-                    nuevoUsuario.setPermisos(permisos);
-
-                    return ResponseEntity.status(HttpStatus.CREATED)
-                            .body(usuarioMapper.toDto(usuarioRepository.save(nuevoUsuario)));
-                });
-    }
 }

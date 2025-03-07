@@ -15,10 +15,7 @@ import com.webserdi.backend.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 //Esta anotacion le dice al spring container que genere el spring bean para esta clase UsuarioServiceImpl
@@ -32,6 +29,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioDto createUsuario(UsuarioDto usuarioDto) {
+
         Rol rol = rolRepository.findById(usuarioDto.getRolId())
                 .orElseThrow(() -> new RuntimeException("No existe el rol con el id " + usuarioDto.getRolId()));
         Usuario usuario = UsuarioMapper.mapToUsuario(usuarioDto);
@@ -39,7 +37,12 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario = usuarioRepository.save(usuario);
 
         return UsuarioMapper.mapToUsuarioDto(usuario);
+    }
 
+    @Override
+    public UsuarioDto checkOrCreateUser(UsuarioDto usuarioDto) {
+        Optional<Usuario> usuario = usuarioRepository.findById(usuarioDto.getId());
+        return UsuarioMapper.mapToUsuarioDto(usuario.orElse(null));
     }
 
     @Override
@@ -114,4 +117,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .map(PermisoMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+
+
 }

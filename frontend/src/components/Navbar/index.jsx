@@ -1,5 +1,5 @@
 import { Navbar } from "react-bootstrap";
-import Button from "../MicrosoftAuth/LoginButton";
+import MicrosoftLoginButton from "../MicrosoftAuth/LoginButton";
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
@@ -29,19 +29,21 @@ const Index = () => {
             Inicia sesión para ver tu información de perfil.
           </div>
         </UnauthenticatedTemplate>
-        <Button />
+        <MicrosoftLoginButton /> {/* Reemplaza el Button anterior */}
       </Navbar>
     </>
   );
 };
+
 const ProfileContent = () => {
   const { accounts } = useMsal();
  
   return (
     <>
       <div className="card-title">Bienvenido, {accounts[0].name}!</div>
-      <div>{accounts[0].username}</div>
+      {/* <div>{accounts[0].username}</div> */}
     </>
   );
 };
+
 export default Index;
