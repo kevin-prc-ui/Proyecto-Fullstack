@@ -3,37 +3,21 @@ package com.webserdi.backend.controller;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.webserdi.backend.dto.PermisoDto;
 import com.webserdi.backend.dto.UsuarioDto;
-import com.webserdi.backend.dto.UsuarioPermisoDto;
-import com.webserdi.backend.entity.Permiso;
-import com.webserdi.backend.entity.Rol;
-import com.webserdi.backend.entity.Usuario;
-import com.webserdi.backend.exception.ResourceNotFoundException;
-import com.webserdi.backend.mapper.UsuarioMapper;
-import com.webserdi.backend.repository.PermisoRepository;
-import com.webserdi.backend.repository.RolRepository;
-import com.webserdi.backend.repository.UsuarioRepository;
 import com.webserdi.backend.service.UsuarioService;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/users")
 @AllArgsConstructor
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class UsuarioController implements WebMvcConfigurer {
-    private final UsuarioRepository usuarioRepository;
-    private final RolRepository rolRepository;
-    private final PermisoRepository permisoRepository;
-    private final UsuarioMapper usuarioMapper;
+
+    private final UsuarioService usuarioService;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -45,7 +29,6 @@ public class UsuarioController implements WebMvcConfigurer {
                 .maxAge(3600);
     }
 
-    private final UsuarioService usuarioService;
 
     //Construccion del REST API de usuarios
     @PostMapping
@@ -57,6 +40,7 @@ public class UsuarioController implements WebMvcConfigurer {
     @PostMapping("/check-or-create")
     public ResponseEntity<UsuarioDto> checkOrCreateUser(@RequestBody UsuarioDto usuarioDto) {
         UsuarioDto checkOrCreateUser = usuarioService.checkOrCreateUser(usuarioDto);
+        if (checkOrCreateUser == null) {}
         return ResponseEntity.ok(checkOrCreateUser);
     }
 

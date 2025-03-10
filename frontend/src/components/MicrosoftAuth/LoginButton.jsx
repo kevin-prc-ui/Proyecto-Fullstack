@@ -29,7 +29,7 @@ const Login = () => {
   
       const [nombre, ...apellidoParts] = account.name.split(' ');
       const apellido = apellidoParts.join(' ') || 'Sin apellido';
-  
+
       const userData = {
         nombre: nombre.trim(),
         apellido: apellido.trim(),
@@ -41,7 +41,7 @@ const Login = () => {
 
       console.log(userData);
       await checkOrCreateUser(userData);
-      window.location.reload(); // Forzar actualización del estado de autenticación
+      //window.location.reload(); // Forzar actualización del estado de autenticación
       
     } catch (error) {
       console.error("Error completo:", error);

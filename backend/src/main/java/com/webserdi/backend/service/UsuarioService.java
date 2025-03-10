@@ -13,5 +13,4 @@ public interface UsuarioService {
     UsuarioDto updateUsuario(Long usuarioId,UsuarioDto usuarioDto);
     void deleteUsuario(Long usuarioId);
     UsuarioDto checkOrCreateUser(UsuarioDto usuarioDto);
-
 }
