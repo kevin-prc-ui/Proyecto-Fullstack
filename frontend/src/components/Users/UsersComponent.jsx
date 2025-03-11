@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 // Importando constantes y funciones de utilidad
 import { USER_ROLES_ARRAY, handleApiError } from "../../utils/utils";
+import axios from "axios";
 
 /**
  * Componente para agregar o editar un usuario.
@@ -31,13 +32,22 @@ const UsersComponent = () => {
   const navigator = useNavigate(); // Hook para la navegación
   const [loading, setLoading] = useState(false);
 
+  const getAuthToken = () => localStorage.getItem("authToken");
+
+  const getHeaders = () => ({
+      headers: {
+          Authorization: `Bearer ${getAuthToken()}`,
+      },
+  });
   //Efecto para cargar los permisos disponibles
   useEffect(() => {
     const fetchPermisos = async () => {
       try {
-        const response = await fetch('/api/permisos');
-        const data = await response.json();
-        setPermisosDisponibles(data);
+        const response = await axios.get('/api/permisos', getHeaders()); //update endpoint
+        const data = await response.data;
+        // Filter permissions with modulo_id=1
+        const filteredPermisos = data.filter(permiso => permiso.moduloId === 1);
+        setPermisosDisponibles(filteredPermisos);
       } catch (error) {
         handleApiError(error, "Error al cargar los permisos");
       }

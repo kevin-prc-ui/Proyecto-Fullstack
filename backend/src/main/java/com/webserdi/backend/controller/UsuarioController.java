@@ -1,33 +1,21 @@
 package com.webserdi.backend.controller;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.webserdi.backend.dto.PermisoDto;
 import com.webserdi.backend.dto.UsuarioDto;
 import com.webserdi.backend.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
 @AllArgsConstructor
-public class UsuarioController implements WebMvcConfigurer {
+public class UsuarioController{
 
     private final UsuarioService usuarioService;
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600);
-    }
 
 
     //Construccion del REST API de usuarios

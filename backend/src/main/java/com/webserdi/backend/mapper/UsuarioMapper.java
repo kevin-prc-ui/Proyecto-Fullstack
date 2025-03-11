@@ -5,6 +5,7 @@ import com.webserdi.backend.entity.Permiso;
 import com.webserdi.backend.entity.Usuario;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.stream.Collectors;
 @Component
 public class UsuarioMapper {

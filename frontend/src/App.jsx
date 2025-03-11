@@ -7,7 +7,7 @@ import TaskDetails from "./pages/Helpdesk/TaskDetails";
 import Tasks from "./pages/Helpdesk/Tasks";
 import Trash from "./pages/Helpdesk/Trash";
 import Users from "./pages/Helpdesk/Users";
-import Dashboard from "./pages/dashboard";
+import Dashboard from "./pages/Dashboard";
 import Home  from "./pages/Knowledge/Home";
 import MyFile  from "./pages/Knowledge/MyFile";
 import SharedFile  from "./pages/Knowledge/SharedFile";
@@ -30,7 +30,7 @@ function Layout() {
         <div className="p-4 2xl:px-10 flex-1">
           <Outlet />
         </div>
-        <Footer /> {/* Add Footer here */}
+        <Footer />
       </div>
     </div>
   );

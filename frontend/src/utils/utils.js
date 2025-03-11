@@ -12,7 +12,15 @@ export const formatUserRole = (rolId) => {
     case 1:
         return "Administrador";
     case 2:
-        return "Staff";
+        return "Agente";
+    case 3:
+        return "Consumidor";
+    case 4:
+        return "Contribuyente";
+    case 5:
+        return "Colaborador";
+    case 6:
+        return "Gerente";
     default:
         return "Desconocido";
     }
@@ -28,7 +36,11 @@ export const formatPermisos = (array) => {
    */
   export const USER_ROLES_ARRAY = [
     { id: "1", name: "Administrador" },
-    { id: "2", name: "Staff" },
+    { id: "2", name: "Agente" },
+    { id: "3", name: "Consumidor" },
+    { id: "4", name: "Contribuyente" },
+    { id: "5", name: "Colaborador" },
+    { id: "6", name: "Gerente" },
   ];
   
   /**

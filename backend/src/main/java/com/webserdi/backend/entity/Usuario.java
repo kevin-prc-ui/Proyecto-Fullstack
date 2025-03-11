@@ -22,6 +22,9 @@ public class Usuario {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = true)
+    private String password;
+
     @Column(nullable = false)
     private String nombre;
 
@@ -30,8 +33,8 @@ public class Usuario {
 
     private boolean enabled;
 
-    @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn(name = "rol_id",referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rol_id", referencedColumnName = "id")
     private Rol rol;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -42,4 +45,17 @@ public class Usuario {
     )
     private Set<Permiso> permisos = new HashSet<>();
 
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", enabled=" + enabled +
+                ", rol=" + (rol != null ? rol.getId() : null) + // Handle potential null rol
+                ", permisos=" + permisos +
+                '}';
+    }
 }

@@ -3,6 +3,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -14,7 +16,8 @@ public class UsuarioDto {
     private String nombre;
     private String apellido;
     private String email;
+    private String password;
     private boolean enabled;
     private int rolId;
-    private Set<String> permisos;
+    private Set<String> permisos=new HashSet<>();
 }
