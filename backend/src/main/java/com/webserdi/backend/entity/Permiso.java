@@ -21,7 +21,6 @@ public class Permiso {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "modulo_id", nullable = false)
     private Modulo modulo;
-
 }
 
 

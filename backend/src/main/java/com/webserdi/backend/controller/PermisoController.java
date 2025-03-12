@@ -16,9 +16,12 @@ public class PermisoController extends BaseController {
     private PermisoService permisoService;
 
     @PostMapping
-    public ResponseEntity<PermisoDto> createPermiso(@RequestBody PermisoDto permisoDto) {
-        PermisoDto savedPermisos = permisoService.createPermiso(permisoDto);
-        return new ResponseEntity<>(savedPermisos, HttpStatus.CREATED);
+    public ResponseEntity<PermisoDto> createPermiso(@RequestBody PermisoDto permisoDto){
+        return new ResponseEntity<>(permisoService.createPermiso(permisoDto), HttpStatus.CREATED);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<PermisoDto> getPermiso(@PathVariable Long id){
+        return ResponseEntity.ok(permisoService.getPermisoById(id));
     }
 
     @GetMapping

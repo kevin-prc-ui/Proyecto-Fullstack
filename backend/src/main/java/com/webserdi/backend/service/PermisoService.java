@@ -8,4 +8,5 @@ public interface PermisoService {
     PermisoDto createPermiso(PermisoDto permisoDto);
     List<PermisoDto> getAllPermisos();
 
+    PermisoDto getPermisoById(Long id);
 }

@@ -19,6 +19,7 @@ public class UsuarioController implements WebMvcConfigurer {
 
     private final UsuarioService usuarioService;
 
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -28,7 +29,6 @@ public class UsuarioController implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .maxAge(3600);
     }
-
 
     //Construccion del REST API de usuarios
     @PostMapping
