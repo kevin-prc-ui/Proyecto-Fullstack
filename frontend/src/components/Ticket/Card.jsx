@@ -16,9 +16,9 @@ import { IoMdAdd } from "react-icons/io";
 import AddSubTicket from "./AddSubTicket";//CREATE
 
 const ICONS = {
-  high: <MdKeyboardDoubleArrowUp />,
-  medium: <MdKeyboardArrowUp />,
-  low: <MdKeyboardArrowDown />,
+  alta: <MdKeyboardDoubleArrowUp />,
+  media: <MdKeyboardArrowUp />,
+  baja: <MdKeyboardArrowDown />,
 };
 
 const Card = ({ ticket }) => {
@@ -36,7 +36,7 @@ const Card = ({ ticket }) => {
             )}
           >
             <span className="text-lg">{ICONS[ticket?.priority]}</span>
-            <span className="uppercase">{ticket?.priority} Priority</span>
+            <span className="uppercase">prioridad {ticket?.priority} </span>
           </div>
 
           {user?.isAdmin && <TicketDialog ticket={ticket} />}

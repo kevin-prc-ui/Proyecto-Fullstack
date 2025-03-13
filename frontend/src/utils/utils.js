@@ -89,9 +89,9 @@ export const formatPermisos = (array) => {
   }
   
   export const PRIOTITYSTYELS = {
-    high: "text-red-600",
-    medium: "text-yellow-600",
-    low: "text-blue-600",
+    alta: "text-red-600",
+    media: "text-yellow-600",
+    baja: "text-blue-600",
   };
   
   export const TICKET_TYPE = {
