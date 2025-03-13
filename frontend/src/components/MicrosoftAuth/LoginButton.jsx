@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../services/authConfig";
 import Button from "react-bootstrap/Button";
 import { checkOrCreateUser } from "../../services/UsuarioService";
+import { callMsGraph } from "../../graph";
 
 const MyButton = () => {
   const isAuthenticated = useIsAuthenticated();
@@ -16,35 +17,43 @@ const MyButton = () => {
 
 const Login = () => {
   const { instance } = useMsal();
+  const [graphData, setGraphData] = useState(null);
+
 
   const handleLogin = async () => {
     try {
+      // 1. Inicio del login
       const response = await instance.loginPopup(loginRequest);
-      const account = response.account;
-      
-      // Validación adicional para cuentas empresariales
-      if (!account.idTokenClaims?.preferred_username) {
-        throw new Error("Esta cuenta no está autorizada");
-      }
-  
-      const [nombre, ...apellidoParts] = account.name.split(' ');
-      const apellido = apellidoParts.join(' ') || 'Sin apellido';
 
+      // 2. Se obtienen los datos del usuario una vez se hace el login
+      const graphResponse = await callMsGraph(response.accessToken);
+      setGraphData(graphResponse);
+
+      // 3. Se crea el usuario y se comprueba si existe o no en la base de datos
       const userData = {
-        nombre: nombre.trim(),
-        apellido: apellido.trim(),
-        email: account.username.toLowerCase(),
+        nombre: graphResponse.givenName,
+        apellido: graphResponse.surname,
+        email: graphResponse.userPrincipalName,
         enabled: true,
         rolId: 2,
-        permisos: ["CREAR_TICKET"]
+        permisos: ["CREAR_TICKET"],
+      };
+
+      const login = {
+        email: graphResponse.userPrincipalName,
+        password: graphResponse.id, // in real app hash the password
       };
 
       console.log(userData);
+      console.log(login);
       await checkOrCreateUser(userData);
-      //window.location.reload(); // Forzar actualización del estado de autenticación
-      
+      // const respuesta = await login(login);
+
+      // const token = respuesta.data.token; // Assuming your backend returns the token like this
+      // localStorage.setItem("authToken", token); // Store the token
+      // window.location.reload();
     } catch (error) {
-      console.error("Error completo:", error);
+      console.error("Login failed:", error);
       alert(`Error de autenticación: ${error.message}`);
     }
   };

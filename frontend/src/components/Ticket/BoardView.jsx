@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from 'prop-types'; // Import PropTypes
 import Card from "./Card";
 
 const BoardView = ({ tickets }) => {
@@ -13,46 +12,6 @@ const BoardView = ({ tickets }) => {
 };
 
 // Add prop type validation
-BoardView.propTypes = {
-  tickets: PropTypes.arrayOf(
-    PropTypes.shape({
-      _id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      date: PropTypes.string.isRequired,
-      priority: PropTypes.string.isRequired,
-      stage: PropTypes.string.isRequired,
-      assets: PropTypes.arrayOf(PropTypes.string).isRequired,
-      team: PropTypes.arrayOf(PropTypes.shape({
-        _id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired,
-        email: PropTypes.string.isRequired,
-      })).isRequired,
-      isTrashed: PropTypes.bool.isRequired,
-      activities: PropTypes.arrayOf(PropTypes.shape({
-        type: PropTypes.string.isRequired,
-        activity: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-        by: PropTypes.oneOfType([
-          PropTypes.string,
-          PropTypes.shape({
-            _id: PropTypes.string.isRequired,
-            name: PropTypes.string.isRequired,
-          })
-        ]).isRequired,
-        _id: PropTypes.string.isRequired,
-      })).isRequired,
-      subTickets: PropTypes.arrayOf(PropTypes.shape({
-        title: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-        tag: PropTypes.string.isRequired,
-        _id: PropTypes.string.isRequired,
-      })).isRequired,
-      createdAt: PropTypes.string.isRequired,
-      updatedAt: PropTypes.string.isRequired,
-      __v: PropTypes.number.isRequired,
-    })
-  ).isRequired,
-};
+
 
 export default BoardView;

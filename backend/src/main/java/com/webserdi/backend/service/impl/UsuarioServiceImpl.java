@@ -13,6 +13,7 @@ import com.webserdi.backend.repository.PermisoRepository;
 import com.webserdi.backend.repository.RolRepository;
 import com.webserdi.backend.repository.UsuarioRepository;
 import com.webserdi.backend.service.UsuarioService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,45 +30,32 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final RolRepository rolRepository;
     private final UsuarioRepository usuarioRepository;
 
+    @Override
     public UsuarioDto createUsuario(UsuarioDto usuarioDto) {
+        if(usuarioRepository.existsByEmail(usuarioDto.getEmail())){
+            throw new ResourceNotFoundException("El usuario ya existe");
+        }
         Rol rol = rolRepository.findById(usuarioDto.getRolId())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe el rol con el id " + usuarioDto.getRolId()));
         Usuario usuario = UsuarioMapper.mapToUsuario(usuarioDto);
         usuario.setRol(rol); // Asigna el rol al usuario
-        //You need to save the permissions, if the user provides them
-        if(usuarioDto.getPermisos() != null && !usuarioDto.getPermisos().isEmpty()) {
-            List<Permiso> nuevosPermisos = permisoRepository.findByNombreIn(
-                    new ArrayList<>(usuarioDto.getPermisos())
-            );
-            // Validar que todos los permisos existen
-            if(nuevosPermisos.size() != usuarioDto.getPermisos().size()) {
-                Set<String> permisosNoEncontrados = new HashSet<>(usuarioDto.getPermisos());
-                nuevosPermisos.forEach(p -> permisosNoEncontrados.remove(p.getNombre()));
-
-                throw new ResourceNotFoundException(
-                        "Los siguientes permisos no existen: " + String.join(", ", permisosNoEncontrados)
-                );
-            }
-
-            usuario.getPermisos().clear();
-            usuario.getPermisos().addAll(new HashSet<>(nuevosPermisos));
+        if(usuarioDto.getPermisos() != null && !usuarioDto.getPermisos().isEmpty()){
+            Set<Permiso> permisos = permisoRepository.findByNombreIn(usuarioDto.getPermisos());
+            usuario.setPermisos(permisos);
+        }else{
+            usuario.setPermisos(new HashSet<>());
         }
         usuario = usuarioRepository.save(usuario);
 
         return UsuarioMapper.mapToUsuarioDto(usuario);
     }
-
     @Override
+    @Transactional
     public UsuarioDto checkOrCreateUser(UsuarioDto usuarioDto) {
-        Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(usuarioDto.getEmail());
-        if (usuarioOptional.isEmpty()) {
-            // User doesn't exist, create it
-            return createUsuario(usuarioDto);
-        } else {
-            // User exists, get the Usuario from the Optional and map it.
-            Usuario usuario = usuarioOptional.get();
-            return UsuarioMapper.mapToUsuarioDto(usuario);
-        }
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(usuarioDto.getEmail());
+
+        if (optionalUsuario.isPresent()) return UsuarioMapper.mapToUsuarioDto(optionalUsuario.get());
+        else return createUsuario(usuarioDto);
     }
 
     @Override
@@ -105,8 +93,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         // Actualizar permisos
         if(usuarioDto.getPermisos() != null && !usuarioDto.getPermisos().isEmpty()) {
-            List<Permiso> nuevosPermisos = permisoRepository.findByNombreIn(
-                    new ArrayList<>(usuarioDto.getPermisos())
+            Set<Permiso> nuevosPermisos = permisoRepository.findByNombreIn(usuarioDto.getPermisos()
             );
 
             // Validar que todos los permisos existen
@@ -142,7 +129,4 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .map(PermisoMapper::toDto)
                 .collect(Collectors.toList());
     }
-
-
-
 }
