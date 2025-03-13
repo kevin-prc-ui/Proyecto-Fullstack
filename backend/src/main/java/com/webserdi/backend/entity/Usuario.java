@@ -1,5 +1,6 @@
 package com.webserdi.backend.entity;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

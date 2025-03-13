@@ -18,6 +18,7 @@ public class UsuarioController{
     private final UsuarioService usuarioService;
 
 
+
     //Construccion del REST API de usuarios
     @PostMapping
     public ResponseEntity<UsuarioDto> createUsuario(@RequestBody UsuarioDto usuarioDto) {
