@@ -20,9 +20,12 @@ const Login = () => {
             
         };
         const response = await checkOrCreateUser(userData);
-
+        console.log(response);
+        
         const token = response.data.token; // Assuming your backend returns the token like this
-        localStorage.setItem("authToken", token); // Store the token
+        console.log(token);
+        
+        sessionStorage.setItem("authToken", token); // Store the token
 
         console.log('Login successful!');
         navigate("/"); // Redirect to a protected route

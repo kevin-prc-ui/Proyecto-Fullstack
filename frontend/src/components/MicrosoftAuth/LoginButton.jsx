@@ -4,6 +4,8 @@ import { loginRequest } from "../../services/authConfig";
 import Button from "react-bootstrap/Button";
 import { checkOrCreateUser } from "../../services/UsuarioService";
 import { callMsGraph } from "../../graph";
+import { login } from "../../services/UsuarioService";
+const getAuthToken = () => sessionStorage.getItem("authToken");
 
 const MyButton = () => {
   const isAuthenticated = useIsAuthenticated();
@@ -34,17 +36,20 @@ const Login = () => {
         permisos: ["CREAR_TICKET"],
       };
 
-      const login = {
+      const loginData = {
         email: graphResponse.userPrincipalName,
-        password: graphResponse.id, // in real app hash the password
+        password: '1', // in real app hash the password
       };
 
-      await checkOrCreateUser(userData);
-      const respuesta = await login(login);
-
-      const token = respuesta.data.token; // Assuming your backend returns the token like this
+      const respuesta = await login(loginData);
+      const token = respuesta.data; // Assuming your backend returns the token like this
+      console.log(token);
       localStorage.setItem("authToken", token); // Store the token
-      window.location.reload();
+      console.log(getAuthToken());
+      
+      await checkOrCreateUser(userData);
+
+      // window.location.reload();
     } catch (error) {
       console.error("Login failed:", error);
       alert(`Error de autenticación: ${error.message}`);
@@ -64,7 +69,7 @@ const Logout = () => {
   const { instance } = useMsal();
 
   const handleLogout = () => {
-    instance.logoutRedirect({
+    instance.logoutPopup({
       postLogoutRedirectUri: "/",
       mainWindowRedirectUri: "/",
     });

@@ -37,9 +37,6 @@ export const getUserPermissions = async () => {
 };
 
 export const checkOrCreateUser = (userData) => 
-  axios.post(`${REST_API_BASE_URL}/users/check-or-create`, userData, {
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
-  export const login = (login) => axios.post(`${REST_API_BASE_URL}/auth/login`, login, getHeaders());
+  axios.post(`${REST_API_BASE_URL}/users/check-or-create`, userData, getHeaders());
+
+export const login = (login) => axios.post(`${REST_API_BASE_URL}/auth/login`, login);
