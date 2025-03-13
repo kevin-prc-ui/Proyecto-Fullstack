@@ -9,7 +9,7 @@ import Tabs from "../../components/Tabs/Tabs";
 import TaskTitle from "../../components/Ticket/Title";
 import BoardView from "../../components/Ticket/BoardView";
 import { tickets } from "../../assets/data";
-import Table from "../../components/Ticket/Title";
+import Table from "../../components/Ticket/Table";
 import AddTask from "../../components/Ticket/Title";
 
 const TABS = [
@@ -61,6 +61,7 @@ const Tasks = () => {
           <BoardView tickets={tickets} />
         ) : (
           <div className='w-full'>
+            <Table tickets={tickets} />
           </div>
         )}
       </Tabs>

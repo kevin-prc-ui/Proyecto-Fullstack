@@ -5,6 +5,7 @@ const REST_API_BASE_URL = "http://localhost:8080/api"; //update the base url
 // Helper function to get the token from localStorage
 const getAuthToken = () => localStorage.getItem("authToken");
 
+
 // Function to create headers with the Authorization token
 const getHeaders = () => ({
   headers: {

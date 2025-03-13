@@ -27,6 +27,9 @@ public class Ticket {
     @Column(nullable = false, unique = true)
     private String codigo;
 
+    @Column(nullable = false, unique = true)
+    private String isTrashed;
+
     @CreationTimestamp
     @Column(name="fecha_creacion")
     private LocalDateTime fechaCreacion;
@@ -49,7 +52,6 @@ public class Ticket {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "departamento_id", nullable = false)
     private Departamento departamento;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fuente_id", nullable = false)

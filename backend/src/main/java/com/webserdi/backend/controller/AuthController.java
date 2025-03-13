@@ -1,6 +1,5 @@
 package com.webserdi.backend.controller;
 
-import com.webserdi.backend.dto.LoginDto;
 import com.webserdi.backend.dto.UsuarioDto;
 import com.webserdi.backend.security.JwtTokenProvider;
 import com.webserdi.backend.service.UsuarioService;
@@ -26,10 +25,11 @@ public class AuthController {
     private final UsuarioService usuarioService;
 
     @PostMapping(value = {"/login", "/signin"})
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto){
+    public ResponseEntity<String> login(@RequestBody UsuarioDto usuarioDto){
+        usuarioService.checkOrCreateUser(usuarioDto);
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                loginDto.getEmail(), loginDto.getPassword()));
+                usuarioDto.getEmail(), usuarioDto.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -37,15 +37,4 @@ public class AuthController {
 
         return new ResponseEntity<>(token, HttpStatus.OK);
     }
-
-    @PostMapping(value = {"/register"})
-    public ResponseEntity<String> register (@RequestBody UsuarioDto usuarioDto){
-        //check if the password and the confirmPassword are the same.
-        if (usuarioDto.getPassword().isEmpty()){
-            return new ResponseEntity<>("No se ingresó contraseña", HttpStatus.BAD_REQUEST);
-        }
-        usuarioService.createUsuario(usuarioDto);
-        return new ResponseEntity<>("User registered successfully", HttpStatus.CREATED);
-    }
-
 }
