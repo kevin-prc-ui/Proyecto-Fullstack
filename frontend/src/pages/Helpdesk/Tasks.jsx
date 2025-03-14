@@ -60,7 +60,7 @@ const Tasks = () => {
         {selected !== 1 ? (
           <BoardView tickets={tickets} />
         ) : (
-          <div className='w-full '>
+          <div className='w-full'>
             <Table tickets={tickets} />
           </div>
         )}

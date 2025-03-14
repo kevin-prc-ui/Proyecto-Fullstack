@@ -6,9 +6,11 @@ import com.webserdi.backend.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +26,7 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UsuarioService usuarioService;
 
+    @PreAuthorize("permitAll")
     @PostMapping(value = {"/login", "/signin"})
     public ResponseEntity<String> login(@RequestBody UsuarioDto usuarioDto){
         usuarioService.checkOrCreateUser(usuarioDto);
@@ -36,5 +39,12 @@ public class AuthController {
         String token = jwtTokenProvider.generateToken(authentication);
 
         return new ResponseEntity<>(token, HttpStatus.OK);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/signout")
+    public ResponseEntity<Void> signOut(@AuthenticationPrincipal UsuarioDto usuarioDto){
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.noContent().build();
     }
 }

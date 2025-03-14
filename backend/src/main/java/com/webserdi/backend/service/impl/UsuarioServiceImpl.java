@@ -89,7 +89,9 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(()->
                         new ResourceNotFoundException("No existe el usuario con el id " + usuarioId));
+        String rolNombre = usuario.getRol().getNombre();
         return UsuarioMapper.mapToUsuarioDto(usuario);
+
     }
 
     @Override

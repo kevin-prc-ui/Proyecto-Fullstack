@@ -40,4 +40,5 @@ export const getUserPermissions = async () => {
 export const checkOrCreateUser = (userData) => 
   axios.post(`${REST_API_BASE_URL}/users/check-or-create`, userData, getHeaders());
 
-export const login = (login) => axios.post(`${REST_API_BASE_URL}/auth/login`, login);
+export const login = (loginData) => axios.post(`${REST_API_BASE_URL}/auth/login`, loginData);
+export const logout = (signoutData) => axios.post(`${REST_API_BASE_URL}/auth/signout`, signoutData);

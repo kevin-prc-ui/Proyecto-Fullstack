@@ -28,7 +28,7 @@ public class Ticket {
     private String codigo;
 
     @Column(nullable = false, unique = true)
-    private String isTrashed;
+    private Boolean isTrashed;
 
     @CreationTimestamp
     @Column(name="fecha_creacion")
