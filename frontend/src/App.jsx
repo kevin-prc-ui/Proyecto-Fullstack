@@ -22,7 +22,7 @@ import Footer from "./components/Footer";
 function Layout() {
   return (
     <div className="w-full h-screen flex flex-col md:flex-row" data-theme={'dark'}>
-      <div className="w-1/6 h-screen bg-white sticky top-0 hidden md:block" >
+      <div  className="w-1/6 h-screen bg-white min-w-53 sticky top-0 hidden md:block" >
         <Sidebar />
       </div>
       <div className="flex-1 flex flex-col overflow-y-auto">
@@ -38,7 +38,7 @@ function Layout() {
 
 function App() {
   return (
-    <main className="w-full min-h-screen bg-[#f3f7ff] ">
+    <main className="w-full min-h-screen bg-[#e7ebf3] ">
       <Routes>
         <Route element={<Layout />}>
           <Route index path="/" element={<Navigate to="/dashboard" />} />

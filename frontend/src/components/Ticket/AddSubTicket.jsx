@@ -34,7 +34,7 @@ const AddSubTicket = ({ open, setOpen, id }) => {
             as='h2'
             className='text-base font-bold leading-6 text-gray-900 mb-4'
           >
-            ADD SUB-TASK
+            ADD SUB-TICKET
           </Dialog.Title>
           <div className='mt-2 flex flex-col gap-6'>
             <Textbox

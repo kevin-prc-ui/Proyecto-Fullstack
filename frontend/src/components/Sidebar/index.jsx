@@ -148,7 +148,7 @@ const Sidebar = () => {
                       className={clsx(
                         "child-link",
                         "w-full lg:w-3/4 flex gap-2 px-3 py-2 rounded-full items-center mb-2",
-                        "text-decoration-none hover:bg-[#2564ed2d]",
+                        "text-decoration-none hover:bg-[#2564ed2d] min-w-40",
                         isActiveLink(child.link)
                           ? "bg-primary text-white"
                           : "text-dark"

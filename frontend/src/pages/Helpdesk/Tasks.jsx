@@ -43,7 +43,7 @@ const Tasks = () => {
   ) : (
     <div className='w-full'>
       <div className='flex items-center justify-between mb-4'>
-        <Title title={status ? `${status} Tasks` : "Tasks"} />
+        {/* <Title title={status ? `${status} Tasks` : "Tasks"} /> */}
 
         {!status && (
           <Button
@@ -60,13 +60,13 @@ const Tasks = () => {
         {selected !== 1 ? (
           <BoardView tickets={tickets} />
         ) : (
-          <div className='w-full'>
+          <div className='w-full '>
             <Table tickets={tickets} />
           </div>
         )}
       </Tabs>
 
-      <AddTask open={open} setOpen={setOpen} />
+      {/* <AddTask open={open} setOpen={setOpen} /> */}
     </div>
   );
 };

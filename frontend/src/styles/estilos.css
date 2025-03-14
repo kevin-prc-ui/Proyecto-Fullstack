@@ -132,7 +132,6 @@ h1 {
 .user-table td {
   padding: 12px 15px;
   text-align: left;
-  border-bottom: 10px solid #f3f7ff;
 }
 
 .user-table th {
@@ -145,7 +144,7 @@ h1 {
   background-color: #f5f5f5;
 }
 .user-table tbody tr:hover {
-  border-top: 10px solid#dc3545;
+  border-left: 2px solid #007bff;
 }
 
 .user-table .sortable-header {

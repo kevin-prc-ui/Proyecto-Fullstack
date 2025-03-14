@@ -27,8 +27,8 @@ const Card = ({ ticket }) => {
 
   return (
     <>
-      <div className="w-full h-fit bg-white shadow-md p-4 rounded">
-        <div className="w-full flex justify-between">
+      <div className="w-full h-fit bg-white shadow-md p-4 rounded ">
+        <div className="w-full flex justify-evenly items-center ">
           <div
             className={clsx(
               "flex flex-1 gap-1 items-center text-sm font-medium",
@@ -113,9 +113,7 @@ const Card = ({ ticket }) => {
         <div className="w-full pb-2">
           <button
             onClick={() => setOpen(true)}
-            
-            className="w-full flex gap-4 items-center text-sm text-gray-500 font-semibold disabled:cursor-not-allowed disabled::text-gray-300"
-          >
+            className="w-full flex gap-4 items-center text-sm text-gray-500 font-semibold disabled:cursor-not-allowed disabled::text-gray-300">
             <IoMdAdd className="text-lg" />
             <span>ADD SUBTICKET</span>
           </button>
