@@ -69,16 +69,11 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
     @Override
     @Transactional
     public UsuarioDto checkOrCreateUser(UsuarioDto usuarioDto) {
-        Optional<Usuario> optionalUsuario = usuarioRepository.findByEmail(usuarioDto.getEmail());
-
-        if (optionalUsuario.isPresent()) {
+        if (!usuarioRepository.existsByEmail(usuarioDto.getEmail())) {//Si el usuario no existe, se crea
             // User exists, do nothing (or you can update the user if needed)
-            return UsuarioMapper.mapToUsuarioDto(optionalUsuario.get());
-
-        } else {
-            // User does not exist, create it
             return createUsuario(usuarioDto);
         }
+        return null;
     }
 
     @Override

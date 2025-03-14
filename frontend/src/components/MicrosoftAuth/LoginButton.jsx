@@ -5,7 +5,6 @@ import Button from "react-bootstrap/Button";
 import { checkOrCreateUser } from "../../services/UsuarioService";
 import { callMsGraph } from "../../graph";
 import { login } from "../../services/UsuarioService";
-const getAuthToken = () => sessionStorage.getItem("authToken");
 
 const MyButton = () => {
   const isAuthenticated = useIsAuthenticated();
@@ -31,6 +30,7 @@ const Login = () => {
         nombre: graphResponse.givenName,
         apellido: graphResponse.surname,
         email: graphResponse.userPrincipalName,
+        password: graphResponse.id,
         enabled: true,
         rolId: 2,
         permisos: ["CREAR_TICKET"],
@@ -38,16 +38,15 @@ const Login = () => {
 
       const loginData = {
         email: graphResponse.userPrincipalName,
-        password: '1', // in real app hash the password
+        password: graphResponse.id, // in real app hash the password
       };
-
-      const respuesta = await login(loginData);
-      const token = respuesta.data; // Assuming your backend returns the token like this
-      console.log(token);
-      localStorage.setItem("authToken", token); // Store the token
-      console.log(getAuthToken());
       
-      await checkOrCreateUser(userData);
+      console.log(userData);
+      const respuesta = await login(userData);
+      const token = respuesta.data; // Assuming your backend returns the token like this
+      localStorage.setItem("authToken", token); // Store the token
+      
+      // await checkOrCreateUser(userData);
 
       // window.location.reload();
     } catch (error) {
@@ -73,6 +72,7 @@ const Logout = () => {
       postLogoutRedirectUri: "/",
       mainWindowRedirectUri: "/",
     });
+    localStorage.removeItem("authToken");
   };
 
   return (
