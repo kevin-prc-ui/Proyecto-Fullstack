@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,7 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public TicketDto createTicket(TicketDto dto) {
         try {
+            dto.setIsTrashed(false);
             Ticket ticket = ticketMapper.toEntity(dto);
             ticket.setCodigo(generateNextCodigo());
             setRelationships(dto, ticket);
