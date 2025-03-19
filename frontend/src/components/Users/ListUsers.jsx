@@ -12,6 +12,7 @@ import {
   handleApiError,
   formatUserRole,
 } from "../../utils/utils";
+import { toast } from "sonner";
 
 /**
  * Componente para listar usuarios.
@@ -51,8 +52,7 @@ function ListUsuarioComponent() {
       const response = await listUsers(); // Llama al servicio para obtener los usuarios
       setUsuarios(response.data); // Actualiza el estado con la lista de usuarios
     } catch (error) {
-      setErrorConexion(true); // Indica que hubo un error de conexión
-      handleApiError(error, "Error al obtener la lista de usuarios");
+      setErrorConexion(error!=null); // Indica que hubo un error de conexión
     } finally {
       setLoading(false); // Oculta el spinner de carga
     }
@@ -62,7 +62,7 @@ function ListUsuarioComponent() {
    * Navega a la página para agregar un nuevo usuario.
    */
   function addNewUser() {
-    navigator("/helpdesk/add-user");
+    navigator("/admin/helpdesk/add-user");
   }
 
   /**
@@ -70,7 +70,7 @@ function ListUsuarioComponent() {
    * @param {number} id - ID del usuario a editar.
    */
   function updateUser(id) {
-    navigator(`/helpdesk/edit-user/${id}`);
+    navigator(`/admin/helpdesk/edit-user/${id}`);
   }
 
   /**
@@ -85,7 +85,7 @@ function ListUsuarioComponent() {
           setUsuarios(usuarios.filter((usuario) => usuario.id !== id));
         })
         .catch((error) => {
-          handleApiError(error, "Error al eliminar el usuario");
+          toast.error("Error"(error));
         });
     }
   }

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "sonner";
 
 const REST_API_BASE_URL = "http://localhost:8080/api"; //update the base url
 
@@ -19,6 +20,7 @@ export const listUsers = () =>
     .then((response) => response)
     .catch((error) => {
       if (!error.response) {
+        toast.error("Error de conexión con el servidor");
         throw new Error("Error de conexion con el servidor");
       }
       throw error;

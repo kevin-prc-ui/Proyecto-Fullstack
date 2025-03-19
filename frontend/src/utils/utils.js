@@ -2,6 +2,8 @@
  * Archivo de utilidades que contiene funciones y constantes compartidas
  */
 
+import { listRol } from "../services/RolService";
+
 /**
  * Formatea el rol del usuario para mostrar un nombre legible.
  * @param {string} rolId - ID del rol del usuario.
@@ -13,36 +15,18 @@ export const formatUserRole = (rolId) => {
         return "Administrador";
     case 2:
         return "Agente";
-    case 3:
-        return "Consumidor";
-    case 4:
-        return "Contribuyente";
-    case 5:
-        return "Colaborador";
-    case 6:
-        return "Gerente";
     default:
         return "Desconocido";
     }
 };
-
-export const formatPermisos = (array) => {
-  console.log(array[1])
-}
-
   
   /**
    * Constantes que contiene todos los roles de la aplicacion
    */
-  export const USER_ROLES_ARRAY = [
-    { id: "1", name: "Administrador" },
-    { id: "2", name: "Agente" },
-    { id: "3", name: "Consumidor" },
-    { id: "4", name: "Contribuyente" },
-    { id: "5", name: "Colaborador" },
-    { id: "6", name: "Gerente" },
-  ];
-  
+  const fetchRoles = await listRol();
+  export const USER_ROLES_ARRAY = fetchRoles.data;
+  console.log(USER_ROLES_ARRAY)
+
   /**
    * Mensaje de error por defecto
    */

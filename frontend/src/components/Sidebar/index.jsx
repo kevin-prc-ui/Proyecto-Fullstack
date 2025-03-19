@@ -40,7 +40,7 @@ const linkData = [
       },
       {
         label: "Equipo",
-        link: "/helpdesk/users",
+        link: "/admin/helpdesk/users",
         icon: <FaUsers />,
       },
       {

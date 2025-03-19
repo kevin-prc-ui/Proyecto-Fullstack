@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 // Importando constantes y funciones de utilidad
 import { USER_ROLES_ARRAY, handleApiError } from "../../utils/utils";
 import axios from "axios";
+import { toast } from "sonner";
 
 /**
  * Componente para agregar o editar un usuario.
@@ -49,7 +50,7 @@ const UsersComponent = () => {
         const filteredPermisos = data.filter(permiso => permiso.moduloId === 1);
         setPermisosDisponibles(filteredPermisos);
       } catch (error) {
-        handleApiError(error, "Error al cargar los permisos");
+        toast.error("Error al cargar los permisos");
       }
     };
     fetchPermisos();
@@ -71,7 +72,6 @@ const UsersComponent = () => {
           setSelectedPermisos(response.data.permisos || []);
         })
         .catch((error) => {
-          handleApiError(error, "Error al obtener los datos del usuario")
         })
         .finally(() => setLoading(false));
     }
@@ -104,9 +104,9 @@ const UsersComponent = () => {
           await createUser(userData) // Llama al servicio para crear el usuario
           console.log("Usuario creado correctamente");
         }
-        navigator("/helpdesk/users"); // Navega a la lista de usuarios
+        navigator("/admin/helpdesk/users"); // Navega a la lista de usuarios
     } catch (error) {
-      handleApiError(error, "Error al guardar los cambios del usuario")
+      toast.error(error, "Error al guardar los cambios del usuario")
     } finally {
         setLoading(false);
     }
@@ -265,7 +265,7 @@ const UsersComponent = () => {
                   </Button>
                   <Button
                     className="btn btn-danger"
-                    onClick={() => navigator("/helpdesk/users")}
+                    onClick={() => navigator("/admin/helpdesk/users")}
                   >
                     Cancelar
                   </Button>
