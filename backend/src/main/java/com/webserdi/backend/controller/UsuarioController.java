@@ -5,6 +5,7 @@ import com.webserdi.backend.dto.UsuarioDto;
 import com.webserdi.backend.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -36,6 +37,7 @@ public class UsuarioController{
         return ResponseEntity.ok(usuarioDto);
     }
 
+    //@PostAuthorize("hasRole('Administrador')")
     @GetMapping
     public ResponseEntity<List<UsuarioDto>> getAllUsuarios() {
         List<UsuarioDto> usuarios = usuarioService.getAllUsuarios();

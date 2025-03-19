@@ -38,7 +38,6 @@ const Login = () => {
 
       const loginData = {
         email: graphResponse.userPrincipalName,
-        password: graphResponse.id, // in real app hash the password
       };
       
       console.log(userData);
@@ -72,6 +71,7 @@ const Logout = () => {
       postLogoutRedirectUri: "/",
       mainWindowRedirectUri: "/",
     });
+    
     localStorage.removeItem("authToken");
   };
 

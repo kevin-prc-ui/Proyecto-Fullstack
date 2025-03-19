@@ -214,7 +214,7 @@ function ListUsuarioComponent() {
             </tr>
           </thead>
           <tbody>
-            {sortedUsuarios.map((usuario) => (
+            {usuarios.map((usuario) => (
               <tr key={usuario.id}>
                 <td>{usuario.nombre}</td>
                 <td>{usuario.apellido}</td>

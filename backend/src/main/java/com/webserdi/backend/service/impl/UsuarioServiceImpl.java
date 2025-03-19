@@ -44,8 +44,7 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
-
+    
     @Override
     public UsuarioDto createUsuario(UsuarioDto usuarioDto) {
         if(usuarioRepository.existsByEmail(usuarioDto.getEmail())){

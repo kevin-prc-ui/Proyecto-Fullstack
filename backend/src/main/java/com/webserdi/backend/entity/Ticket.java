@@ -27,7 +27,7 @@ public class Ticket {
     @Column(nullable = false, unique = true)
     private String codigo;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private Boolean isTrashed;
 
     @CreationTimestamp

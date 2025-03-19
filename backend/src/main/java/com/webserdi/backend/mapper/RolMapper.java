@@ -15,7 +15,8 @@ public class RolMapper {
         // Los permisos se manejan en el servicio específico
         return rol;
 
-    }public static RolDto mapToRolDto(Rol rol) {
+    }
+    public static RolDto mapToRolDto(Rol rol) {
         RolDto rolDto = new RolDto();
         rolDto.setId(rol.getId());
         rolDto.setNombre(rol.getNombre());

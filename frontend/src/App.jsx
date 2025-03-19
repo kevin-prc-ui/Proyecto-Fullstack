@@ -48,10 +48,10 @@ function App() {
           <Route path="/helpdesk/in-progress/:status" element={<Tasks />} />
           <Route path="/helpdesk/todo/:status" element={<Tasks />} />
           <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
-          <Route path="/helpdesk/users" element={<Users />} />
           <Route path="/helpdesk/trash" element={<Trash />} />
-          <Route path="/helpdesk/add-user" element={<UsersComponent />} />
-          <Route path="/helpdesk/edit-user/:id" element={<UsersComponent />} />
+          <Route path="/admin/helpdesk/add-user" element={<UsersComponent />} />
+          <Route path="/admin/helpdesk/edit-user/:id" element={<UsersComponent />} />
+          <Route path="/admin/helpdesk/users" element={<Users />} />
           <Route path="/knowledge/home" element={<Home />} />
           <Route path="/knowledge/myfile" element={<MyFile />} />
           <Route path="/knowledge/sharedfile" element={<SharedFile />} />
