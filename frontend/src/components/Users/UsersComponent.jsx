@@ -4,7 +4,7 @@ import { createUser, getUserById, updateUser } from "../../services/UsuarioServi
 import { useNavigate, useParams } from "react-router-dom";
 
 // Importando constantes y funciones de utilidad
-import { USER_ROLES_ARRAY, handleApiError } from "../../utils/utils";
+import { USER_ROLES_ARRAY} from "../../utils/utils";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -243,7 +243,7 @@ const UsersComponent = () => {
                   >
                     <option value="">Seleccione</option>
                     {USER_ROLES_ARRAY.map((rol) => (
-                        <option key={rol.id} value={rol.id}>{rol.name}</option>
+                        <option key={rol.id} value={rol.id}>{rol.nombre}</option>
                     ))}
                   </select>
                   {errors.rolId && (

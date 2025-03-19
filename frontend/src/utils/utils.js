@@ -25,7 +25,6 @@ export const formatUserRole = (rolId) => {
    */
   const fetchRoles = await listRol();
   export const USER_ROLES_ARRAY = fetchRoles.data;
-  console.log(USER_ROLES_ARRAY)
 
   /**
    * Mensaje de error por defecto
