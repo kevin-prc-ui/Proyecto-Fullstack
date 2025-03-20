@@ -11,6 +11,7 @@ import jakarta.annotation.PostConstruct;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtTokenProvider {
@@ -27,6 +28,7 @@ public class JwtTokenProvider {
     public void init() {
         key=Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
+
 
     // Generate JWT token
     public String generateToken(Authentication authentication) {

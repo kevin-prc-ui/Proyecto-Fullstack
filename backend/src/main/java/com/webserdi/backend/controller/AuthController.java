@@ -38,7 +38,7 @@ public class AuthController {
 
         String token = jwtTokenProvider.generateToken(authentication);
 
-        return new ResponseEntity<>(token, HttpStatus.OK);
+        return ResponseEntity.ok();
     }
 
     @PreAuthorize("isAuthenticated()")

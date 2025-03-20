@@ -9,7 +9,6 @@ import '../../styles/index.css';
 // Importando constantes y funciones de utilidad
 import {
   DEFAULT_ERROR_MESSAGE,
-  handleApiError,
   formatUserRole,
 } from "../../utils/utils";
 import { toast } from "sonner";
@@ -214,7 +213,7 @@ function ListUsuarioComponent() {
             </tr>
           </thead>
           <tbody>
-            {usuarios.map((usuario) => (
+            {sortedUsuarios.map((usuario) => (
               <tr key={usuario.id}>
                 <td>{usuario.nombre}</td>
                 <td>{usuario.apellido}</td>
