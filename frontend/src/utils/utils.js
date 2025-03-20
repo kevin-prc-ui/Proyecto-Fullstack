@@ -89,9 +89,8 @@ export const formatUserRole = (rolId) => {
   };
   
   export const TICKET_TYPE = {
-    todo: "bg-blue-600",
-    "in progress": "bg-yellow-600",
-    completed: "bg-green-600",
+    1: "bg-blue-600",
+    2: "bg-green-600",
   };
   
   export const BGS = [

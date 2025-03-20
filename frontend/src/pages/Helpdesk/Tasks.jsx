@@ -12,6 +12,8 @@ import Table from "../../components/Ticket/Table";
 import AddTask from "../../components/Ticket/Title";
 import { toast } from "sonner";
 import axios from "axios";
+import { listTickets } from "../../services/TicketService";
+import { useIsAuthenticated } from "@azure/msal-react";
 
 const TABS = [
   { title: "Cuadricula", icon: <MdGridView /> },
@@ -27,34 +29,40 @@ const TASK_TYPE = {
 const Tasks = () => {
   
   const params = useParams();
-
+  const isAuth = useIsAuthenticated(); // Hook para verificar si el usuario está autenticado
   const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [tickets,setTickets] = useEffect();
+  const [tickets,setTickets] = useState([]);
+  const [errorConexion, setErrorConexion] = useState(false); // Estado para indicar si hubo un error de conexión
+
   
 
   const status = params?.status || "";
 
-  const getAuthToken = () => localStorage.getItem("authToken");
-
-  const getHeaders = () => ({
-      headers: {
-          Authorization: `Bearer ${getAuthToken()}`,
-      },
-  });
   useEffect(() => {
-    const fetchTickets = async () => {
+      const fetchTickets = async () => {
+        await getAllTickets();
+      };
+  
+      if (isAuth) fetchTickets();
+    }, [isAuth]);
+  
+    /**
+     * Obtiene la lista de todos los usuarios.
+     * Actualiza el estado de `usuarios`, `loading` y `errorConexion`.
+     */
+    async function getAllTickets() {
+      setLoading(true); // Mostrar el spinner de carga
       try {
-        const response = await axios.get('/api/roles', getHeaders());
-        const data = await response.data;
-        setTickets(data);
+        const response = await listTickets(); // Llama al servicio para obtener los usuarios
+        setTickets(response.data); // Actualiza el estado con la lista de usuarios
       } catch (error) {
-        toast.error("Error al cargar los roles");
+        setErrorConexion(error!=null); // Indica que hubo un error de conexión
+      } finally {
+        setLoading(false); // Oculta el spinner de carga
       }
-    };
-    fetchTickets();
-  }, []);
+    }
 
   return loading ? (
     <div className='py-10'>

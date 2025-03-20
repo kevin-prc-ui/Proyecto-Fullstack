@@ -22,4 +22,5 @@ public class TicketDto {
     private Long incidencia;
     private Long motivo;
     private Long prioridad;
+    private Long estado;
 }

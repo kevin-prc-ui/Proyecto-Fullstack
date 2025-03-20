@@ -16,9 +16,9 @@ import { IoMdAdd } from "react-icons/io";
 import AddSubTicket from "./AddSubTicket";//CREATE
 
 const ICONS = {
-  alta: <MdKeyboardDoubleArrowUp />,
-  media: <MdKeyboardArrowUp />,
-  baja: <MdKeyboardArrowDown />,
+  1: <MdKeyboardDoubleArrowUp />,
+  2: <MdKeyboardArrowUp />,
+  3: <MdKeyboardArrowDown />,
 };
 
 const Card = ({ ticket }) => {
@@ -45,7 +45,7 @@ const Card = ({ ticket }) => {
         <>
           <div className="flex items-center gap-2">
             <div
-              className={clsx("w-4 h-4 rounded-full", TICKET_TYPE[ticket.stage])}
+              className={clsx("w-4 h-4 rounded-full", TICKET_TYPE[ticket.estado])}
             />
             <h4 className="line-clamp-1 text-black">{ticket?.tema}</h4>
           </div>

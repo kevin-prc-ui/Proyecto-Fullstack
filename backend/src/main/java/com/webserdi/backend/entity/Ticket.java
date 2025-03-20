@@ -73,7 +73,7 @@ public class Ticket {
 //    @JoinColumn(name = "chat_id")
 //    private Chat chat;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "estado_id", nullable = false)
-//    private Estado estado;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "estado_id", nullable = false)
+    private Estado estado;
 }

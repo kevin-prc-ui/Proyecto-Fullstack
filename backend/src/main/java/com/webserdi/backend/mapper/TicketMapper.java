@@ -23,6 +23,7 @@ public class TicketMapper {
         ticketDto.setIncidencia(ticket.getIncidencia().getId());
         ticketDto.setMotivo(ticket.getMotivo().getId());
         ticketDto.setPrioridad(ticket.getPrioridad().getId());
+        ticketDto.setEstado(ticket.getEstado().getId());
         return ticketDto;
     }
 

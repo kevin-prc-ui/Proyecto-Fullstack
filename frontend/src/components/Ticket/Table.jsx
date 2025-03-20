@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { BiMessageAltDetail } from "react-icons/bi";
 import {
   MdAttachFile,
@@ -6,6 +6,7 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
+import { toast } from "sonner";
 import { BGS, PRIOTITYSTYELS, TICKET_TYPE, formatDate } from "../../utils/utils";
 import clsx from "clsx";
 import { FaList } from "react-icons/fa";
@@ -14,17 +15,14 @@ import Button from "../Button";
 import ConfirmatioDialog from "./Dialog";
 
 const ICONS = {
-  "1": <MdKeyboardDoubleArrowUp />,
+  1: <MdKeyboardDoubleArrowUp />,
   2: <MdKeyboardArrowUp />,
   3: <MdKeyboardArrowDown />,
 };
 
-const Table = () => {
-
+const Table = ({ tickets }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selected, setSelected] = useState(null);
-
-
 
   const deleteClicks = (id) => {
     setSelected(id);
@@ -50,28 +48,28 @@ const Table = () => {
       <td className='py-2'>
         <div className='flex items-center gap-2'>
           <div
-            className={clsx("w-4 h-4 rounded-full", TICKET_TYPE[ticket.stage])}
+            className={clsx("w-4 h-4 rounded-full", TICKET_TYPE[ticket.estado])}
           />
           <p className='w-full line-clamp-2 text-base text-black'>
-            {ticket?.title}
+            {ticket?.tema}
           </p>
         </div>
       </td>
 
       <td className='py-2'>
         <div className={"flex gap-1 items-center"}>
-          <span className={clsx("text-lg", PRIOTITYSTYELS[ticket?.priority])}>
-            {ICONS[ticket?.priority]}
+          <span className={clsx("text-lg", PRIOTITYSTYELS[ticket?.prioridad])}>
+            {ICONS[ticket?.prioridad]}
           </span>
           <span className='capitalize line-clamp-1'>
-            Prioridad {ticket?.priority} 
+            Prioridad {ticket?.prioridad} 
           </span>
         </div>
       </td>
 
       <td className='py-2'>
         <span className='text-sm text-gray-600'>
-          {formatDate(new Date(ticket?.date))}
+          {formatDate(new Date(ticket?.fechaVencimiento))}
         </span>
       </td>
 
@@ -96,7 +94,7 @@ const Table = () => {
         <div className='flex'>
           {ticket?.team?.map((m, index) => (
             <div
-              key={m.id}
+              key={m._id}
               className={clsx(
                 "w-7 h-7 rounded-full text-white flex items-center justify-center text-sm -mr-1",
                 BGS[index % BGS?.length]
@@ -114,7 +112,6 @@ const Table = () => {
           label='Edit'
           type='button'
         />
-
         <Button
           className='text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base'
           label='Delete'
@@ -124,6 +121,7 @@ const Table = () => {
       </td>
     </tr>
   );
+  console.log(tickets)
   return (
     <>
       <div className='bg-white  px-2 md:px-4 pt-4 pb-9 shadow-md rounded'>
