@@ -4,7 +4,6 @@ import { createUser, getUserById, updateUser } from "../../services/UsuarioServi
 import { useNavigate, useParams } from "react-router-dom";
 
 // Importando constantes y funciones de utilidad
-import { USER_ROLES_ARRAY} from "../../utils/utils";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -19,6 +18,7 @@ const UsersComponent = () => {
   const [rolId, setRolId] = useState("");
   const [selectedPermisos, setSelectedPermisos] = useState([]);
   const [permisosDisponibles, setPermisosDisponibles] = useState([]);
+  const [roles, setRoles] = useState([]);
 
 
   // Estado para almacenar los errores de validación
@@ -40,6 +40,23 @@ const UsersComponent = () => {
           Authorization: `Bearer ${getAuthToken()}`,
       },
   });
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await axios.get('/api/roles', getHeaders());
+        const data = await response.data;
+        setRoles(data);
+      } catch (error) {
+        toast.error("Error al cargar los roles");
+      }
+    };
+    fetchRoles();
+  }, []);
+
+  
+
+
   //Efecto para cargar los permisos disponibles
   useEffect(() => {
     const fetchPermisos = async () => {
@@ -242,7 +259,7 @@ const UsersComponent = () => {
                     value={rolId}
                   >
                     <option value="">Seleccione</option>
-                    {USER_ROLES_ARRAY.map((rol) => (
+                    {ROLES.map((rol) => (
                         <option key={rol.id} value={rol.id}>{rol.nombre}</option>
                     ))}
                   </select>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { BiMessageAltDetail } from "react-icons/bi";
 import {
   MdAttachFile,
@@ -6,7 +6,6 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
-import { toast } from "sonner";
 import { BGS, PRIOTITYSTYELS, TICKET_TYPE, formatDate } from "../../utils/utils";
 import clsx from "clsx";
 import { FaList } from "react-icons/fa";
@@ -20,9 +19,12 @@ const ICONS = {
   3: <MdKeyboardArrowDown />,
 };
 
-const Table = ({ tickets }) => {
+const Table = () => {
+
   const [openDialog, setOpenDialog] = useState(false);
   const [selected, setSelected] = useState(null);
+
+
 
   const deleteClicks = (id) => {
     setSelected(id);

@@ -23,8 +23,7 @@ export const formatUserRole = (rolId) => {
   /**
    * Constantes que contiene todos los roles de la aplicacion
    */
-  const fetchRoles = await listRol();
-  export const USER_ROLES_ARRAY = fetchRoles.data;
+  // const fetchRoles = await listRol();
 
   /**
    * Mensaje de error por defecto
