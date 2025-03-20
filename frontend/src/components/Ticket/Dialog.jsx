@@ -4,7 +4,7 @@ import { FaQuestion } from "react-icons/fa";
 import ModalWrapper from "../ModalWrapper";
 import Button from "../Button";
 
-export default function ConfirmatioDialog({
+export default function ConfirmationDialog({
   open,
   setOpen,
   msg,

@@ -259,7 +259,7 @@ const UsersComponent = () => {
                     value={rolId}
                   >
                     <option value="">Seleccione</option>
-                    {ROLES.map((rol) => (
+                    {roles.map((rol) => (
                         <option key={rol.id} value={rol.id}>{rol.nombre}</option>
                     ))}
                   </select>

@@ -22,3 +22,6 @@ export const listTickets = () =>
         }
         throw error;
       });
+
+export const deleteTicket = (ticketId) => axios.delete(`${REST_API_BASE_URL}/tickets/${ticketId}`, getHeaders());
+

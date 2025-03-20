@@ -12,7 +12,8 @@ import clsx from "clsx";
 import { FaList } from "react-icons/fa";
 import UserInfo from "../Users/UserInfo";
 import Button from "../Button";
-import ConfirmatioDialog from "./Dialog";
+import ConfirmationDialog from "./Dialog";
+import { deleteTicket } from "../../services/TicketService";
 
 const ICONS = {
   1: <MdKeyboardDoubleArrowUp />,
@@ -29,7 +30,12 @@ const Table = ({ tickets }) => {
     setOpenDialog(true);
   };
 
-  const deleteHandler = () => {};
+  const deleteHandler = () => {
+    deleteTicket(selected);
+    setOpenDialog(false);
+    window.location.reload();
+    toast.success("Ticket deleted successfully")
+  };
 
   const TableHeader = () => (
     <thead className='w-full border-b border-gray-300'>
@@ -121,7 +127,7 @@ const Table = ({ tickets }) => {
       </td>
     </tr>
   );
-  console.log(tickets)
+  
   return (
     <>
       <div className='bg-white  px-2 md:px-4 pt-4 pb-9 shadow-md rounded'>
@@ -138,7 +144,7 @@ const Table = ({ tickets }) => {
       </div>
 
       {/* TODO */}
-      <ConfirmatioDialog
+      <ConfirmationDialog
         open={openDialog}
         setOpen={setOpenDialog}
         onClick={deleteHandler}
