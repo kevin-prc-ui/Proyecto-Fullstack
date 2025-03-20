@@ -95,6 +95,7 @@ public class TicketServiceImpl implements TicketService {
         ticket.setCodigo(dto.getCodigo());
         ticket.setIsTrashed(dto.getIsTrashed());
         ticket.setFechaVencimiento(dto.getFechaVencimiento());
+        ticket.setFechaActualizacion(LocalDateTime.now());
 
         setRelationships(dto, ticket);
 

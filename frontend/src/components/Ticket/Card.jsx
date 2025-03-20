@@ -32,11 +32,11 @@ const Card = ({ ticket }) => {
           <div
             className={clsx(
               "flex flex-1 gap-1 items-center text-sm font-medium",
-              PRIOTITYSTYELS[ticket?.priority]
+              PRIOTITYSTYELS[ticket?.prioridad]
             )}
           >
-            <span className="text-lg">{ICONS[ticket?.priority]}</span>
-            <span className="uppercase">prioridad {ticket?.priority} </span>
+            <span className="text-lg">{ICONS[ticket?.prioridad]}</span>
+            <span className="uppercase">prioridad {ticket?.prioridad} </span>
           </div>
 
           {user?.isAdmin && <TicketDialog ticket={ticket} />}
@@ -47,10 +47,10 @@ const Card = ({ ticket }) => {
             <div
               className={clsx("w-4 h-4 rounded-full", TICKET_TYPE[ticket.stage])}
             />
-            <h4 className="line-clamp-1 text-black">{ticket?.title}</h4>
+            <h4 className="line-clamp-1 text-black">{ticket?.tema}</h4>
           </div>
           <span className="text-sm text-gray-600">
-            {formatDate(new Date(ticket?.date))}
+            {formatDate(new Date(ticket?.fechaVencimiento))}
           </span>
         </>
 
@@ -90,12 +90,12 @@ const Card = ({ ticket }) => {
         {ticket?.subTickets?.length > 0 ? (
           <div className="py-4 border-t border-gray-200">
             <h5 className="text-base line-clamp-1 text-black">
-              {ticket?.subTickets[0].title}
+              {ticket?.subTickets[0].tema}
             </h5>
 
             <div className="p-4 space-x-8">
               <span className="text-sm text-gray-600">
-                {formatDate(new Date(ticket?.subTickets[0]?.date))}
+                {formatDate(new Date(ticket?.subTickets[0]?.fechaVencimiento))}
               </span>
               <span className="bg-blue-600/10 px-3 py-1 rounded0full text-blue-700 font-medium">
                 {ticket?.subTickets[0].tag}
@@ -120,7 +120,7 @@ const Card = ({ ticket }) => {
         </div>
       </div>
 
-      <AddSubTicket open={open} setOpen={setOpen} id={ticket._id} />
+      <AddSubTicket open={open} setOpen={setOpen} id={ticket.id} />
     </>
   );
 };

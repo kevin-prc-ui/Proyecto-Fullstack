@@ -84,9 +84,9 @@ export const formatUserRole = (rolId) => {
   }
   
   export const PRIOTITYSTYELS = {
-    alta: "text-red-600",
-    media: "text-yellow-600",
-    baja: "text-blue-600",
+    1: "text-red-600",
+    2: "text-yellow-600",
+    3: "text-blue-600",
   };
   
   export const TICKET_TYPE = {
