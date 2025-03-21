@@ -28,39 +28,30 @@ import java.util.stream.Collectors;
 
 //Esta anotacion le dice al spring container que genere el spring bean para esta clase UsuarioServiceImpl
 @Service
-public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
+public class UsuarioServiceImpl implements UsuarioService {
     private final PermisoRepository permisoRepository;
     private final RolRepository rolRepository;
     private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UsuarioServiceImpl(PermisoRepository permisoRepository,
                               RolRepository rolRepository,
-                              UsuarioRepository usuarioRepository,
-                              PasswordEncoder passwordEncoder) {
+                              UsuarioRepository usuarioRepository) {
         this.permisoRepository = permisoRepository;
         this.rolRepository = rolRepository;
         this.usuarioRepository = usuarioRepository;
-        this.passwordEncoder = passwordEncoder;
     }
-    
+
     @Override
     public UsuarioDto createUsuario(UsuarioDto usuarioDto) {
         if(usuarioRepository.existsByEmail(usuarioDto.getEmail())){
             throw new ResourceNotFoundException("El usuario ya existe");
         }
-        Rol rol = rolRepository.findById(usuarioDto.getRolId())
-                .orElseThrow(() -> new ResourceNotFoundException("No existe el rol con el id " + usuarioDto.getRolId()));
+        Set<Rol> rol = rolRepository.findByNombreIn(usuarioDto.getRoles());
         Usuario usuario = UsuarioMapper.mapToUsuario(usuarioDto);
-        usuario.setRol(rol); // Asigna el rol al usuario
-        usuario.setPassword(passwordEncoder.encode(usuarioDto.getPassword()));
-        if(usuarioDto.getPermisos() != null && !usuarioDto.getPermisos().isEmpty()){
-            Set<Permiso> permisos = permisoRepository.findByNombreIn(usuarioDto.getPermisos());
-            usuario.setPermisos(permisos);
-        }else{
-            usuario.setPermisos(new HashSet<>());
-        }
+        usuario.setRoles(rol); // Asigna el rol al usuario
+        Set<Permiso> permisos = permisoRepository.findByNombreIn(usuarioDto.getPermisos());
+        usuario.setPermisos(permisos);
         usuario = usuarioRepository.save(usuario);
 
         return UsuarioMapper.mapToUsuarioDto(usuario);
@@ -88,7 +79,6 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(()->
                         new ResourceNotFoundException("No existe el usuario con el id " + usuarioId));
-        String rolNombre = usuario.getRol().getNombre();
         return UsuarioMapper.mapToUsuarioDto(usuario);
 
     }
@@ -105,29 +95,15 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
         savedUsuario.setEmail(usuarioDto.getEmail());
 
         // Actualizar rol
-        Rol rol = rolRepository.findById(usuarioDto.getRolId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Rol no encontrado con id: " + usuarioDto.getRolId()));
-        savedUsuario.setRol(rol);
+        Set<Rol> roles = rolRepository.findByNombreIn(usuarioDto.getRoles());
+        savedUsuario.setRoles(roles);
+        savedUsuario.getRoles().clear();
+        savedUsuario.getRoles().addAll(new HashSet<>(roles));
 
         // Actualizar permisos
-        if(usuarioDto.getPermisos() != null && !usuarioDto.getPermisos().isEmpty()) {
-            Set<Permiso> nuevosPermisos = permisoRepository.findByNombreIn(usuarioDto.getPermisos()
-            );
-
-            // Validar que todos los permisos existen
-            if(nuevosPermisos.size() != usuarioDto.getPermisos().size()) {
-                Set<String> permisosNoEncontrados = new HashSet<>(usuarioDto.getPermisos());
-                nuevosPermisos.forEach(p -> permisosNoEncontrados.remove(p.getNombre()));
-
-                throw new ResourceNotFoundException(
-                        "Los siguientes permisos no existen: " + String.join(", ", permisosNoEncontrados)
-                );
-            }
-
-            savedUsuario.getPermisos().clear();
-            savedUsuario.getPermisos().addAll(new HashSet<>(nuevosPermisos));
-        }
+        Set<Permiso> permisos = permisoRepository.findByNombreIn(usuarioDto.getPermisos());
+        savedUsuario.getPermisos().clear();
+        savedUsuario.getPermisos().addAll(new HashSet<>(permisos));
 
         Usuario usuarioActualizado = usuarioRepository.save(savedUsuario);
         return UsuarioMapper.mapToUsuarioDto(usuarioActualizado);
@@ -148,15 +124,6 @@ public class UsuarioServiceImpl implements UsuarioService, UserDetailsService {
                 .map(PermisoMapper::toDto)
                 .collect(Collectors.toList());
     }
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByEmail(email).orElseThrow(
-                () -> new UsernameNotFoundException("User not found with username or email:" + email));
 
-        Set<GrantedAuthority> authorities = new HashSet<>();
-        usuario.getPermisos().forEach(permiso -> authorities.add(new SimpleGrantedAuthority(permiso.getNombre())));
-
-        return new User(usuario.getEmail(), usuario.getPassword(), authorities);
-    }
 
 }
