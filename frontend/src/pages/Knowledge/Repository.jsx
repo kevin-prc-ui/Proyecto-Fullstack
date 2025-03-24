@@ -1,4 +1,8 @@
 import React from 'react';
+import { DocumentsReposi } from "../Knowledge/ComponentsKnow/Repository_Components/DocumentsReposi";
+import { RepositoryReposi } from './ComponentsKnow/Repository_Components/RepositoryReposi';
+import { CategoriesReposi } from './ComponentsKnow/Repository_Components/CategoriesReposi';
+import { TagsReposi } from './ComponentsKnow/Repository_Components/TagsReposi';
 import "../../styles/estilos.css";
 
 
@@ -7,10 +11,10 @@ const Repository = () => {
     <div className="container">
       {/* Barra superior con botones */}
       <div className="top-bar">
-        <button className="top-button">Documentos</button>
-        <button className="top-button">Repositorio</button>
-        <button className="top-button">Categorías</button>
-        <button className="top-button">Etiquetas</button>
+        <DocumentsReposi />
+        <RepositoryReposi />
+        <CategoriesReposi />
+        <TagsReposi />
       </div>
 
       {/* Contenido principal */}
