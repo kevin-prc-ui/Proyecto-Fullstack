@@ -40,10 +40,13 @@ const Login = () => {
         email: graphResponse.userPrincipalName,
       };
       
-      console.log(userData);
-      const respuesta = await login(userData);
-      const token = respuesta.data; // Assuming your backend returns the token like this
-      localStorage.setItem("authToken", token); // Store the token
+      console.log(loginData);
+      const respuesta = await login(loginData);
+      console.log(respuesta);
+      const token = respuesta.data;
+      console.log(token);
+      // Assuming your backend returns the token like this
+      sessionStorage.setItem("authToken", JSON.stringify(token)); // Store the token
       
       // await checkOrCreateUser(userData);
 
