@@ -1,10 +1,11 @@
-export const MisArchivos = () => {
+import React from 'react';
 
-    return (
-        <>
-            <button type="sumbit" className="btn" btn-primay>Mis Archivos</button>
+const MisArchivos = () => {
+  return (
+    <div className="content">
+      <h1>Mis Archivos</h1>
+    </div>
+  );
+};
 
-
-        </>
-    )
-}
+export default MisArchivos;
