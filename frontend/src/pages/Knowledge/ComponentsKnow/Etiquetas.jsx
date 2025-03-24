@@ -1,9 +1,9 @@
-import React from 'react';
+export const Etiquetas = () => {
 
-const Etiquetas = () => {
-  return (
-    <button className="top-button">Etiquetas</button>
-  );
-};
+    return (
+        <>
+            <button type="sumbit" className="btn" btn-primay>Etiquetas</button>
+        </>
+    )
 
-export default Etiquetas;
+}

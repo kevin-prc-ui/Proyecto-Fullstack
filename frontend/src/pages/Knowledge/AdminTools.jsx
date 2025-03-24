@@ -12,4 +12,4 @@ const AdminTools = () => {
   )
 }
 
-export default AdminTools;
+export default AdminTools
