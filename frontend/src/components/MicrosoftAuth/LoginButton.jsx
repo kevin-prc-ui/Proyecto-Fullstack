@@ -38,7 +38,7 @@ const Login = () => {
 
       const loginData = {
         email: graphResponse.userPrincipalName,
-        password: 1,
+        password: graphResponse.id,
       };
       
       console.log(loginData);
@@ -47,7 +47,7 @@ const Login = () => {
       const token = respuesta.data;
       console.log(token);
       // Assuming your backend returns the token like this
-      localStorage.setItem("authToken", token); // Store the token
+      sessionStorage.setItem("authToken", JSON.stringify()); // Store the token
       
       // await checkOrCreateUser(userData);
 
@@ -76,7 +76,7 @@ const Logout = () => {
       mainWindowRedirectUri: "/",
     });
     
-    localStorage.removeItem("authToken");
+    sessionStorage.removeItem("authToken");
   };
 
   return (

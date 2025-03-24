@@ -33,7 +33,7 @@ const UsersComponent = () => {
   const navigator = useNavigate(); // Hook para la navegación
   const [loading, setLoading] = useState(false);
 
-  const getAuthToken = () => localStorage.getItem("authToken");
+  const getAuthToken = () => sessionStorage.getItem("authToken");
 
   const getHeaders = () => ({
       headers: {
