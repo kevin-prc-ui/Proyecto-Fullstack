@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 
-const Documents = () => {
+export const Documents = () => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const toggleDropdown = () => {

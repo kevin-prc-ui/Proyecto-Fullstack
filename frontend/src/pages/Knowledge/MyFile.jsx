@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import Documents from './ComponentsKnow/My_File_Components/Documents';
+import MisArchivos from './ComponentsKnow/My_File_Components/MisArchivos';
+import Categorias from './ComponentsKnow/My_File_Components/Categorias';
+import Etiquetas from './ComponentsKnow/My_File_Components/Etiquetas';
 import "../../styles/estilos.css";
 
 const MyFile = () => {
@@ -14,25 +18,10 @@ const MyFile = () => {
     <div className="container">
       {/* Barra superior con botones */}
       <div className="top-bar">
-        <div className="dropdown">
-          <button className="top-button" onClick={toggleDropdown}>
-            DOCUMENTOS
-          </button>
-          {/* Dropdown menu */}
-          {showDropdown && (
-            <div className="dropdown-menu">
-              <button className="dropdown-item">Todos los documentos</button>
-              <button className="dropdown-item">Editando actualmente</button>
-              <button className="dropdown-item">Otros están editando</button>
-              <button className="dropdown-item">Modificados recientemente</button>
-              <button className="dropdown-item">Agregados recientemente</button>
-              <button className="dropdown-item">Mis favoritos</button>
-            </div>
-          )}
-        </div>
-        <button className="top-button">Mis archivos</button>
-        <button className="top-button">Categorías</button>
-        <button className="top-button">Etiquetas</button>
+        <Documents />
+        <MisArchivos />
+        <Categorias />
+        <Etiquetas />
       </div>
 
       {/* Contenido principal */}

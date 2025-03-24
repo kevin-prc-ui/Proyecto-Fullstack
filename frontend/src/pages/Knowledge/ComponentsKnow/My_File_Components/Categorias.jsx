@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-const Categorias = () => {
+export const Categorias = () => {
   return (
     <button className="top-button">Categorías</button>
   );
