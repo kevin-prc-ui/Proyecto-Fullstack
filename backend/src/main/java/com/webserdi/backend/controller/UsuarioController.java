@@ -6,6 +6,7 @@ import com.webserdi.backend.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -43,7 +44,7 @@ public class UsuarioController{
         List<UsuarioDto> usuarios = usuarioService.getAllUsuarios();
         return ResponseEntity.ok(usuarios);
     }
-
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/edit/{id}")
     public ResponseEntity<UsuarioDto> updateUsuario(@PathVariable("id")Long usuarioId, @RequestBody UsuarioDto usuarioDto) {
         UsuarioDto updatedUsuario = usuarioService.updateUsuario(usuarioId,usuarioDto);

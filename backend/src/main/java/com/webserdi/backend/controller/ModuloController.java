@@ -6,6 +6,7 @@ import com.webserdi.backend.service.ModuloService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +19,13 @@ public class ModuloController {
 
     private final ModuloService moduloService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<ModuloDto> crearModulo(@Validated @RequestBody ModuloDto moduloDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(moduloService.crearModulo(moduloDTO));
     }
+
 
     @GetMapping
     public ResponseEntity<List<ModuloDto>> obtenerTodosModulos() {

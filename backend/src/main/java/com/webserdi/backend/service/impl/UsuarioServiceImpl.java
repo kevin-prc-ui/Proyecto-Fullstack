@@ -40,7 +40,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioDto createUsuario(UsuarioDto usuarioDto) {
-        if(usuarioRepository.existsByEmail(usuarioDto.getEmail())){
+        if (usuarioRepository.existsByEmail(usuarioDto.getEmail())) {
             throw new ResourceNotFoundException("El usuario ya existe");
         }
         Set<Rol> rol = rolRepository.findByNombreIn(usuarioDto.getRoles());
@@ -53,6 +53,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         return UsuarioMapper.mapToUsuarioDto(usuario);
     }
+
     @Override
     @Transactional
     public UsuarioDto checkOrCreateUser(UsuarioDto usuarioDto) {
@@ -74,7 +75,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioDto getUsuarioById(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(()->
+                .orElseThrow(() ->
                         new ResourceNotFoundException("No existe el usuario con el id " + usuarioId));
         return UsuarioMapper.mapToUsuarioDto(usuario);
 
@@ -93,7 +94,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         // Actualizar rol
         Set<Rol> roles = rolRepository.findByNombreIn(usuarioDto.getRoles());
-        savedUsuario.setRoles(roles);
         savedUsuario.getRoles().clear();
         savedUsuario.getRoles().addAll(new HashSet<>(roles));
 
@@ -109,18 +109,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public void deleteUsuario(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId).
-                orElseThrow(()->
+                orElseThrow(() ->
                         new ResourceNotFoundException("No existe el usuario con el id" + usuarioId));
         usuarioRepository.deleteById(usuarioId);
     }
 
     @Override
-    public List<PermisoDto> getAllPermisos(){
+    public List<PermisoDto> getAllPermisos() {
         List<Permiso> permisos = permisoRepository.findAll();
         return permisos.stream()
                 .map(PermisoMapper::toDto)
                 .collect(Collectors.toList());
     }
-
-
 }
+    
+    
