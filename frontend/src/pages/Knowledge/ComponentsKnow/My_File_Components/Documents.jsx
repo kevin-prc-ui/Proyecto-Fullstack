@@ -30,7 +30,7 @@ export const Documents = () => {
         aria-expanded={showDropdown}
         aria-haspopup="true"
       >
-        DOCUMENTOS 
+        Documentos 
         {/* Ícono que cambia según el estado */}
         {showDropdown ? (
           <FiChevronUp className="dropdown-icon" />
