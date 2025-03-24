@@ -6,6 +6,7 @@ import com.webserdi.backend.dto.UsuarioDto;
 import java.util.List;
 
 public interface UsuarioService {
+
     UsuarioDto createUsuario(UsuarioDto usuarioDto);
     UsuarioDto getUsuarioById(Long usuarioId);
     List<UsuarioDto> getAllUsuarios();
@@ -13,4 +14,5 @@ public interface UsuarioService {
     UsuarioDto updateUsuario(Long usuarioId,UsuarioDto usuarioDto);
     void deleteUsuario(Long usuarioId);
     UsuarioDto checkOrCreateUser(UsuarioDto usuarioDto);
+
 }

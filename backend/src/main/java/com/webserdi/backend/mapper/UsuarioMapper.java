@@ -2,6 +2,7 @@ package com.webserdi.backend.mapper;
 
 import com.webserdi.backend.dto.UsuarioDto;
 import com.webserdi.backend.entity.Permiso;
+import com.webserdi.backend.entity.Rol;
 import com.webserdi.backend.entity.Usuario;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +28,9 @@ public class UsuarioMapper {
         usuarioDto.setEnabled(usuario.isEnabled());
         usuarioDto.setNombre(usuario.getNombre());
         usuarioDto.setApellido(usuario.getApellido());
-        usuarioDto.setRolId(usuario.getRol().getId());
+        usuarioDto.setRoles(usuario.getRoles().stream()
+                .map(Rol::getNombre)
+                .collect(Collectors.toSet()));
         usuarioDto.setPermisos(usuario.getPermisos().stream()
                 .map(Permiso::getNombre)
                 .collect(Collectors.toSet()));
