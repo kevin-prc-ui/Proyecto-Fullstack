@@ -26,11 +26,4 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         return jwtTokenProvider.generateToken(authentication);
     }
-
-//    @Override
-//    public String register(UsuarioDto usuarioDto) {
-//        // Lógica para registrar un nuevo usuario
-//
-//        return null;
-//    }
 }

@@ -25,13 +25,6 @@ public class UsuarioController{
         return ResponseEntity.ok(createdUsuario);
     }
 
-    @PostMapping("/check-or-create")
-    public ResponseEntity<UsuarioDto> checkOrCreateUser(@RequestBody UsuarioDto usuarioDto) {
-        UsuarioDto checkOrCreateUser = usuarioService.checkOrCreateUser(usuarioDto);
-        if (checkOrCreateUser == null) {}
-        return ResponseEntity.ok(checkOrCreateUser);
-    }
-
     @GetMapping("{id}")
     public ResponseEntity<UsuarioDto> getUsuarioById(@PathVariable("id")  Long usuarioId) {
         UsuarioDto usuarioDto = usuarioService.getUsuarioById(usuarioId);
@@ -54,12 +47,18 @@ public class UsuarioController{
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteUsuario(@PathVariable("id")Long usuarioId) {
         usuarioService.deleteUsuario(usuarioId);
-        return ResponseEntity.ok("Empleado eliminado");
+        return ResponseEntity.ok("Empleado eliminado.");
     }
     @GetMapping("/permisos")
     public ResponseEntity<List<PermisoDto>>getAllPermisos(){
         List<PermisoDto> permisos = usuarioService.getAllPermisos();
         return ResponseEntity.ok(permisos);
+    }
+
+    @PutMapping("/email/{id}")
+    public  ResponseEntity<String> updateEmail(@PathVariable("id") Long id, @RequestBody String newEmail){
+        usuarioService.updateUsuarioEmail(id, newEmail);
+        return ResponseEntity.ok("Correo actualizado con exito.");
     }
 
 

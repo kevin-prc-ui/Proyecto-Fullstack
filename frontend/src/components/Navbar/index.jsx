@@ -41,7 +41,6 @@ const ProfileContent = () => {
   return (
     <>
       <div className="card-title">Bienvenido, {accounts[0].name}!</div>
-      {/* <div>{accounts[0].username}</div> */}
     </>
   );
 };

@@ -5,6 +5,7 @@ import com.webserdi.backend.dto.UsuarioDto;
 import com.webserdi.backend.entity.Permiso;
 import com.webserdi.backend.entity.Rol;
 import com.webserdi.backend.entity.Usuario;
+import com.webserdi.backend.exception.DuplicateEmailException;
 import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.mapper.PermisoMapper;
 import com.webserdi.backend.mapper.UsuarioMapper;
@@ -13,10 +14,9 @@ import com.webserdi.backend.repository.RolRepository;
 import com.webserdi.backend.repository.UsuarioRepository;
 import com.webserdi.backend.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +39,22 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public void updateUsuarioEmail(Long usuarioId, String newEmail) {
+        try {
+            Usuario usuario = usuarioRepository.findById(usuarioId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario not found"));
+            usuario.setEmail(newEmail);
+            usuarioRepository.save(usuario);
+        } catch (DataIntegrityViolationException ex) {
+            // Check if the error is due to the email unique constraint
+            if (ex.getMessage().contains("UK5171l57faosmj8myawaucatdw")) {
+                throw new DuplicateEmailException("Email is already in use");
+            }
+            throw ex;
+        }
+    }
+
+    @Override
     public UsuarioDto createUsuario(UsuarioDto usuarioDto) {
         if (usuarioRepository.existsByEmail(usuarioDto.getEmail())) {
             throw new ResourceNotFoundException("El usuario ya existe");
@@ -52,16 +68,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuario = usuarioRepository.save(usuario);
 
         return UsuarioMapper.mapToUsuarioDto(usuario);
-    }
-
-    @Override
-    @Transactional
-    public UsuarioDto checkOrCreateUser(UsuarioDto usuarioDto) {
-        if (!usuarioRepository.existsByEmail(usuarioDto.getEmail())) {//Si el usuario no existe, se crea
-            // User exists, do nothing (or you can update the user if needed)
-            return createUsuario(usuarioDto);
-        }
-        return null;
     }
 
     @Override
@@ -122,5 +128,3 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .collect(Collectors.toList());
     }
 }
-    
-    

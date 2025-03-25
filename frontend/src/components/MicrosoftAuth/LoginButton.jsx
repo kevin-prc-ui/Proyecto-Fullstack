@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../services/authConfig";
 import Button from "react-bootstrap/Button";
-import { checkOrCreateUser } from "../../services/UsuarioService";
 import { callMsGraph } from "../../graph";
 import { login } from "../../services/UsuarioService";
 
@@ -40,7 +39,7 @@ const Login = () => {
         email: graphResponse.userPrincipalName,
         password: graphResponse.id,
       };
-      
+
       console.log(loginData);
       const respuesta = await login(loginData);
       console.log(respuesta);
@@ -48,7 +47,7 @@ const Login = () => {
       console.log(token);
       // Assuming your backend returns the token like this
       sessionStorage.setItem("authToken", JSON.stringify(token)); // Store the token
-      
+
       // await checkOrCreateUser(userData);
 
       // window.location.reload();
@@ -60,6 +59,10 @@ const Login = () => {
 
   return (
     <div className="flex">
+      <Button style={{ marginRight: "10px" }} variant="secondary" href="/signup">
+        Registro
+      </Button>
+      
       <Button variant="primary" onClick={handleLogin}>
         Iniciar sesión
       </Button>
@@ -75,7 +78,7 @@ const Logout = () => {
       postLogoutRedirectUri: "/",
       mainWindowRedirectUri: "/",
     });
-    
+
     sessionStorage.removeItem("authToken");
   };
 

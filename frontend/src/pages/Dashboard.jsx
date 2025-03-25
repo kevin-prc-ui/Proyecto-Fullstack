@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "../styles/index.css";
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
   useMsal,
 } from "@azure/msal-react";
-import Button from "react-bootstrap/Button";
 import { loginRequest } from "../services/authConfig";
 import { callMsGraph } from "../graph";
-// import { ProfileData } from "../components/MicrosoftAuth/ProfileData";
 
 const Dashboard = () => {
   return (
@@ -17,7 +15,6 @@ const Dashboard = () => {
         <AuthenticatedTemplate>
           <ProfileContent />
         </AuthenticatedTemplate>
-
         <UnauthenticatedTemplate>
           <h5 className="card-title">
             Please sign-in to see your profile information.

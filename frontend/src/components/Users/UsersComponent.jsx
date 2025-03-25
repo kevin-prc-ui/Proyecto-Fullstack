@@ -1,6 +1,10 @@
 import { Button, Alert, Form, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { createUser, getUserById, updateUser } from "../../services/UsuarioService";
+import {
+  signUp,
+  getUserById,
+  updateUser,
+} from "../../services/UsuarioService";
 import { useNavigate, useParams } from "react-router-dom";
 
 // Importando constantes y funciones de utilidad
@@ -15,36 +19,36 @@ const UsersComponent = () => {
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
-  const [rolId, setRolId] = useState("");
+  const [rol, setRol] = useState([]);
   const [selectedPermisos, setSelectedPermisos] = useState([]);
   const [permisosDisponibles, setPermisosDisponibles] = useState([]);
   const [roles, setRoles] = useState([]);
-
 
   // Estado para almacenar los errores de validación
   const [errors, setErrors] = useState({
     nombre: "",
     apellido: "",
     email: "",
-    rolId: "",
+    rol: "",
   });
 
   const { id } = useParams(); // Obtiene el ID del usuario de los parámetros de la URL
   const navigator = useNavigate(); // Hook para la navegación
   const [loading, setLoading] = useState(false);
 
-  const getAuthToken = () => sessionStorage.getItem("authToken");
+  const token = () => sessionStorage.getItem("authToken");
+  const getAuthToken = () => JSON.parse(token()).accessToken;
 
   const getHeaders = () => ({
-      headers: {
-          Authorization: `Bearer ${getAuthToken()}`,
-      },
+    headers: {
+      Authorization: `Bearer ${getAuthToken()}`,
+    },
   });
 
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await axios.get('/api/roles', getHeaders());
+        const response = await axios.get("/api/roles", getHeaders());
         const data = await response.data;
         setRoles(data);
       } catch (error) {
@@ -54,17 +58,16 @@ const UsersComponent = () => {
     fetchRoles();
   }, []);
 
-  
-
-
   //Efecto para cargar los permisos disponibles
   useEffect(() => {
     const fetchPermisos = async () => {
       try {
-        const response = await axios.get('/api/permisos', getHeaders()); //update endpoint
+        const response = await axios.get("/api/permisos", getHeaders());
         const data = await response.data;
         // Filter permissions with modulo_id=1
-        const filteredPermisos = data.filter(permiso => permiso.moduloId === 1);
+        const filteredPermisos = data.filter(
+          (permiso) => permiso.moduloId === 1
+        );
         setPermisosDisponibles(filteredPermisos);
       } catch (error) {
         toast.error("Error al cargar los permisos");
@@ -85,19 +88,18 @@ const UsersComponent = () => {
           setNombre(response.data.nombre);
           setApellido(response.data.apellido);
           setEmail(response.data.email);
-          setRolId(response.data.rolId.toString()); // Convierte el rolId a string
+          setRol(response.data.rol);
           setSelectedPermisos(response.data.permisos || []);
         })
-        .catch((error) => {
-        })
+        .catch((error) => {})
         .finally(() => setLoading(false));
     }
   }, [id]);
 
   const handlePermissionChange = (permisoNombre) => {
-    setSelectedPermisos(prev => {
+    setSelectedPermisos((prev) => {
       if (prev.includes(permisoNombre)) {
-        return prev.filter(p => p !== permisoNombre);
+        return prev.filter((p) => p !== permisoNombre);
       }
       return [...prev, permisoNombre];
     });
@@ -109,23 +111,30 @@ const UsersComponent = () => {
    */
   const saveOrUpdateUser = async (e) => {
     e.preventDefault(); // Evita el comportamiento por defecto del formulario
-    const userData = { nombre, apellido, email, rolId, permisos:selectedPermisos};
+    const userData = {
+      nombre,
+      apellido,
+      email,
+      roles: [rol],
+      permisos: selectedPermisos,
+    };
+    console.log(userData);
     // Verifica si el formulario es válido
     if (!isFormValid(userData)) return; // Si no es valido, retorna sin ejecutar la peticion
-    setLoading(true)
+    setLoading(true);
     try {
-        if (id) {
-          await updateUser(id, userData) // Llama al servicio para actualizar el usuario
-          console.log("Usuario actualizado correctamente");
-        } else {
-          await createUser(userData) // Llama al servicio para crear el usuario
-          console.log("Usuario creado correctamente");
-        }
-        navigator("/admin/helpdesk/users"); // Navega a la lista de usuarios
+      if (id) {
+        await updateUser(id, userData); // Llama al servicio para actualizar el usuario
+        console.log("Usuario actualizado correctamente");
+      } else {
+        await signUp(userData); // Llama al servicio para crear el usuario
+        console.log("Usuario creado correctamente");
+      }
+      navigator("/admin/helpdesk/users"); // Navega a la lista de usuarios
     } catch (error) {
-      toast.error(error, "Error al guardar los cambios del usuario")
+      toast.error(error, "Error al guardar los cambios del usuario");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -159,11 +168,11 @@ const UsersComponent = () => {
       errorsCopy.email = "";
     }
 
-    if (!formData.rolId) {
-      errorsCopy.rolId = "El Rol es obligatorio";
+    if (formData.roles[0].trim() === "") {
+      errorsCopy.roles = "El Rol es obligatorio";
       valid = false;
     } else {
-      errorsCopy.rolId = "";
+      errorsCopy.roles = "";
     }
 
     // Actualizamos los errores
@@ -251,28 +260,46 @@ const UsersComponent = () => {
                   <label className="form-label">Rol:</label>
                   <select
                     required
-                    name="rolId"
-                    onChange={(e) => setRolId(e.target.value)}
-                    className={`form-control ${
-                      errors.rolId ? "is-invalid" : ""
-                    }`}
-                    value={rolId}
+                    name="rol"
+                    onChange={(e) => setRol(e.target.value)}
+                    className={`form-control ${errors.rol ? "is-invalid" : ""}`}
                   >
                     <option value="">Seleccione</option>
                     {roles.map((rol) => (
-                        <option key={rol.id} value={rol.id}>{rol.nombre}</option>
+                      <option key={rol.nombre} value={rol.nombre}>
+                        {rol.nombre}
+                      </option>
                     ))}
                   </select>
-                  {errors.rolId && (
-                    <div className="invalid-feedback">{errors.rolId}</div>
+                  {errors.rol && (
+                    <div className="invalid-feedback">{errors.rol}</div>
                   )}
                 </div>
+                <Form.Group>
+                  <Form.Label>Permisos:</Form.Label>
+                  <Row>
+                    {permisosDisponibles.map((permiso) => (
+                      <Col key={permiso.nombre} md={6}>
+                        <Form.Check
+                          type="checkbox"
+                          id={permiso.nombre}
+                          label={permiso.nombre}
+                          checked={selectedPermisos.includes(permiso.nombre)}
+                          onChange={() =>
+                            handlePermissionChange(permiso.nombre)
+                          }
+                          className="mb-2"
+                        />
+                      </Col>
+                    ))}
+                  </Row>
+                </Form.Group>
                 {/* Botones */}
                 {loading && (
                   <Alert variant="info" className="mt-3">
-                      Cargando...
+                    Cargando...
                   </Alert>
-                  )}
+                )}
                 <div className="flex justify-content-evenly">
                   <Button
                     className="btn btn-success"
@@ -289,25 +316,7 @@ const UsersComponent = () => {
                 </div>
                 {/* Permisos */}
                 <div className="flex justify-content-evenly">
-                <div className="form-group mb-4">
-              <Form.Group>
-                <Form.Label>Permisos:</Form.Label>
-                <Row>
-                  {permisosDisponibles.map((permiso) => (
-                    <Col key={permiso.nombre} md={6}>
-                      <Form.Check 
-                        type="checkbox"
-                        id={permiso.nombre}
-                        label={permiso.nombre}
-                        checked={selectedPermisos.includes(permiso.nombre)}
-                        onChange={() => handlePermissionChange(permiso.nombre)}
-                        className="mb-2"
-                      />
-                    </Col>
-                  ))}
-                </Row>
-              </Form.Group>
-            </div>
+                  <div className="form-group mb-4"></div>
                 </div>
               </form>
             </div>

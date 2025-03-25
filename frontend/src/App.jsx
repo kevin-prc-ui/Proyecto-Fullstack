@@ -18,13 +18,35 @@ import Repository  from "./pages/Knowledge/Repository";
 import AdminTools  from "./pages/Knowledge/AdminTools";
 import UsersComponent from "./components/Users/UsersComponent";
 import Footer from "./components/Footer";
+import { useIsAuthenticated } from "@azure/msal-react";
+import MicrosoftSignUp from "./components/MicrosoftAuth/SignupButton";
 
 function Layout() {
-  return (
-    <div className="w-full h-screen flex flex-col md:flex-row" data-theme={'dark'}>
+    const isAuthenticated = useIsAuthenticated();
+
+    if (isAuthenticated)
+    {
+      return (
+        <>
+    <div className="w-full h-screen flex flex-col md:flex-row">
       <div  className="w-1/6 h-screen bg-white min-w-53 sticky top-0 hidden md:block" >
         <Sidebar />
       </div>
+      <div className="flex-1 flex flex-col overflow-y-auto">
+        <Navbar />
+        <div className="p-4 2xl:px-10 flex-1">
+          <Outlet />
+        </div>
+        <Footer />
+      </div>
+    </div>
+        </>
+      )
+    }
+      
+
+  return (
+    <div className="w-full h-screen flex flex-col md:flex-row">
       <div className="flex-1 flex flex-col overflow-y-auto">
         <Navbar />
         <div className="p-4 2xl:px-10 flex-1">
@@ -43,6 +65,7 @@ function App() {
         <Route element={<Layout />}>
           <Route index path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/signup" element={<MicrosoftSignUp />} />
           <Route path="/helpdesk/tasks" element={<Tasks />} />
           <Route path="/helpdesk/completed/:status" element={<Tasks />} />
           <Route path="/helpdesk/in-progress/:status" element={<Tasks />} />

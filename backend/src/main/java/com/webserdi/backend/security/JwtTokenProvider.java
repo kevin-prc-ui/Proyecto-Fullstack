@@ -20,10 +20,10 @@ public class JwtTokenProvider {
     private long jwtExpirationMs; // Fixed type to long
 
     private Key key() {
-        // Use this if `jwtSecret` is Base64-encoded:
+        // Para un `jwtSecret` que esta en Base64-encoded:
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
 
-        // OR use this if `jwtSecret` is plain text:
+        // O se utiliza este cuando `jwtSecret` es texto plano:
         // return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 

@@ -13,6 +13,5 @@ public interface UsuarioService {
     List<PermisoDto> getAllPermisos();
     UsuarioDto updateUsuario(Long usuarioId,UsuarioDto usuarioDto);
     void deleteUsuario(Long usuarioId);
-    UsuarioDto checkOrCreateUser(UsuarioDto usuarioDto);
-
+    void updateUsuarioEmail(Long usuarioId, String newEmail);
 }

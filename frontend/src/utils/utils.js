@@ -12,9 +12,9 @@ import { listRol } from "../services/RolService";
 export const formatUserRole = (rolId) => {
     switch (rolId) {
     case 1:
-        return "Administrador";
+        return "ROLE_ADMIN";
     case 2:
-        return "Agente";
+        return "ROLE_USER";
     default:
         return "Desconocido";
     }

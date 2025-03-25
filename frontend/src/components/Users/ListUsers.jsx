@@ -218,7 +218,7 @@ function ListUsuarioComponent() {
                 <td>{usuario.nombre}</td>
                 <td>{usuario.apellido}</td>
                 <td>{usuario.email}</td>
-                <td>{formatUserRole(usuario.rolId)}</td>
+                <td>{usuario.roles.join(", ")}</td>
                 <td>{usuario.permisos.join(", ")}</td>
                 <td>
                   <div className="action-buttons">
