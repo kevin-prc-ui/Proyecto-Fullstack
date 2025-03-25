@@ -1,10 +1,10 @@
 
-const Categorias = () => {
+import React from 'react';
+
+export const Categorias = () => {
   return (
-    <>
-        <button type="sumbit" className="btn btn-primary" >Categorias</button>
-    </>
-  )
-}
+    <button className="top-button">Categorías</button>
+  );
+};
 
 export default Categorias;
