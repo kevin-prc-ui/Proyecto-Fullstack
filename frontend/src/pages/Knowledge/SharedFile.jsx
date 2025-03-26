@@ -5,8 +5,6 @@ import { DocumentosCopart } from './ComponentsKnow/Shared_File_Components/Docume
 import {TagsCompart} from './ComponentsKnow/Shared_File_Components/TagsCompart.JSX';
 import {SubMenu} from './ComponentsKnow/SubMenu/SubMenu';
 import "../../styles/estilos.css";
-import TagsCompart from './ComponentsKnow/Shared_File_Components/TagsCompart.JSX';
-import SubMenuCompart from './ComponentsKnow/Shared_File_Components/SubMenuCompart';
 
 
 const SharedFile = () => {
@@ -23,7 +21,7 @@ const SharedFile = () => {
       {/* Contenido principal */}
       <div className="content">
         <h1>Archivos Compartidos</h1>
-        <SubMenuCompart />
+        <SubMenu />
       </div>
     </div>
   );
