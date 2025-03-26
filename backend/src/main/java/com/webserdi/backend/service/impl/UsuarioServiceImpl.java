@@ -114,10 +114,11 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public void deleteUsuario(Long usuarioId) {
+
         Usuario usuario = usuarioRepository.findById(usuarioId).
                 orElseThrow(() ->
                         new ResourceNotFoundException("No existe el usuario con el id" + usuarioId));
-        usuarioRepository.deleteById(usuarioId);
+        usuarioRepository.deleteAllById(Collections.singleton(usuarioId));
     }
 
     @Override

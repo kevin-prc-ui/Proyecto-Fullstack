@@ -41,19 +41,24 @@ const MicrosoftSignUp = () => {
         email: graphResponse.userPrincipalName,
         password: graphResponse.id,
         enabled: true,
-        rol: ["ROLE_USER"],
+        roles: ["ROLE_ADMIN"],
         permisos: ["CREAR_TICKET"],
       };
+
+      const loginData = { 
+        email: graphResponse.userPrincipalName,
+        password: graphResponse.id,
+      }
 
       console.log(userData)
       const registro = await signUp(userData);
       console.log(registro," a")
       
-      const respuesta = await login(userData.email, userData.password);
+      const respuesta = await login(loginData);
       const token = respuesta.data;
       sessionStorage.setItem("authToken", JSON.stringify(token)); // Store the token      
-      toast.success("Registro exitoso! Redirigiendo...");
       navigate("/dashboard");  
+      toast.success("Registro exitoso! Redirigiendo...");
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Error desconocido";
       toast.error(`Error en el registro: ${errorMessage}`);
