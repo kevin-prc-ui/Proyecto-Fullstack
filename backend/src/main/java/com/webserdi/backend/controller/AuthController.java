@@ -61,7 +61,7 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping("/signup")
-    public ResponseEntity<UsuarioDto> signUp(@RequestBody @Validated UsuarioDto user) {
+    public ResponseEntity<UsuarioDto> signUp(@RequestBody UsuarioDto user) {
         UsuarioDto createdUser = usuarioService.createUsuario(user);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }

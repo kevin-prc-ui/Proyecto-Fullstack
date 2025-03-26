@@ -27,7 +27,7 @@ export const listUsers = () =>
       throw error;
     });
 
-export const signUp = (userData) => axios.post(`${REST_API_BASE_URL}/auth/register`, userData, getHeaders());
+export const signUp = (userData) => axios.post(`${REST_API_BASE_URL}/auth/signup`, userData);
 
 export const getUserById = (userId) => axios.get(`${REST_API_BASE_URL}/users/${userId}`, getHeaders());
 

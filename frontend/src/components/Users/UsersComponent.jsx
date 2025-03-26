@@ -125,10 +125,10 @@ const UsersComponent = () => {
     try {
       if (id) {
         await updateUser(id, userData); // Llama al servicio para actualizar el usuario
-        console.log("Usuario actualizado correctamente");
+        toast.info("Usuario actualizado correctamente");
       } else {
         await signUp(userData); // Llama al servicio para crear el usuario
-        console.log("Usuario creado correctamente");
+        toast.info("Usuario creado correctamente");
       }
       navigator("/admin/helpdesk/users"); // Navega a la lista de usuarios
     } catch (error) {

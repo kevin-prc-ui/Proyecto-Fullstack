@@ -5,47 +5,65 @@ import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../services/authConfig";
 import { callMsGraph } from "../../graph";
 import { toast } from "sonner";
-import { signUp } from "../../services/UsuarioService";
+import { signUp, login } from "../../services/UsuarioService";
 
 const MicrosoftSignUp = () => {
     const { instance } = useMsal();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const [graphData, setGraphData] = useState(null);
   
-
   const handleSignIn = async () => {
     try {
       setIsSigningIn(true);
       setError("");
-
-      //Autenticación con Microsoft
-      const response = await instance.loginPopup(loginRequest);
-
-      // 2. Se obtienen los datos del usuario una vez se inicia sesion
-      const graphResponse = await callMsGraph(response.accessToken);
-      setGraphData(graphResponse);
   
-      // 3. Se crea el usuario y se comprueba si existe o no en la base de datos
+      // 1. Autenticación con Microsoft
+      const response = await instance.loginPopup(loginRequest).catch(error => {
+        throw new Error(`Error de autenticación: ${error.errorCode} - ${error.errorMessage}`);
+      });
+  
+      if (!response?.accessToken) {
+        throw new Error("No se pudo obtener el token de acceso");
+      }
+  
+      // 2. Obtener datos del usuario
+      const graphResponse = await callMsGraph(response.accessToken);
+      
+      if (!graphResponse?.userPrincipalName) {
+        throw new Error("Datos de usuario incompletos");
+      }
+  
+      // 3. Crear usuario en tu backend
       const userData = {
-        nombre: graphResponse.givenName,
-        apellido: graphResponse.surname,
+        nombre: graphResponse.givenName || "Nombre no proporcionado",
+        apellido: graphResponse.surname || "Apellido no proporcionado",
         email: graphResponse.userPrincipalName,
         password: graphResponse.id,
         enabled: true,
         rol: ["ROLE_USER"],
         permisos: ["CREAR_TICKET"],
       };
-      console.log(userData);
-      toast.success("Usuario creado con exito. Inicia sesión a continuación.");
 
-      await signUp(userData);
-
-      navigate("/dashboard");
+      console.log(userData)
+      const registro = await signUp(userData);
+      console.log(registro," a")
+      
+      // const respuesta = await login(userData.email, userData.password);
+      // const token = respuesta.data;
+      // Assuming your backend returns the token like this
+      // sessionStorage.setItem("authToken", JSON.stringify(token)); // Store the token
+      
+      
+      // 4. Redirección sin hacer logout
+      toast.success("Registro exitoso! Redirigiendo...");
+      // navigate("/dashboard");  
     } catch (error) {
-      toast.error(error.message)
-      setError("Error al iniciar sesión. Inténtalo de nuevo.",error);
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      toast.error(`Error en el registro: ${errorMessage}`);
+      console.error("Error en el registro:", error, error.message);
+      setError(errorMessage);
+      
     } finally {
       setIsSigningIn(false);
     }

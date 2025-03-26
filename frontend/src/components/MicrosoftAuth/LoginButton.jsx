@@ -24,32 +24,16 @@ const Login = () => {
       const graphResponse = await callMsGraph(response.accessToken);
       setGraphData(graphResponse);
 
-      // 3. Se crea el usuario y se comprueba si existe o no en la base de datos
-      const userData = {
-        nombre: graphResponse.givenName,
-        apellido: graphResponse.surname,
-        email: graphResponse.userPrincipalName,
-        password: graphResponse.id,
-        enabled: true,
-        rolId: 2,
-        permisos: ["CREAR_TICKET"],
-      };
-
+      // 3. Se crea el json con los datos del usuario y se comprueba si existe o no en la base de datos
       const loginData = {
         email: graphResponse.userPrincipalName,
         password: graphResponse.id,
       };
 
-      console.log(loginData);
       const respuesta = await login(loginData);
-      console.log(respuesta);
       const token = respuesta.data;
-      console.log(token);
       // Assuming your backend returns the token like this
       sessionStorage.setItem("authToken", JSON.stringify(token)); // Store the token
-
-      // await checkOrCreateUser(userData);
-
       // window.location.reload();
     } catch (error) {
       console.error("Login failed:", error);
@@ -78,7 +62,6 @@ const Logout = () => {
       postLogoutRedirectUri: "/",
       mainWindowRedirectUri: "/",
     });
-
     sessionStorage.removeItem("authToken");
   };
 
