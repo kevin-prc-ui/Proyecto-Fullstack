@@ -1,34 +1,58 @@
 import { 
-    BsCheck2Square,  // Select
-    BsPlusSquare,    // Create
-    BsUpload,        // Upload
-    BsListCheck      // Selected items
-  } from "react-icons/bs";
-  
-  export const SubMenu = () => {
-    return (
-      <div className="d-flex align-items-center gap-3">  
-        {/* Select */}
-        <button className="btn bg-dark-subtle d-flex align-items-center gap-2">
-          <BsCheck2Square /> Select
-        </button>
-  
-        {/* Create */}
-        <button className="btn bg-dark-subtle d-flex align-items-center gap-2">
-          <BsPlusSquare /> Create
-        </button>
-  
-        {/* Upload */}
-        <button className="btn bg-dark-subtle d-flex align-items-center gap-2">
-          <BsUpload /> Upload
-        </button>
-  
-        {/* Selected items */}
-        <button className="btn bg-dark-subtle d-flex align-items-center gap-2">
-          <BsListCheck /> Selected items
-        </button>
-      </div>
-    );
+  BsCheck2Square,
+  BsPlusSquare,
+  BsUpload,
+  BsListCheck
+} from "react-icons/bs";
+import { useRef } from "react";
+
+export const SubMenu = ({ onFileUpload }) => {
+  const fileInputRef = useRef(null);
+
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
-  
-  export default SubMenu;
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Pasar el archivo al componente padre
+      onFileUpload(file);
+    }
+  };
+
+  return (
+    <div className="d-flex align-items-center gap-3">  
+      <button className="btn bg-dark-subtle d-flex align-items-center gap-2">
+        <BsCheck2Square /> Select
+      </button>
+
+      <button className="btn bg-dark-subtle d-flex align-items-center gap-2">
+        <BsPlusSquare /> Create
+      </button>
+
+      <button 
+        className="btn bg-dark-subtle d-flex align-items-center gap-2"
+        onClick={handleUploadClick}
+      >
+        <BsUpload /> Upload
+      </button>
+
+      <input 
+        type="file" 
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+        accept="image/*,.pdf"
+      />
+
+      <button className="btn bg-dark-subtle d-flex align-items-center gap-2">
+        <BsListCheck /> Selected items
+      </button>
+    </div>
+  );
+};
+
+export default SubMenu;
