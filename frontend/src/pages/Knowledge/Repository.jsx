@@ -3,7 +3,7 @@ import { DocumentsReposi } from "../Knowledge/ComponentsKnow/Repository_Componen
 import { RepositoryReposi } from './ComponentsKnow/Repository_Components/RepositoryReposi';
 import { CategoriesReposi } from './ComponentsKnow/Repository_Components/CategoriesReposi';
 import { TagsReposi } from './ComponentsKnow/Repository_Components/TagsReposi';
-import { SubMenu } from './ComponentsKnow/SubMenu/SubMenu';
+import { SubMenuReposi } from './ComponentsKnow/Repository_Components/SubMenuReposi';
 import "../../styles/estilos.css";
 
 
@@ -21,7 +21,7 @@ const Repository = () => {
       {/* Contenido principal */}
       <div className="content">
         <h1>Repositorio</h1>
-        <SubMenu />
+        <SubMenuReposi />
       </div>
     </div>
   );

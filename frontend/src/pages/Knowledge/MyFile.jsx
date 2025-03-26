@@ -3,7 +3,7 @@ import Documents from './ComponentsKnow/My_File_Components/Documents';
 import MisArchivos from './ComponentsKnow/My_File_Components/MisArchivos';
 import Categorias from './ComponentsKnow/My_File_Components/Categorias';
 import Etiquetas from './ComponentsKnow/My_File_Components/Etiquetas';
-import  SubMenu  from './ComponentsKnow//SubMenu/SubMenu';
+import SubMenu from './ComponentsKnow/My_File_Components/SubMenu';
 import "../../styles/estilos.css";
 
 const MyFile = () => {
