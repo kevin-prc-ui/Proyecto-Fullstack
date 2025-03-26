@@ -49,15 +49,11 @@ const MicrosoftSignUp = () => {
       const registro = await signUp(userData);
       console.log(registro," a")
       
-      // const respuesta = await login(userData.email, userData.password);
-      // const token = respuesta.data;
-      // Assuming your backend returns the token like this
-      // sessionStorage.setItem("authToken", JSON.stringify(token)); // Store the token
-      
-      
-      // 4. Redirección sin hacer logout
+      const respuesta = await login(userData.email, userData.password);
+      const token = respuesta.data;
+      sessionStorage.setItem("authToken", JSON.stringify(token)); // Store the token      
       toast.success("Registro exitoso! Redirigiendo...");
-      // navigate("/dashboard");  
+      navigate("/dashboard");  
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Error desconocido";
       toast.error(`Error en el registro: ${errorMessage}`);
