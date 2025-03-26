@@ -52,7 +52,7 @@ const UsersComponent = () => {
         const data = await response.data;
         setRoles(data);
       } catch (error) {
-        toast.error("Error al cargar los roles");
+        toast.error("Error al cargar los roles",error);
       }
     };
     fetchRoles();
@@ -70,7 +70,7 @@ const UsersComponent = () => {
         );
         setPermisosDisponibles(filteredPermisos);
       } catch (error) {
-        toast.error("Error al cargar los permisos");
+        toast.error("Error al cargar los permisos",error);
       }
     };
     fetchPermisos();
@@ -91,7 +91,9 @@ const UsersComponent = () => {
           setRol(response.data.rol);
           setSelectedPermisos(response.data.permisos || []);
         })
-        .catch((error) => {})
+        .catch((error) => {
+          toast.error("Error al cargar el usuario",error);
+        })
         .finally(() => setLoading(false));
     }
   }, [id]);

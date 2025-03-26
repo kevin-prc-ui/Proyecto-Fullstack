@@ -12,13 +12,13 @@ const Index = () => {
       <Navbar
         bg="white shadow"
         variant="white"
-        className="navbarStyle flex-wrap justify-content-between"
+        className="navbarStyle flex flex-wrap justify-content-between"
       >
-        <a className="navbar-brand" href="/">
+        <a className="w-45" href="/">
           <img
             src="https://serdiaceros.com.mx/wp-content/uploads/2022/08/SERDI-logo-web-1.png"
             alt=""
-            width={"80%"}
+            width={"100%"}
           />
         </a>
         <AuthenticatedTemplate>
@@ -40,7 +40,7 @@ const ProfileContent = () => {
  
   return (
     <>
-      <div className="card-title">Bienvenido, {accounts[0].name}!</div>
+      <div className="">Bienvenido, {accounts[0].name}!</div>
     </>
   );
 };

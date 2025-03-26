@@ -20,36 +20,30 @@ import UsersComponent from "./components/Users/UsersComponent";
 import Footer from "./components/Footer";
 import { useIsAuthenticated } from "@azure/msal-react";
 import MicrosoftSignUp from "./components/MicrosoftAuth/SignupButton";
+import {  useLocation } from "react-router-dom";
 
 function Layout() {
-    const isAuthenticated = useIsAuthenticated();
-
-    if (isAuthenticated)
-    {
-      return (
-        <>
-    <div className="w-full h-screen flex flex-col md:flex-row">
-      <div  className="w-1/6 h-screen bg-white min-w-53 sticky top-0 hidden md:block" >
-        <Sidebar />
-      </div>
-      <div className="flex-1 flex flex-col overflow-y-auto">
-        <Navbar />
-        <div className="p-4 2xl:px-10 flex-1">
-          <Outlet />
-        </div>
-        <Footer />
-      </div>
-    </div>
-        </>
-      )
-    }
-      
+  const isAuthenticated = useIsAuthenticated();
+  const { pathname } = useLocation();
+  const isDashboard = pathname === "/dashboard";
 
   return (
     <div className="w-full h-screen flex flex-col md:flex-row">
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      {/* Sidebar condicional */}
+      {isAuthenticated && !isDashboard && (
+        <div className="w-1/6 h-screen bg-white min-w-53 sticky top-0 hidden md:block">
+          <Sidebar />
+        </div>
+      )}
+
+      {/* Contenido principal */}
+      <div
+        className={`flex-1 flex flex-col overflow-y-auto ${
+          isDashboard ? "w-full" : ""
+        }`}
+      >
         <Navbar />
-        <div className="p-4 2xl:px-10 flex-1">
+        <div className="p-4 2xl:px-10 flex flex-col">
           <Outlet />
         </div>
         <Footer />
@@ -86,7 +80,7 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>
-      <Toaster richColors />
+      <Toaster/>
     </main>
   );
 }

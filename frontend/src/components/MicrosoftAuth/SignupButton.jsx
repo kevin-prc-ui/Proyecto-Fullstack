@@ -41,18 +41,15 @@ const MicrosoftSignUp = () => {
         email: graphResponse.userPrincipalName,
         password: graphResponse.id,
         enabled: true,
-        roles: ["ROLE_ADMIN"],
+        roles: ["ROLE_USER"],
         permisos: ["CREAR_TICKET"],
       };
 
-      const loginData = { 
+      const loginData = {
         email: graphResponse.userPrincipalName,
         password: graphResponse.id,
       }
-
-      console.log(userData)
-      const registro = await signUp(userData);
-      console.log(registro," a")
+      await signUp(userData);
       
       const respuesta = await login(loginData);
       const token = respuesta.data;
@@ -64,7 +61,6 @@ const MicrosoftSignUp = () => {
       toast.error(`Error en el registro: ${errorMessage}`);
       console.error("Error en el registro:", error, error.message);
       setError(errorMessage);
-      
     } finally {
       setIsSigningIn(false);
     }
@@ -77,7 +73,7 @@ const MicrosoftSignUp = () => {
       enter="transition-opacity duration-1000"
       enterFrom="opacity-0"
       enterTo="opacity-100"
-    >
+      >
       <div className="h-45 w-full flex flex-col items-center justify-center py-12 sm:px-6 lg:px-8">
         <div className="mt-8 bg-gray-50 sm:rounded-lg sm:w-full sm:max-w-md">
           <div className="pt-4 pb-4 py-8 px-4 shadow sm:rounded-lg sm:px-10">

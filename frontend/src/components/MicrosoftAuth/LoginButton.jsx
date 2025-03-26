@@ -1,9 +1,10 @@
-import React, { useState } from "react";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../services/authConfig";
 import Button from "react-bootstrap/Button";
 import { callMsGraph } from "../../graph";
 import { login } from "../../services/UsuarioService";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const MyButton = () => {
   const isAuthenticated = useIsAuthenticated();
@@ -12,7 +13,8 @@ const MyButton = () => {
 
 const Login = () => {
   const { instance } = useMsal();
-  const [graphData, setGraphData] = useState(null);
+  const navigate = useNavigate();
+
 
   // login handler
   const handleLogin = async () => {
@@ -22,7 +24,6 @@ const Login = () => {
 
       // 2. Se obtienen los datos del usuario una vez se hace el login
       const graphResponse = await callMsGraph(response.accessToken);
-      setGraphData(graphResponse);
 
       // 3. Se crea el json con los datos del usuario y se comprueba si existe o no en la base de datos
       const loginData = {
@@ -34,21 +35,22 @@ const Login = () => {
       const token = respuesta.data;
       // Assuming your backend returns the token like this
       sessionStorage.setItem("authToken", JSON.stringify(token)); // Store the token
-      // window.location.reload();
+      navigate("/dashboard");
+      toast.info("Se ha iniciado sesión correctamente.")
     } catch (error) {
       console.error("Login failed:", error);
-      alert(`Error de autenticación: ${error.message}`);
+      toast.error(`Error de autenticación: ${error.message}`);
     }
   };
 
   return (
     <div className="flex">
-      <Button style={{ marginRight: "10px" }} variant="secondary" href="/signup">
-        Registro
-      </Button>
+      <a style={{ marginRight: "10px" }} href="/signup" className=" text-black hover:text-white hover:bg-blue-100 rounded px-4 py-2 text-decoration-none cursor-pointer">
+        Crear cuenta
+      </a>
       
-      <Button variant="primary" onClick={handleLogin}>
-        Iniciar sesión
+      <Button variant="dark" onClick={handleLogin}>
+        Acceder
       </Button>
     </div>
   );
