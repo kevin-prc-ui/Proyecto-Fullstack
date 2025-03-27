@@ -4,6 +4,9 @@ package com.webserdi.backend.controller;
 import com.webserdi.backend.dto.TicketDto;
 import com.webserdi.backend.service.TicketService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +26,11 @@ public class TicketController {
     }
 
     @GetMapping
-    public List<TicketDto> getAllTickets() {
-        return ticketService.getAllTickets();
+    public Page<TicketDto> getAllTickets(
+            @PathVariable Long id,
+            @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable,
+            @RequestParam(required = false) String filtro) {
+        return ticketService.getAllTickets(pageable, filtro);
     }
 
     @GetMapping("/{id}")

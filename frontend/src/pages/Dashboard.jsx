@@ -8,6 +8,7 @@ import { LiaUserAstronautSolid } from "react-icons/lia";
 import { Transition } from "@headlessui/react";
 import { FaRegHandPeace, FaUserPlus, FaSignInAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { UseLoginHandler } from "../components/MicrosoftAuth/ButtonHandler";
 
 const Dashboard = () => {
   return (
@@ -24,6 +25,8 @@ const Dashboard = () => {
   );
 };
 const AuthPrompt = () => {
+  const { handleLogin } = UseLoginHandler();
+
   return (
     <>
       <Transition
@@ -58,7 +61,7 @@ const AuthPrompt = () => {
           </Link>
 
           <Link
-            to="/login"
+            onClick={handleLogin}
             className="mb-4 text-decoration-none flex items-center space-x-3 p-3 rounded-lg bg-gray-50 hover:bg-primary-50 transition-colors group"
           >
             <FaSignInAlt className="w-5 h-5 text-primary-600 group-hover:text-primary-700" />

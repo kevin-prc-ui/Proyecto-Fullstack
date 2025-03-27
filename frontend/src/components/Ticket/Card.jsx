@@ -27,7 +27,7 @@ const Card = ({ ticket }) => {
 
   return (
     <>
-      <div className="w-full h-fit bg-white shadow-md p-4 rounded ">
+      <div className="w-full h-fit bg-white shadow-md p-2 rounded ">
         <div className="w-full flex justify-evenly items-center ">
           <div
             className={clsx(

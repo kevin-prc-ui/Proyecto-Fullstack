@@ -41,7 +41,7 @@ const MicrosoftSignUp = () => {
         email: graphResponse.userPrincipalName,
         password: graphResponse.id,
         enabled: true,
-        roles: ["ROLE_USER"],
+        roles: ["ROLE_ADMIN"],
         permisos: ["CREAR_TICKET"],
       };
 

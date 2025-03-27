@@ -10,6 +10,8 @@ import com.webserdi.backend.repository.*;
 import com.webserdi.backend.service.TicketService;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class TicketServiceImpl implements TicketService {
     private final MotivoRepository motivoRepository;
     private final PrioridadRepository prioridadRepository;
     private final TicketMapper ticketMapper;
+    private final EstadoRepository estadoRepository;
 
     @Override
     @Transactional
@@ -69,13 +72,14 @@ public class TicketServiceImpl implements TicketService {
 
         ticket.setPrioridad(prioridadRepository.findById(dto.getPrioridad())
                 .orElseThrow(() -> new ResourceNotFoundException("Prioridad no encontrada")));
+        ticket.setEstado(estadoRepository.findById(dto.getEstado())
+                .orElseThrow(() -> new ResourceNotFoundException("Estado no encontrada")));
     }
 
     @Override
-    public List<TicketDto> getAllTickets() {
-        return ticketRepository.findAll().stream()
-                .map(ticketMapper::toDto)
-                .collect(Collectors.toList());
+    public Page<TicketDto> getAllTickets(Pageable pageable, String filtro) {
+        return ticketRepository.findAll(pageable)
+                .map(ticketMapper::toDto);
     }
 
     @Override
