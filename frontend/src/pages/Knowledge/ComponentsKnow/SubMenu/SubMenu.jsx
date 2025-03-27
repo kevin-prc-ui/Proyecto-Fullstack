@@ -2,8 +2,10 @@ import {
   BsCheck2Square,
   BsPlusSquare,
   BsUpload,
-  BsListCheck
+  BsListCheck,
+  BsFolderPlus
 } from "react-icons/bs";
+
 import { useRef } from "react";
 
 export const SubMenu = ({ onFileUpload }) => {
@@ -30,7 +32,7 @@ export const SubMenu = ({ onFileUpload }) => {
       </button>
 
       <button className="btn bg-dark-subtle d-flex align-items-center gap-2">
-        <BsPlusSquare /> Create
+        <BsFolderPlus /> Create
       </button>
 
       <button 
