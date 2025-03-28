@@ -1,8 +1,7 @@
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import Login from "./pages/Helpdesk/Login";
 import TaskDetails from "./pages/Helpdesk/TaskDetails";
 import Tasks from "./pages/Helpdesk/Tasks";
 import Trash from "./pages/Helpdesk/Trash";
@@ -22,7 +21,7 @@ import { useIsAuthenticated } from "@azure/msal-react";
 import MicrosoftSignUp from "./components/MicrosoftAuth/SignupButton";
 import { useLocation } from "react-router-dom";
 import { Transition } from "@headlessui/react";
-
+import NotFound from "./pages/NotFound";
 
 function Layout() {
   const isAuthenticated = useIsAuthenticated();
@@ -30,7 +29,6 @@ function Layout() {
   const isDashboard = pathname === "/dashboard";
 
   return (
-    <>
       <Transition
       as="div"
       appear
@@ -61,7 +59,6 @@ function Layout() {
           </div>
         </div>
       </Transition>
-    </>
   );
 }
 
@@ -69,14 +66,14 @@ function App() {
   return (
     <main className="w-full min-h-screen bg-[#e7ebf3] ">
       <Routes>
+        <Route index path="/" element={<Navigate to="/dashboard" />} />
         <Route element={<Layout />}>
-          <Route index path="/" element={<Navigate to="/dashboard" />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/signup" element={<MicrosoftSignUp />} />
           <Route path="/helpdesk/tasks" element={<Tasks />} />
-          <Route path="/helpdesk/completed/:status" element={<Tasks />} />
-          <Route path="/helpdesk/in-progress/:status" element={<Tasks />} />
-          <Route path="/helpdesk/todo/:status" element={<Tasks />} />
+          <Route path="/helpdesk/completado/:estado" element={<Tasks />} />
+          <Route path="/helpdesk/en-proceso/:estado" element={<Tasks />} />
+          <Route path="/helpdesk/todo/:estado" element={<Tasks />} />
           <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
           <Route path="/helpdesk/trash" element={<Trash />} />
           <Route path="/admin/helpdesk/add-user" element={<UsersComponent />} />
@@ -90,8 +87,9 @@ function App() {
           <Route path="/knowledge/people" element={<People />} />
           <Route path="/knowledge/repository" element={<Repository />} />
           <Route path="/knowledge/admintools" element={<AdminTools />} />
+          <Route path="/notfound" element={<NotFound/>} />
+          <Route path="*" element={<Navigate to="/notfound"/>} />
         </Route>
-        <Route path="/login" element={<Login />} />
       </Routes>
       <Toaster />
     </main>

@@ -1,10 +1,13 @@
 import { FaHome, FaFileAlt, FaFolderOpen, FaGlobe, FaTasks, FaUsers, FaDatabase, FaTools, FaTrashAlt } from "react-icons/fa";
-import { MdDashboard, MdTaskAlt, MdOutlinePendingActions } from "react-icons/md";
+import {  MdSupportAgent, MdTaskAlt, MdOutlinePendingActions } from "react-icons/md";
+import { PiFolderSimpleUser } from "react-icons/pi";
+
+
 
 const linkData = [
     {
       label: "Helpdesk",
-      icon: <MdDashboard />,
+      icon: <MdSupportAgent />,
       children: [
         {
           label: "Tickets",
@@ -13,12 +16,12 @@ const linkData = [
         },
         {
           label: "Completados",
-          link: "/helpdesk/completed/completed",
+          link: "/helpdesk/completado/completado",
           icon: <MdTaskAlt />,
         },
         {
           label: "En proceso",
-          link: "/helpdesk/in-progress/in-progress",
+          link: "/helpdesk/en-proceso/en-proceso",
           icon: <MdOutlinePendingActions />,
         },
         {
@@ -40,7 +43,7 @@ const linkData = [
     },
     {
       label: "Knowledge Base",
-      icon: <MdDashboard />,
+      icon: <PiFolderSimpleUser />,
       children: [
         {
           label: "Inicio",

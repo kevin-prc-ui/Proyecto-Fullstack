@@ -21,9 +21,16 @@ const ICONS = {
   3: <MdKeyboardArrowDown />,
 };
 
-const Card = ({ ticket }) => {
+const Card = ({ ticket, status}) => {
   const { user } = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
+
+  if(ticket.estado === status)
+    return (
+  <>
+
+  </>
+  )
 
   return (
     <>
