@@ -4,8 +4,8 @@ import { RepositoryReposi } from './ComponentsKnow/Repository_Components/Reposit
 import { CategoriesReposi } from './ComponentsKnow/Repository_Components/CategoriesReposi';
 import { TagsReposi } from './ComponentsKnow/Repository_Components/TagsReposi';
 import SubMenu from './ComponentsKnow/SubMenu/SubMenu';
-import "../../styles/estilos.css";
 import { BsFolderFill, BsFilePdf, BsImage, BsTrash } from 'react-icons/bs';
+import "../../styles/estilos.css";
 
 const Repository = () => {
   const [items, setItems] = useState([]);

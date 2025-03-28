@@ -4,8 +4,8 @@ import { MyFile } from './ComponentsKnow/Shared_File_Components/MyFile';
 import { DocumentosCopart } from './ComponentsKnow/Shared_File_Components/DocumentosCopart';
 import { TagsCompart } from './ComponentsKnow/Shared_File_Components/TagsCompart.JSX';
 import SubMenu from './ComponentsKnow/SubMenu/SubMenu';
-import "../../styles/estilos.css";
 import { BsFolderFill, BsFilePdf, BsImage, BsTrash, BsChevronDown, BsChevronRight } from 'react-icons/bs';
+import "../../styles/estilos.css";
 
 const SharedFile = () => {
   const [showDropdown, setShowDropdown] = useState(false);
