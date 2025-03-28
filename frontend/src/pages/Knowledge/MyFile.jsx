@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Documents from './ComponentsKnow/My_File_Components/Documents';
 import MisArchivos from './ComponentsKnow/My_File_Components/MisArchivos';
 import Categorias from './ComponentsKnow/My_File_Components/Categorias';
 import Etiquetas from './ComponentsKnow/My_File_Components/Etiquetas';
-import {SubMenu} from './ComponentsKnow/SubMenu/SubMenu';
+import { SubMenu } from './ComponentsKnow/SubMenu/SubMenu';
+import { BsFolderFill, BsFilePdf, BsImage, BsTrash, BsStar, BsStarFill } from 'react-icons/bs';
 import "../../styles/estilos.css";
-import { BsFolderFill, BsFilePdf, BsImage, BsTrash, BsChevronDown, BsChevronRight } from 'react-icons/bs';
 
 const MyFile = () => {
   const [items, setItems] = useState([]);
   const [currentFolder, setCurrentFolder] = useState(null);
-  const [expandedFolders, setExpandedFolders] = useState({});
+  const [currentFilter, setCurrentFilter] = useState('all');
+  const [favorites, setFavorites] = useState(() => {
+    // Cargar favoritos desde localStorage al iniciar
+    const saved = localStorage.getItem('favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Guardar favoritos en localStorage cuando cambian
+  useEffect(() => {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }, [favorites]);
 
   // Manejar subida de archivos
   const handleFileUpload = (file) => {
@@ -22,7 +32,8 @@ const MyFile = () => {
       fileType: file.type.includes('pdf') ? 'pdf' : 'image',
       size: (file.size / 1024).toFixed(2) + ' KB',
       date: new Date().toLocaleDateString(),
-      parentId: currentFolder
+      parentId: currentFolder,
+      isFavorite: favorites.includes(Date.now())
     };
     setItems(prev => [...prev, newItem]);
   };
@@ -39,9 +50,24 @@ const MyFile = () => {
     setItems(prev => [...prev, newFolder]);
   };
 
+  // Alternar favorito
+  const toggleFavorite = (itemId) => {
+    setItems(prev => prev.map(item => 
+      item.id === itemId ? {...item, isFavorite: !item.isFavorite} : item
+    ));
+    
+    setFavorites(prev => {
+      const newFavorites = prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId];
+      return newFavorites;
+    });
+  };
+
   // Eliminar item
   const handleRemoveItem = (id) => {
     setItems(prev => prev.filter(item => item.id !== id));
+    setFavorites(prev => prev.filter(favId => favId !== id));
   };
 
   // Entrar a una carpeta
@@ -54,15 +80,27 @@ const MyFile = () => {
     setCurrentFolder(null);
   };
 
-  // Obtener items actuales según la carpeta actual
-  const getCurrentItems = () => {
-    return items.filter(item => item.parentId === currentFolder);
+  // Obtener items filtrados
+  const getFilteredItems = () => {
+    const currentItems = items.filter(item => item.parentId === currentFolder);
+    
+    switch(currentFilter) {
+      case 'favorites':
+        return currentItems.filter(item => favorites.includes(item.id));
+      case 'recent':
+        return [...currentItems].sort((a,b) => new Date(b.date) - new Date(a.date));
+      default:
+        return currentItems;
+    }
   };
 
   return (
     <div className="container">
       <div className="top-bar">
-        <Documents />
+        <Documents 
+          currentFilter={currentFilter}
+          setCurrentFilter={setCurrentFilter}
+        />
         <MisArchivos />
         <Categorias />
         <Etiquetas />
@@ -82,50 +120,54 @@ const MyFile = () => {
         
         {/* Lista de archivos y carpetas */}
         <div className="uploaded-files-container mt-3">
-          {getCurrentItems().length > 0 ? (
-            getCurrentItems().map(item => (
+          {getFilteredItems().length > 0 ? (
+            getFilteredItems().map(item => (
               <div key={item.id} className="uploaded-file mb-3 p-3 border rounded">
                 <div className="d-flex justify-content-between align-items-center">
                   <div className="d-flex align-items-center">
                     {item.type === 'folder' ? (
-                      <>
-                        <button 
-                          className="btn btn-sm me-2 p-0"
-                          onClick={() => enterFolder(item.id)}
-                        >
-                          <BsFolderFill size={24} color="#4e73df" />
-                        </button>
-                      </>
+                      <button 
+                        className="btn btn-sm me-2 p-0"
+                        onClick={() => enterFolder(item.id)}
+                      >
+                        <BsFolderFill size={24} color="#4e73df" />
+                      </button>
                     ) : item.fileType === 'pdf' ? (
                       <BsFilePdf size={24} color="#e74a3b" className="me-3" />
                     ) : (
                       <img 
                         src={URL.createObjectURL(item.fileObject)} 
                         alt="Preview" 
-                        style={{ 
-                          width: '40px', 
-                          height: '40px',
-                          objectFit: 'cover',
-                          marginRight: '15px'
-                        }}
+                        className="file-preview-img"
                       />
                     )}
                     
                     <div>
                       <h5 className="mb-1">{item.name}</h5>
-                      <div className="d-flex gap-3 text-muted small">
+                      <div className="file-details">
                         <span>{item.type === 'file' ? item.size : 'Carpeta'}</span>
                         <span>{item.date}</span>
                       </div>
                     </div>
                   </div>
                   
-                  <button 
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleRemoveItem(item.id)}
-                  >
-                    <BsTrash size={14} />
-                  </button>
+                  <div className="d-flex gap-2">
+                    {item.type === 'file' && (
+                      <button 
+                        className="btn btn-sm favorite-btn"
+                        onClick={() => toggleFavorite(item.id)}
+                        title={item.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                      >
+                        {item.isFavorite ? <BsStarFill color="gold" /> : <BsStar />}
+                      </button>
+                    )}
+                    <button 
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleRemoveItem(item.id)}
+                    >
+                      <BsTrash size={14} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
@@ -133,7 +175,9 @@ const MyFile = () => {
             <div className="text-center py-4 text-muted">
               {currentFolder ? 
                 'La carpeta está vacía. Sube archivos aquí.' : 
-                'No hay elementos. Sube archivos o crea carpetas.'}
+                currentFilter === 'favorites' 
+                  ? 'No tienes documentos marcados como favoritos' 
+                  : 'No hay elementos. Sube archivos o crea carpetas.'}
             </div>
           )}
         </div>
