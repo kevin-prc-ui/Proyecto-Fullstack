@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaList } from "react-icons/fa";
 import { MdGridView } from "react-icons/md";
 import { useParams } from "react-router-dom";
@@ -9,7 +9,7 @@ import Tabs from "../../components/Tabs/Tabs";
 import TaskTitle from "../../components/Ticket/Title";
 import BoardView from "../../components/Ticket/BoardView";
 import Table from "../../components/Ticket/Table";
-import PaginadoTickets from "../../components/Ticket/PaginadoTickets";
+import PaginationBar from "../../components/Ticket/PaginadoTickets";
 import AddTask from "../../components/Ticket/Title";
 import { toast } from "sonner";
 import axios from "axios";
@@ -31,18 +31,30 @@ const TASK_TYPE = {
 const Tasks = () => {
   const params = useParams();
   const isAuth = useIsAuthenticated(); // Hook para verificar si el usuario está autenticado
-  const [selected, setSelected] = useState(0);
   const [pagina, setPagina] = useState(0);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tickets, setTickets] = useState([]);
   const [errorConexion, setErrorConexion] = useState(false); // Estado para indicar si hubo un error de conexión
   const [totalPages, setTotalPages] = useState(0);
-
+  const [selected, setSelected] = useState(() => {
+    const saved = localStorage.getItem('selectedTab');
+    return saved !== null ? Number(saved) : 0;
+  });
   const status = params?.status || "";
 
+ // Usar useCallback para evitar recreación en cada render
+ const handleTabChange = useCallback((index) => {
+  setSelected(index);
+}, []);
+
+  useEffect(() => {
+    localStorage.setItem('selectedTab', selected);
+  }, [selected]);
+  
   useEffect(() => {
     const fetchTickets = async () => {
+      console.log(selected)
       await getAllTickets();
     };
     if (isAuth) fetchTickets();
@@ -103,7 +115,11 @@ const Tasks = () => {
             />
           )}
         </div>
-        <Tabs tabs={TABS} setSelected={setSelected}>
+        <Tabs 
+          tabs={TABS} 
+          selected={selected} 
+          setSelected={handleTabChange}
+        >
           {selected === 0 ? (
             <BoardView tickets={tickets} />
           ) : (
@@ -114,7 +130,7 @@ const Tasks = () => {
         </Tabs>
         {/* <AddTask open={open} setOpen={setOpen} /> */}
         {totalPages > 1 && (
-          <PaginadoTickets
+          <PaginationBar
             currentPage={pagina}
             totalPages={totalPages}
             onPrev={prevPage}
