@@ -16,7 +16,7 @@ const getHeaders = () => ({
 
 export const listUsers = () =>
   axios
-    .get(REST_API_BASE_URL+"")
+    .get(`${REST_API_BASE_URL}/users`, getHeaders()) // Add headers to the request
     .then((response) => response)
     .catch((error) => {
       if (!error.response) {
@@ -26,10 +26,21 @@ export const listUsers = () =>
       throw error;
     });
 
-export const createUser = (user) => axios.post(REST_API_BASE_URL, user);
+export const signUp = (userData) => axios.post(`${REST_API_BASE_URL}/auth/signup`, userData);
 
-export const getUserById = (userId) => axios.get(REST_API_BASE_URL +'/'+userId);
+export const getUserById = (userId) => axios.get(`${REST_API_BASE_URL}/users/${userId}`, getHeaders());
 
-export const updateUser = (userId,user) => axios.put(REST_API_BASE_URL+"/edit/"+userId, user);
+export const updateUser = (userId,user) => axios.put(`${REST_API_BASE_URL}/users/edit/${userId}`, user, getHeaders());
 
-export const deleteUser = (userId) => axios.delete(REST_API_BASE_URL +'/delete/'+userId);
+export const deleteUser = (userId) => axios.delete(`${REST_API_BASE_URL}/users/delete/${userId}`, getHeaders());
+
+export const getUserPermissions = async () => {
+  const response = await axios.get(`${REST_API_BASE_URL}/users/permisos`, getHeaders());
+  return response;
+};
+
+export const checkOrCreateUser = (userData) => 
+  axios.post(`${REST_API_BASE_URL}/users/check-or-create`, userData, getHeaders());
+
+export const login = (loginData) => axios.post(`${REST_API_BASE_URL}/auth/login`, loginData);
+export const logout = (signoutData) => axios.post(`${REST_API_BASE_URL}/auth/signout`, signoutData);
