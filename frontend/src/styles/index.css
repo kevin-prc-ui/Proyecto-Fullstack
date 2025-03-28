@@ -12,16 +12,6 @@
   }
 }
 
-.bg-white{
-  min-width: 210px;
-}
-.bg-primary{
-  min-width: 160px;
-}
-.hover\:bg-\[\#2564ed2d\] {
-  min-width: 160px;
-}
-
 .child-link {
   animation: slideIn 0.1s ease-out forwards;
   opacity: 0;
@@ -254,4 +244,12 @@ h1 {
 
 .grid-item p {
   color: #555;
+}
+.error-message {
+  color: #dc3545;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  background-color: #f8d7da;
 }

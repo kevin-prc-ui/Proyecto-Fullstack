@@ -1,5 +1,5 @@
 import { Navbar } from "react-bootstrap";
-import Button from "../MicrosoftAuth/LoginButton";
+import MicrosoftLoginButton from "../MicrosoftAuth/LoginButton";
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
@@ -12,13 +12,13 @@ const Index = () => {
       <Navbar
         bg="white shadow"
         variant="white"
-        className="navbarStyle flex-wrap justify-content-between"
+        className="navbarStyle flex flex-wrap justify-content-between"
       >
-        <a className="navbar-brand" href="/">
+        <a className="w-45" href="/">
           <img
             src="https://serdiaceros.com.mx/wp-content/uploads/2022/08/SERDI-logo-web-1.png"
             alt=""
-            width={"80%"}
+            width={"100%"}
           />
         </a>
         <AuthenticatedTemplate>
@@ -29,18 +29,20 @@ const Index = () => {
             Inicia sesión para ver tu información de perfil.
           </div>
         </UnauthenticatedTemplate>
-        <Button />
+        <MicrosoftLoginButton /> {/* Reemplaza el Button anterior */}
       </Navbar>
     </>
   );
 };
+
 const ProfileContent = () => {
   const { accounts } = useMsal();
  
   return (
     <>
-      <div className="card-title">Bienvenido, {accounts[0].name}!</div>
+      <div className="">Bienvenido, {accounts[0].name}!</div>
     </>
   );
 };
+
 export default Index;

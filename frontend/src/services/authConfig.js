@@ -13,6 +13,12 @@ export const msalConfig = {
     }
 };
 
+export const handleSignIn = () => {
+    instance.loginRedirect({
+      scopes: ['user.read'],
+      prompt: 'select_account'
+    });
+  };
 
 export const loginRequest = {
     scopes: ["User.Read"],

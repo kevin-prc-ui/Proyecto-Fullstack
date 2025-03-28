@@ -1,0 +1,26 @@
+package com.webserdi.backend.dto;
+
+import com.webserdi.backend.entity.*;
+import lombok.Data;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Data
+
+public class TicketDto {
+    private Long id;
+    private String tema;
+    private String codigo;
+    private Boolean isTrashed;
+    private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaActualizacion;
+    private LocalDate fechaVencimiento;
+    private Long usuarioCreador;
+    private Long usuarioAsignado;
+    private Long departamento;
+    private Long fuente;
+    private Long incidencia;
+    private Long motivo;
+    private Long prioridad;
+    private Long estado;
+}

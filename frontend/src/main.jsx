@@ -9,7 +9,6 @@ import { MsalProvider } from "@azure/msal-react";
 import { Provider } from "react-redux";
 import store from "./redux/store.js";
 import { BrowserRouter } from "react-router-dom";
-
 // Create MSAL instance
 const msalInstance = new PublicClientApplication(msalConfig);
 

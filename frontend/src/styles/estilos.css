@@ -1,0 +1,203 @@
+/* Estilos generales */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  margin-top: 0;
+  text-align: center;
+}
+
+/* Contenedores */
+.sites-container {
+  padding: 20px;
+}
+
+/* Estilos para la cuadrícula de 2x2 */
+.home-container {
+  padding: 20px;
+}
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+  grid-template-rows: repeat(2, auto); /* Dos filas */
+  gap: 20px; /* Espacio entre contenedores */
+}
+
+.grid-item {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.filter-container {
+  margin-bottom: 15px;
+}
+
+.filter {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: 100%; /* Ancho por defecto */
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.filter-group {
+  margin-bottom: 10px;
+}
+
+/* Estilos específicos para los filtros pequeños */
+.small-filter {
+  width: auto; /* Ancho automático (mismo que Mis Actividades) */
+  padding: 6px 10px; /* Tamaño más pequeño */
+  font-size: 12px; /* Texto más pequeño */
+}
+
+/* Estilos para los filtros de Mis Actividades */
+.activities-filters {
+  display: flex;
+  gap: 10px; /* Espacio entre los filtros */
+}
+
+/* Asegurar que los filtros pequeños tengan el mismo tamaño y largo */
+.filter-container .small-filter {
+  width: auto; /* Ancho automático */
+  padding: 6px 10px; /* Tamaño más pequeño */
+  font-size: 12px; /* Texto más pequeño */
+}
+
+/* Botones */
+.toggle-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-button:hover {
+  background-color: #0056b3;
+}
+
+/* Listas */
+.sites-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 300px;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.sites-list li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+}
+
+.sites-list li:last-child {
+  border-bottom: none;
+}
+
+.sites-list li:hover {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+/* Tabla de usuarios */
+.user-table {
+  border-radius: 10px;
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 400px;
+  margin-top: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  }
+  
+.user-table tr{
+  margin: 100px;
+  }
+
+.user-table th,
+.user-table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.user-table th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+  color: #333;
+}
+
+.user-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+.user-table tbody tr:hover {
+  border-left: 2px solid #007bff;
+}
+
+.user-table .sortable-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.user-table .sortable-header:hover {
+  color: #007bff;
+}
+
+.user-table .action-buttons {
+  display: flex;
+  justify-content: center;
+}
+
+.user-table .action-buttons button {
+  margin: 0 5px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 10px;
+  transition: background-color 0.2s ease-;
+}
+
+.user-table .action-buttons .edit-button {
+  background-color: transparent;
+  color: #6c757d;
+}
+
+.user-table .action-buttons .delete-button {
+  background-color: transparent;
+  color: #dc3545;
+}
+
+.user-table .action-buttons .edit-button:hover {
+  background-color: #bbbec2;
+}
+
+.user-table .action-buttons .delete-button:hover {
+  background-color: #f8bec2;
+}
+#search-icon {
+  background-color: #e2e6ea;
+  border: none;
+}
+
+
+
+
+
+
+
+
+
+
+
