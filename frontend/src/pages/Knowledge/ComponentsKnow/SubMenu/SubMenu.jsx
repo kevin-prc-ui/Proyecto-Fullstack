@@ -5,6 +5,7 @@ import {
   BsListCheck,
   BsFolderPlus
 } from "react-icons/bs";
+
 import { useRef, useState } from "react";
 
 export const SubMenu = ({ onFileUpload, onCreateFolder }) => {
@@ -75,7 +76,7 @@ export const SubMenu = ({ onFileUpload, onCreateFolder }) => {
       {showFolderModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h5>Create New Folder</h5>
+            <h5>Crear Nueva Carpeta</h5>
             <input
               type="text"
               className="form-control mb-3"
