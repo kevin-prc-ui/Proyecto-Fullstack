@@ -34,6 +34,7 @@ export const UseLoginHandler = () => {
   return { handleLogin };
 };
 
+
 export const UseLogoutHandler = () => {
   const { instance } = useMsal();
 

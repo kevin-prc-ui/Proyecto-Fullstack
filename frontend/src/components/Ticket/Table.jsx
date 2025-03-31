@@ -24,7 +24,6 @@ const ICONS = {
 const Table = ({ tickets }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selected, setSelected] = useState(null);
-  console.log(tickets)
 
   const deleteClicks = (id) => {
     setSelected(id);

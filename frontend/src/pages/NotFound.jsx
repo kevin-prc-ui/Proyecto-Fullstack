@@ -1,16 +1,17 @@
 import { Link } from "react-router-dom";
 import { FaExclamationTriangle } from "react-icons/fa";
 
+
 const NotFound = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-center p-4">
+    <div className="flex flex-col items-center justify-center text-center p-4">
       <div className="max-w-md space-y-4">
         <FaExclamationTriangle className="w-30 h-30 mx-auto text-red-500" />
-        <h1 className="text-4xl font-bold text-gray-800">
-          404 - Página no encontrada
+        <h1 className="glitch text-4xl font-bold text-gray-800">
+          Página no encontrada.
         </h1>
         <p className="text-gray-600">
-          La página que estás buscando no existe o ha sido movida.
+          La página que estás buscando no existe o no cuentas con permisos suficientes.
         </p>
         <Link
           to="/dashboard"

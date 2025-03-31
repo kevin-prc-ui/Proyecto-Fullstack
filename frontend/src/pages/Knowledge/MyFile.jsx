@@ -12,14 +12,14 @@ const MyFile = () => {
   const [currentFolder, setCurrentFolder] = useState(null);
   const [currentFilter, setCurrentFilter] = useState('all');
   const [favorites, setFavorites] = useState(() => {
-    // Cargar favoritos desde localStorage al iniciar
-    const saved = localStorage.getItem('favorites');
+    // Cargar favoritos desde sessionStorage al iniciar
+    const saved = sessionStorage.getItem('favorites');
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Guardar favoritos en localStorage cuando cambian
+  // Guardar favoritos en sessionStorage cuando cambian
   useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
+    sessionStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
 
   // Manejar subida de archivos

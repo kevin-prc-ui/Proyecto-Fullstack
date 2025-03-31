@@ -38,7 +38,7 @@ const Tasks = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [permisos, setPermisos] = useState([]);
   const [selected, setSelected] = useState(() => {
-    const saved = localStorage.getItem('selectedTab');
+    const saved = sessionStorage.getItem('selectedTab');
     return saved !== null ? Number(saved) : 0;
   });
   const status = params?.status || "";
@@ -50,7 +50,7 @@ const Tasks = () => {
 }, []);
 
   useEffect(() => {
-    localStorage.setItem('selectedTab', selected);
+    sessionStorage.setItem('selectedTab', selected);
   }, [selected]);
   
   useEffect(() => {
@@ -58,11 +58,10 @@ const Tasks = () => {
       await getAllTickets();
     };
     if (isAuth) fetchTickets();
-  }, [isAuth, pagina,status]);
+  }, [isAuth, pagina]);
 
   function nextPage() {
     setPagina(pagina + 1);
-    console.log(selected)
   }
 
   function prevPage() {

@@ -24,14 +24,6 @@ const ICONS = {
 const Card = ({ ticket, status}) => {
   const { user } = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
-
-  if(ticket.estado === status)
-    return (
-  <>
-
-  </>
-  )
-
   return (
     <>
       <div className="w-full h-fit bg-white shadow-md p-2 rounded ">
