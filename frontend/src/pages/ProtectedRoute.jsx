@@ -1,40 +1,39 @@
-// components/ProtectedRoute.jsx
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useIsAuthenticated } from "@azure/msal-react";
-import { Transition } from "@headlessui/react";
-import Sidebar from "../components/Sidebar";
-import { Navbar } from "react-bootstrap";
-import Footer from "../components/Footer";
+import { useEffect, useState } from "react";
+import {getUserRoles} from "../services/auth"
 
-export const ProtectedRoute = () => {
+// Nuevo componente ProtectedRoute con control de roles
+const ProtectedRoute = ({ allowedRoles }) => {
   const isAuthenticated = useIsAuthenticated();
   const location = useLocation();
+  const [rolesLoaded, setRolesLoaded] = useState(false);
+  const [userRoles, setUserRoles] = useState([]);
+  
+  // Función para obtener roles del token
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setUserRoles(getUserRoles());
+      setRolesLoaded(true);
+    }
+  }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return <Navigate to="/dashboard" state={{ from: location }} replace />;
   }
 
-  return (
-    <Transition
-      as="div"
-      appear
-      show
-      enter="transition-opacity duration-300"
-      enterFrom="opacity-0"
-      enterTo="opacity-100"
-    >
-      <div className="w-full h-screen flex flex-col md:flex-row">
-        <div className="w-1/6 h-screen bg-white min-w-53 sticky top-0 hidden md:block">
-          <Sidebar />
-        </div>
-        <div className="flex-1 flex flex-col overflow-y-auto">
-          <Navbar />
-          <div className="p-4 2xl:px-10 flex-1">
-            <Outlet />
-          </div>
-          <Footer />
-        </div>
-      </div>
-    </Transition>
+  if (!rolesLoaded) {
+    return <div className="spinner">...</div>; // Agrega un componente de carga
+  }
+
+  const hasRequiredRole = allowedRoles.some(role => userRoles.includes(role));
+
+  return hasRequiredRole ? (
+    <Outlet />
+  ) : (
+    <Navigate to="/notauthorized" state={{ from: location }} replace />
   );
 };
+
+export default ProtectedRoute;
