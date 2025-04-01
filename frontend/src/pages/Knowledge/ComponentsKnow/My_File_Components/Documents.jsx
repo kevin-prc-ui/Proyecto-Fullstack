@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
-export const Documents = ({ currentFilter, setCurrentFilter }) => {
+const Documents = ({ currentFilter, setCurrentFilter }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 

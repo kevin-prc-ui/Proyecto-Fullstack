@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
-export const MyFile = () => {
+export const MyFileCompart = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -106,4 +106,4 @@ if (!document.getElementById('myfile-dropdown-styles')) {
   document.head.appendChild(styleElement);
 }
 
-export default MyFile;
+export default MyFileCompart;
