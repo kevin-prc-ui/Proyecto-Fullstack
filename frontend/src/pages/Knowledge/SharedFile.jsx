@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CategoriesCompart } from './ComponentsKnow/Shared_File_Components/CategoriesCompart';
-import { MyFile } from './ComponentsKnow/Shared_File_Components/MyFile';
+import  {MyFileCompart}  from './ComponentsKnow/Shared_File_Components/MyFileCompart';
 import { DocumentosCopart } from './ComponentsKnow/Shared_File_Components/DocumentosCopart';
 import { TagsCompart } from './ComponentsKnow/Shared_File_Components/TagsCompart.JSX';
 import SubMenu from './ComponentsKnow/SubMenu/SubMenu';
@@ -67,7 +67,7 @@ const SharedFile = () => {
   return (
     <div className="container">
       <div className="top-bar">
-        <MyFile />
+        <MyFileCompart />
         <DocumentosCopart />
         <CategoriesCompart />
         <TagsCompart />
