@@ -51,8 +51,15 @@ export const formatUserRole = (rolId) => {
     const month = date.toLocaleString("en-US", { month: "short" });
     const day = date.getDate();
     const year = date.getFullYear();
+    const hours = date.getHours();
+    let minutes = date.getMinutes();
+
+    if(minutes<10)
+    {
+      minutes = "0" + minutes;
+    }
   
-    const formattedDate = `${day}-${month}-${year}`;
+    const formattedDate = `${day}-${month}-${year}, ${hours}:${minutes}`;
   
     return formattedDate;
   };

@@ -1,4 +1,3 @@
-import { useIsAuthenticated } from "@azure/msal-react";
 import { Link } from "react-router-dom";
 import { UseLoginHandler, UseLogoutHandler } from "./ButtonHandler";
 import { FaSignInAlt, FaSignOutAlt, FaUserPlus } from "react-icons/fa";

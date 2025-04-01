@@ -49,16 +49,27 @@ const Tasks = () => {
   setSelected(index);
 }, []);
 
-  useEffect(() => {
-    sessionStorage.setItem('selectedTab', selected);
-  }, [selected]);
-  
-  useEffect(() => {
+// useEffect(() => {
+  // sessionStorage.setItem('selectedTab', selected);
+// }, [selected]);
+
+useEffect(() => {
+  sessionStorage.setItem('selectedTab', selected);
     const fetchTickets = async () => {
-      await getAllTickets();
+      // await getAllTickets();
+        setLoading(true); // Mostrar el spinner de carga
+        try {
+          const response = await listTickets(pagina); // Llama al servicio para obtener los usuarios
+          setTickets(response.data.content); // Actualiza el estado con la lista de usuarios
+          setTotalPages(response.data.totalPages); // Actualiza el estado con la lista de usuarios)
+        } catch (error) {
+          setErrorConexion(error != null); // Indica que hubo un error de conexión
+        } finally {
+          setLoading(false); // Oculta el spinner de carga
+        }
     };
     if (isAuth) fetchTickets();
-  }, [isAuth, pagina]);
+  }, [isAuth, pagina, selected]);
 
   function nextPage() {
     setPagina(pagina + 1);
@@ -68,18 +79,18 @@ const Tasks = () => {
     setPagina(pagina - 1);
   }
 
-  async function getAllTickets() {
-    setLoading(true); // Mostrar el spinner de carga
-    try {
-      const response = await listTickets(pagina); // Llama al servicio para obtener los usuarios
-      setTickets(response.data.content); // Actualiza el estado con la lista de usuarios
-      setTotalPages(response.data.totalPages); // Actualiza el estado con la lista de usuarios)
-    } catch (error) {
-      setErrorConexion(error != null); // Indica que hubo un error de conexión
-    } finally {
-      setLoading(false); // Oculta el spinner de carga
-    }
-  }
+  // async function getAllTickets() {
+  //   setLoading(true); // Mostrar el spinner de carga
+  //   try {
+  //     const response = await listTickets(pagina); // Llama al servicio para obtener los usuarios
+  //     setTickets(response.data.content); // Actualiza el estado con la lista de usuarios
+  //     setTotalPages(response.data.totalPages); // Actualiza el estado con la lista de usuarios)
+  //   } catch (error) {
+  //     setErrorConexion(error != null); // Indica que hubo un error de conexión
+  //   } finally {
+  //     setLoading(false); // Oculta el spinner de carga
+  //   }
+  // }
 
   return loading ? (
     <div className="py-10">
@@ -108,7 +119,7 @@ const Tasks = () => {
           <Button
             label='Crear ticket'
             icon={<IoMdAdd className='text-lg' />}
-            className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md py-2 2xl:py-2.5'
+            className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded py-2 2xl:py-2.5'
           />
         )}
       </div>
