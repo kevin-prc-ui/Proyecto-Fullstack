@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { signUp, login } from "../../services/UsuarioService";
 
 const MicrosoftSignUp = () => {
-    const { instance } = useMsal();
+  const { instance } = useMsal();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -17,23 +17,22 @@ const MicrosoftSignUp = () => {
     try {
       setIsSigningIn(true);
       setError("");
-  
+      sessionStorage.removeItem("authToken"); // Limpiar token al iniciar el proceso
+
       // 1. Autenticación con Microsoft
-      const response = await instance.loginPopup(loginRequest).catch(error => {
-        throw new Error(`Error de autenticación: ${error.errorCode} - ${error.errorMessage}`);
-      });
-  
+      const response = await instance.loginPopup(loginRequest);
+      
       if (!response?.accessToken) {
         throw new Error("No se pudo obtener el token de acceso");
       }
-  
+
       // 2. Obtener datos del usuario
       const graphResponse = await callMsGraph(response.accessToken);
       
       if (!graphResponse?.userPrincipalName) {
         throw new Error("Datos de usuario incompletos");
       }
-  
+
       // 3. Crear usuario en tu backend
       const userData = {
         nombre: graphResponse.givenName || "Nombre no proporcionado",
@@ -41,31 +40,53 @@ const MicrosoftSignUp = () => {
         email: graphResponse.userPrincipalName,
         password: graphResponse.id,
         enabled: true,
-        roles: ["ROLE_ADMIN"],
+        roles: ["ROLE_USER"],
         permisos: ["CREAR_TICKET"],
       };
 
       const loginData = {
         email: graphResponse.userPrincipalName,
         password: graphResponse.id,
-      }
+      };
+
+      // Intento de registro
       await signUp(userData);
       
+      // Si el registro es exitoso, hacer login
       const respuesta = await login(loginData);
-      const token = respuesta.data;
-      sessionStorage.setItem("authToken", JSON.stringify(token)); // Store the token      
-      navigate("/dashboard");  
+      sessionStorage.setItem("authToken", JSON.stringify(respuesta.data));
+      navigate("/dashboard");
       toast.success("Registro exitoso! Redirigiendo...");
+
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
-      toast.error(`Error en el registro: ${errorMessage}`);
-      console.error("Error en el registro:", error, error.message);
+      let errorMessage = "Error desconocido";
+      
+      // Manejo específico de errores
+      if (error.response) {
+        // Error del backend
+        const { status, data } = error.response;
+        
+        if (status === 401) { // Suponiendo que 409 es el código para conflicto (usuario existente)
+          errorMessage = data.mensaje || "El usuario ya existe";
+        } else {
+          errorMessage = data.mensaje || `Error del servidor (${status})`;
+        }
+      } else if (error.message) {
+        // Errores de Microsoft o de red
+        errorMessage = error.message;
+      }
+
+      // Mostrar notificación y limpiar estado
+      toast.error(errorMessage);
       setError(errorMessage);
+      console.error("Error en el registro:", error);
+
     } finally {
       setIsSigningIn(false);
     }
   };
 
+  // ... (resto del componente igual)
   return (
     <Transition
       appear

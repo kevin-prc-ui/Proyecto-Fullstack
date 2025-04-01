@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaExclamationTriangle } from "react-icons/fa";
 
-
 const NotFound = () => {
   return (
     <div className="flex flex-col items-center justify-center text-center p-4">

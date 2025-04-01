@@ -1,31 +1,31 @@
-import { Navigate, Outlet, Route, Routes, useNavigate } from "react-router-dom";
-import { Toaster } from "sonner";
-import Navbar from "./components/Navbar";
-import Sidebar from "./components/Sidebar";
+import MicrosoftSignUp from "./components/MicrosoftAuth/SignupButton";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import UsersComponent from "./components/Users/UsersComponent";
+import { useIsAuthenticated } from "@azure/msal-react";
 import TaskDetails from "./pages/Helpdesk/TaskDetails";
+import SharedFile from "./pages/Knowledge/SharedFile";
+import Repository from "./pages/Knowledge/Repository";
+import AdminTools from "./pages/Knowledge/AdminTools";
+import ProtectedRoute from "./pages/ProtectedRoute";
+import { Transition } from "@headlessui/react";
+import { useLocation } from "react-router-dom";
+import People from "./pages/Knowledge/People";
+import MyFile from "./pages/Knowledge/MyFile";
+import Sites from "./pages/Knowledge/Sites";
+import Sidebar from "./components/Sidebar";
 import Tasks from "./pages/Helpdesk/Tasks";
 import Trash from "./pages/Helpdesk/Trash";
 import Users from "./pages/Helpdesk/Users";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Knowledge/Home";
-import MyFile from "./pages/Knowledge/MyFile";
-import SharedFile from "./pages/Knowledge/SharedFile";
-import Sites from "./pages/Knowledge/Sites";
 import Task from "./pages/Knowledge/Task";
-import People from "./pages/Knowledge/People";
-import Repository from "./pages/Knowledge/Repository";
-import AdminTools from "./pages/Knowledge/AdminTools";
-import UsersComponent from "./components/Users/UsersComponent";
 import Footer from "./components/Footer";
-import { useIsAuthenticated } from "@azure/msal-react";
-import MicrosoftSignUp from "./components/MicrosoftAuth/SignupButton";
-import { useLocation } from "react-router-dom";
-import { Transition } from "@headlessui/react";
+import Navbar from "./components/Navbar";
 import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./pages/ProtectedRoute";
+import { Toaster } from "sonner";
 
 function Layout() {
-  const isAuthenticated = useIsAuthenticated();
+  const isAuthenticated = sessionStorage.getItem("authToken");
   const { pathname } = useLocation();
   const isDashboard = pathname === "/dashboard";
 
@@ -41,7 +41,7 @@ function Layout() {
     >
       <div className="w-full h-screen flex flex-col md:flex-row">
         {/* Sidebar condicional */}
-        {isAuthenticated && !isDashboard && (
+        {isAuthenticated!==null && !isDashboard && (
           <div className="w-1/6 h-screen bg-white min-w-53 sticky top-0 hidden md:block">
             <Sidebar />
           </div>

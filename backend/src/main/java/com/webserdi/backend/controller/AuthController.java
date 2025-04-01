@@ -10,15 +10,16 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,23 +33,28 @@ public class AuthController {
     // Build Login REST API
     @PreAuthorize("permitAll()")
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto loginDto) {
-        String token = authService.login(loginDto);
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+        try {
+            String token = authService.login(loginDto);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Set<Rol> roles = authentication.getAuthorities().stream()
-                .map(authority -> {
-                    Rol rol = new Rol();
-                    rol.setNombre(authority.getAuthority());
-                    return rol;
-                })
-                .collect(Collectors.toSet());
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Set<Rol> roles = authentication.getAuthorities().stream()
+                    .map(authority -> {
+                        Rol rol = new Rol();
+                        rol.setNombre(authority.getAuthority());
+                        return rol;
+                    })
+                    .collect(Collectors.toSet());
 
-        JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
-        jwtAuthResponse.setAccessToken(token);
-        jwtAuthResponse.setRoles(roles);
+            JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
+            jwtAuthResponse.setAccessToken(token);
+            jwtAuthResponse.setRoles(roles);
 
-        return new ResponseEntity<>(jwtAuthResponse, HttpStatus.OK);
+            return ResponseEntity.ok(jwtAuthResponse);
+        } catch (AuthenticationException e) { // Captura todas las excepciones de autenticación
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "Usuario o contraseña incorrectos"));
+        }
     }
 
     @PreAuthorize("isAuthenticated()")

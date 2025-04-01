@@ -1,10 +1,10 @@
 import { useIsAuthenticated } from "@azure/msal-react";
-import { Link} from "react-router-dom";
-import { UseLoginHandler, UseLogoutHandler} from "./ButtonHandler";
+import { Link } from "react-router-dom";
+import { UseLoginHandler, UseLogoutHandler } from "./ButtonHandler";
 import { FaSignInAlt, FaSignOutAlt, FaUserPlus } from "react-icons/fa";
 
 const MyButton = () => {
-  const isAuthenticated = useIsAuthenticated();
+  const isAuthenticated = sessionStorage.getItem("authToken");
   return <div>{isAuthenticated ? <Logout /> : <Login />}</div>;
 };
 
@@ -19,7 +19,7 @@ export const Login = () => {
         <FaUserPlus className="mr-1" />
         Crear cuenta
       </Link>
-      <Link 
+      <Link
         onClick={handleLogin}
         className="flex items-center gap-1 bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 rounded-lg transition-colors text-decoration-none"
       >
@@ -37,7 +37,7 @@ export const Logout = () => {
     <Link
       onClick={handleLogout}
       className="max-w-45 flex items-center gap-1 bg-red-500 px-4 py-2 text-white hover:bg-red-600 rounded-lg transition-colors text-decoration-none"
-      >
+    >
       <FaSignOutAlt className="mr-1" />
       Cerrar sesión
     </Link>
