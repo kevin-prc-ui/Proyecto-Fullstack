@@ -1,109 +1,118 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import DocumentosCompart from './DocumentosCopart';
+import CategoriesCompart from './CategoriesCompart';
+import TagsCompart from './TagsCompart';
+import { SubMenu } from '../SubMenu/SubMenu';
+import { useFileManager } from '../Funciones/Funcions';
+import { BsFolderFill, BsFilePdf, BsImage, BsTrash, BsStar, BsStarFill } from 'react-icons/bs';
 
-export const MyFileCompart = () => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef(null);
+const MyFileCompart = () => {
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
-  };
+  const{
+    items,
+    currentFolder,
+    currentFilter,
+    setCurrentFilter,
+    favorites,
+    handleFileUpload,
+    handleCreateFolder,
+    toggleFavorite,
+    handleRemoveItem,
+    enterFolder,
+    goBack,
+    getFilteredItems
+  } = useFileManager();
+  
 
   return (
-    <div className="myfile-dropdown-container" ref={dropdownRef}>
-      <button 
-        className="top-button" 
-        onClick={toggleDropdown}
-        aria-expanded={showDropdown}
-        aria-haspopup="true"
-      >
-        Documentos
-        {showDropdown ? (
-          <FiChevronUp className="myfile-dropdown-icon" />
-        ) : (
-          <FiChevronDown className="myfile-dropdown-icon" />
-        )}
-      </button>
-      
-      {showDropdown && (
-        <div className="myfile-dropdown-menu">
-          <button className="myfile-dropdown-item">Todos los documentos</button>
-          <button className="myfile-dropdown-item">Editando actualmente</button>
-          <button className="myfile-dropdown-item">Otros están editando</button>
-          <button className="myfile-dropdown-item">Modificados recientemente</button>
-          <button className="myfile-dropdown-item">Agregados recientemente</button>
-          <button className="myfile-dropdown-item">Mis favoritos</button>
+    <>
+      <div className="top-bar">
+        <DocumentosCompart 
+          currentFilter={currentFilter}
+          setCurrentFilter={setCurrentFilter}
+        />
+        <button className="top-button active">Archivos Compartidos</button>
+        <CategoriesCompart />
+        <TagsCompart />
+      </div>
+
+      <div className="content">
+        <h1>Archivos Compartidos {currentFolder && (
+          <button className="btn btn-sm btn-outline-secondary ms-3" onClick={goBack}>
+            Volver
+          </button>
+        )}</h1>
+        
+        <SubMenu 
+          onFileUpload={handleFileUpload} 
+          onCreateFolder={handleCreateFolder} 
+        />
+        
+        <div className="uploaded-files-container mt-3">
+          {getFilteredItems().length > 0 ? (
+            getFilteredItems().map(item => (
+              <div key={item.id} className="uploaded-file mb-3 p-3 border rounded">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center">
+                    {item.type === 'folder' ? (
+                      <button 
+                        className="btn btn-sm me-2 p-0"
+                        onClick={() => enterFolder(item.id)}
+                      >
+                        <BsFolderFill size={24} color="#4e73df" />
+                      </button>
+                    ) : item.fileType === 'pdf' ? (
+                      <BsFilePdf size={24} color="#e74a3b" className="me-3" />
+                    ) : (
+                      <img 
+                        src={URL.createObjectURL(item.fileObject)} 
+                        alt="Preview" 
+                        className="file-preview-img"
+                      />
+                    )}
+                    
+                    <div>
+                      <h5 className="mb-1">{item.name}</h5>
+                      <div className="file-details">
+                        <span>{item.type === 'file' ? item.size : 'Carpeta'}</span>
+                        <span>{item.date}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="d-flex gap-2">
+                    {item.type === 'file' && (
+                      <button 
+                        className="btn btn-sm favorite-btn"
+                        onClick={() => toggleFavorite(item.id)}
+                        title={favorites.includes(item.id) ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                      >
+                        {favorites.includes(item.id) ? <BsStarFill color="gold" /> : <BsStar />}
+                      </button>
+                    )}
+                    <button 
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleRemoveItem(item.id)}
+                    >
+                      <BsTrash size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-4 text-muted">
+              {currentFolder ? 
+                'La carpeta está vacía. Sube archivos aquí.' : 
+                currentFilter === 'favorites' 
+                  ? 'No tienes documentos marcados como favoritos' 
+                  : 'No hay elementos. Sube archivos o crea carpetas.'}
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 };
-
-// Estilos específicos con prefijo único
-const styles = `
-  .myfile-dropdown-container {
-    position: relative;
-    display: inline-block;
-  }
-
-  /* Estilos específicos para el ícono del dropdown */
-  .myfile-dropdown-icon {
-    transition: transform 0.3s ease;
-    font-size: 0.9em;
-    margin-left: 4px;
-  }
-
-  /* Estilos del menú desplegable */
-  .myfile-dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    width: 220px;
-    z-index: 1000;
-    margin-top: 5px;
-  }
-
-  /* Items del menú */
-  .myfile-dropdown-item {
-    display: block;
-    width: 100%;
-    padding: 10px 16px;
-    text-align: left;
-    background: none;
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-size: 0.9em;
-  }
-
-  .myfile-dropdown-item:hover {
-    background-color: #f8f8f8;
-  }
-`;
-
-// Inyectar estilos solo una vez
-if (!document.getElementById('myfile-dropdown-styles')) {
-  const styleElement = document.createElement('style');
-  styleElement.id = 'myfile-dropdown-styles';
-  styleElement.innerHTML = styles;
-  document.head.appendChild(styleElement);
-}
 
 export default MyFileCompart;
