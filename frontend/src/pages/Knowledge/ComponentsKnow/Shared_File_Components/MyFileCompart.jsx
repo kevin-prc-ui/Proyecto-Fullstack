@@ -31,13 +31,13 @@ const MyFileCompart = () => {
           currentFilter={currentFilter}
           setCurrentFilter={setCurrentFilter}
         />
-        <button className="top-button active">Mis archivos</button>
+        <button className="top-button active">Archivos Compartidos</button>
         <CategoriesCompart />
         <TagsCompart />
       </div>
 
       <div className="content">
-        <h1>Mis Archivos {currentFolder && (
+        <h1>Archivos Compartidos {currentFolder && (
           <button className="btn btn-sm btn-outline-secondary ms-3" onClick={goBack}>
             Volver
           </button>
