@@ -44,3 +44,5 @@ export const checkOrCreateUser = (userData) =>
 
 export const login = (loginData) => axios.post(`${REST_API_BASE_URL}/auth/login`, loginData);
 export const logout = (signoutData) => axios.post(`${REST_API_BASE_URL}/auth/signout`, signoutData);
+// export const getUserRoles = (email) => {axios. get(`${REST_API_BASE_URL}/users/email`,email, getHeaders());}
+
