@@ -52,24 +52,18 @@ public class TicketServiceImpl implements TicketService {
     private void setRelationships(TicketDto dto, Ticket ticket) {
         ticket.setUsuarioCreador(usuarioRepository.findById(dto.getUsuarioCreador())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado")));
-
         if(dto.getUsuarioAsignado() != null) {
             ticket.setUsuarioAsignado(usuarioRepository.findById(dto.getUsuarioAsignado())
                     .orElseThrow(() -> new ResourceNotFoundException("Usuario asignado no encontrado")));
         }
-
         ticket.setDepartamento(departamentoRepository.findById(dto.getDepartamento())
                 .orElseThrow(() -> new ResourceNotFoundException("Departamento no encontrado")));
-
         ticket.setFuente(fuenteRepository.findById(dto.getFuente())
                 .orElseThrow(() -> new ResourceNotFoundException("Fuente no encontrada")));
-
         ticket.setIncidencia(incidenciaRepository.findById(dto.getIncidencia())
                 .orElseThrow(() -> new ResourceNotFoundException("Incidencia no encontrada")));
-
         ticket.setMotivo(motivoRepository.findById(dto.getMotivo())
                 .orElseThrow(() -> new ResourceNotFoundException("Motivo no encontrado")));
-
         ticket.setPrioridad(prioridadRepository.findById(dto.getPrioridad())
                 .orElseThrow(() -> new ResourceNotFoundException("Prioridad no encontrada")));
         ticket.setEstado(estadoRepository.findById(dto.getEstado())
