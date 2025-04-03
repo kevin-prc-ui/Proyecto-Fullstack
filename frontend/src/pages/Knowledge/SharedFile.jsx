@@ -3,7 +3,7 @@ import { CategoriesCompart } from './ComponentsKnow/Shared_File_Components/Categ
 import  {MyFileCompart}  from './ComponentsKnow/Shared_File_Components/MyFileCompart';
 import { DocumentosCopart } from './ComponentsKnow/Shared_File_Components/DocumentosCopart';
 import { TagsCompart } from './ComponentsKnow/Shared_File_Components/TagsCompart.JSX';
-import SubMenu from './ComponentsKnow/SubMenu/SubMenu';
+import {SubMenu} from './ComponentsKnow/SubMenu/SubMenu';
 import { BsFolderFill, BsFilePdf, BsImage, BsTrash, BsChevronDown, BsChevronRight } from 'react-icons/bs';
 import "../../styles/estilos.css";
 
