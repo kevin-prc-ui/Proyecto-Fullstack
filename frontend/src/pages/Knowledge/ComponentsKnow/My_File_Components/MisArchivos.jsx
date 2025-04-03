@@ -3,8 +3,8 @@ import Documents from './Documents';
 import Categorias from './Categorias';
 import Etiquetas from './Etiquetas';
 import { SubMenu } from '../SubMenu/SubMenu';
-import { BsFolderFill, BsFilePdf, BsImage, BsTrash, BsStar, BsStarFill } from 'react-icons/bs';
 import { useFileManager } from '../Funciones/Funcions';
+import { BsFolderFill, BsFilePdf, BsImage, BsTrash, BsStar, BsStarFill } from 'react-icons/bs';
 
 const MisArchivos = () => {
 
