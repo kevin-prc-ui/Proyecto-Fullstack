@@ -37,7 +37,7 @@ const RepositoryRepsosi = () => {
       </div>
 
       <div className="content">
-        <h1>Mis Archivos {currentFolder && (
+        <h1>Repositorio {currentFolder && (
           <button className="btn btn-sm btn-outline-secondary ms-3" onClick={goBack}>
             Volver
           </button>
