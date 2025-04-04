@@ -3,8 +3,8 @@ import { toast } from "sonner";
 
 const REST_API_BASE_URL = "http://localhost:8080/api"; //update the base url
 
-// Helper function to get the token from sessionStorage
-const token = () => sessionStorage.getItem("authToken");
+// Helper function to get the token from localStorage
+const token = () => localStorage.getItem("authToken");
 const getAuthToken = () => JSON.parse(token()).accessToken;
 
 // Function to create headers with the Authorization token
@@ -44,5 +44,15 @@ export const checkOrCreateUser = (userData) =>
 
 export const login = (loginData) => axios.post(`${REST_API_BASE_URL}/auth/login`, loginData);
 export const logout = (signoutData) => axios.post(`${REST_API_BASE_URL}/auth/signout`, signoutData);
-// export const getUserRoles = (email) => {axios. get(`${REST_API_BASE_URL}/users/email`,email, getHeaders());}
+export const getUserRoles = (email) => {
+  return axios.get(`${REST_API_BASE_URL}/users/email?email=${email}`, getHeaders())
+  .then(response => response)
+  .catch(error => {
+    if (!error.response) {
+      toast.error("Error de conexión con el servidor");
+      throw new Error("Error de conexion con el servidor");
+    }
+    throw error;
+  });
+};
 

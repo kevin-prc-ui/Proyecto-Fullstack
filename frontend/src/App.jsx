@@ -25,7 +25,7 @@ import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
 
 function Layout() {
-  const isAuthenticated = sessionStorage.getItem("authToken");
+  const isAuthenticated = localStorage.getItem("authToken");
   const { pathname } = useLocation();
   const isDashboard = pathname === "/dashboard";
 
@@ -65,7 +65,7 @@ function Layout() {
 }
 
 function App() {
-  const isAuthenticated = useIsAuthenticated();
+  const isAuthenticated = localStorage.getItem("authToken");
 
   if (!isAuthenticated)
     return (

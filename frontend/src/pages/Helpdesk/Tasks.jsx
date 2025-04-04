@@ -30,7 +30,7 @@ const TASK_TYPE = {
 
 const Tasks = () => {
   const params = useParams();
-  const isAuth = useIsAuthenticated(); // Hook para verificar si el usuario está autenticado
+  const isAuth = localStorage.getItem("authToken");
   const [pagina, setPagina] = useState(0);
   const [loading, setLoading] = useState(false);
   const [tickets, setTickets] = useState([]);
@@ -38,7 +38,7 @@ const Tasks = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [permisos, setPermisos] = useState([]);
   const [selected, setSelected] = useState(() => {
-    const saved = sessionStorage.getItem('selectedTab');
+    const saved = localStorage.getItem('selectedTab');
     return saved !== null ? Number(saved) : 0;
   });
   const status = params?.status || "";
@@ -50,11 +50,11 @@ const Tasks = () => {
 }, []);
 
 // useEffect(() => {
-  // sessionStorage.setItem('selectedTab', selected);
+  // localStorage.setItem('selectedTab', selected);
 // }, [selected]);
 
 useEffect(() => {
-  sessionStorage.setItem('selectedTab', selected);
+  localStorage.setItem('selectedTab', selected);
     const fetchTickets = async () => {
       // await getAllTickets();
         setLoading(true); // Mostrar el spinner de carga

@@ -110,7 +110,7 @@ const ProfileContent = () => {
           </div>
         </a>
         <a
-          href="/helpdesk/tasks"
+          href="/knowledge/home"
           className="flex w-96 min-h-30 h-fit bg-white m-2 p-1 justify-center rounded text-decoration-none text-black"
         >
           <div className="flex flex-row w-90 ">

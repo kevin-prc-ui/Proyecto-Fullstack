@@ -128,4 +128,14 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .map(PermisoMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public Set<String> getRole (String email){
+        Usuario user = usuarioRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("No existe el usuario con el email" + email));
+        return user.getRoles().stream()
+                .map(Rol::getNombre)
+                .collect(Collectors.toSet());
+    }
 }

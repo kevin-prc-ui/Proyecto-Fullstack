@@ -21,6 +21,9 @@ const Index = () => {
             width={"100%"}
           />
         </a>
+        {
+          
+        }
         <AuthenticatedTemplate>
           <ProfileContent />
         </AuthenticatedTemplate>
@@ -37,7 +40,7 @@ const Index = () => {
 
 const ProfileContent = () => {
   const { accounts } = useMsal();
-  const isAuthenticated = sessionStorage.getItem("authToken");
+  const isAuthenticated = localStorage.getItem("authToken");
   if (!isAuthenticated)
     return (
       <div className="card-title">

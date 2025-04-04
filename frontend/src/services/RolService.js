@@ -2,8 +2,8 @@ import axios from "axios";
 
 const REST_API_BASE_URL = "http://localhost:8080/api";
 
-// Helper function to get the token from sessionStorage
-const token = () => sessionStorage.getItem("authToken");
+// Helper function to get the token from localStorage
+const token = () => localStorage.getItem("authToken");
 const getAuthToken = () => JSON.parse(token()).accessToken;
 // Function to create headers with the Authorization token
 const getHeaders = () => ({

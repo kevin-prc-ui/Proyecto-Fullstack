@@ -37,18 +37,8 @@ public class AuthController {
         try {
             String token = authService.login(loginDto);
 
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Set<Rol> roles = authentication.getAuthorities().stream()
-                    .map(authority -> {
-                        Rol rol = new Rol();
-                        rol.setNombre(authority.getAuthority());
-                        return rol;
-                    })
-                    .collect(Collectors.toSet());
-
-            JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
+                JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
             jwtAuthResponse.setAccessToken(token);
-            jwtAuthResponse.setRoles(roles);
 
             return ResponseEntity.ok(jwtAuthResponse);
         } catch (AuthenticationException e) { // Captura todas las excepciones de autenticación

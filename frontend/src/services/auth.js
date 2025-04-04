@@ -1,9 +1,9 @@
 // services/auth.js
 export const getAuthToken = () => {
-    return JSON.parse(sessionStorage.getItem("authToken"));
+    return JSON.parse(localStorage.getItem("authToken"));
   };
   
-  export const getUserRoles = () => {
+  export const getUserRolesByDecryptedToken = () => {
     const token = getAuthToken()?.roles;
     if (!token) return [];
     

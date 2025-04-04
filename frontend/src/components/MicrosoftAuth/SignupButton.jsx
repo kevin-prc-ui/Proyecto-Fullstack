@@ -17,7 +17,7 @@ const MicrosoftSignUp = () => {
     try {
       setIsSigningIn(true);
       setError("");
-      sessionStorage.removeItem("authToken"); // Limpiar token al iniciar el proceso
+      localStorage.removeItem("authToken"); // Limpiar token al iniciar el proceso
 
       // 1. Autenticación con Microsoft
       const response = await instance.loginPopup(loginRequest);
@@ -54,7 +54,7 @@ const MicrosoftSignUp = () => {
       
       // Si el registro es exitoso, hacer login
       const respuesta = await login(loginData);
-      sessionStorage.setItem("authToken", JSON.stringify(respuesta.data));
+      localStorage.setItem("authToken", JSON.stringify(respuesta.data));
       navigate("/dashboard");
       toast.success("Registro exitoso! Redirigiendo...");
 

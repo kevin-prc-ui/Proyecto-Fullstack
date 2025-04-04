@@ -24,7 +24,7 @@ export const UseLoginHandler = () => {
     const respuesta = await login(loginData);
 
     // 4. Manejar éxito
-    sessionStorage.setItem("authToken", JSON.stringify(respuesta.data));
+    localStorage.setItem("authToken", JSON.stringify(respuesta.data));
     toast.success("Sesión iniciada correctamente");
     navigate("/dashboard");
   };
@@ -39,7 +39,7 @@ export const UseLogoutHandler = () => {
         postLogoutRedirectUri: "/",
         mainWindowRedirectUri: "/",
       });
-      sessionStorage.removeItem("authToken");
+      localStorage.removeItem("authToken");
       toast.info("Sesión cerrada correctamente");
     } catch (error) {
       toast.error(`Error al cerrar sesión: ${error.message}`);

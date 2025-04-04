@@ -3,7 +3,7 @@ import React, { Fragment } from "react";
 import { getInitials } from "../../utils/utils";
 
 const UserInfo = ({ user }) => {
-  const token = sessionStorage.getItem("token");
+  const token = localStorage.getItem("token");
   console.log(token);
   return (
     <div className='px-4'>

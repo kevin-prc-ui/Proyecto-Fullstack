@@ -1,8 +1,11 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useIsAuthenticated } from "@azure/msal-react";
 import { useEffect, useState } from "react";
-import { getUserRoles } from "../services/auth";
+import { getUserRolesByDecryptedToken } from "../services/auth";
+import { getUserRoles } from "../services/UsuarioService";
 import {LoadingSpinner} from "./LoadingSpinner"; // Componente de carga personalizado
+import { jwtDecode } from 'jwt-decode';
+
 
 /**
  * Componente de ruta protegida que verifica autenticación y roles de usuario
@@ -12,15 +15,15 @@ import {LoadingSpinner} from "./LoadingSpinner"; // Componente de carga personal
  * @returns {JSX.Element} Elemento JSX que renderiza la ruta protegida o redirección
  */
 const ProtectedRoute = ({ allowedRoles = [] }) => {
-  const isAuthenticated = useIsAuthenticated();
-
+  const isAuthenticated = localStorage.getItem("authToken");
   const location = useLocation();
   const [state, setState] = useState({
     isLoading: true,
     roles: [],
     error: null
   });
-
+  const accessToken = localStorage.getItem("authToken");
+  const decoded = jwtDecode(accessToken).sub;
   useEffect(() => {
     let isMounted = true;
     
@@ -29,8 +32,7 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
         if (!isAuthenticated) {
           return isMounted && setState(s => ({ ...s, isLoading: false }));
         }
-
-        const roles = await getUserRoles();
+        const roles = (await getUserRoles(decoded)).data;
         if (isMounted) {
           setState({ isLoading: false, roles, error: null });
         }
@@ -79,7 +81,7 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
     <Outlet />
   ) : (
     <Navigate 
-      to="/unauthorized" 
+      to="/notfound" 
       state={{ from: location }} 
       replace 
     />

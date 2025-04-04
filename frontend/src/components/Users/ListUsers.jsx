@@ -19,7 +19,7 @@ import { toast } from "sonner";
  * agregar, editar y eliminar usuarios.
  */
 function ListUsuarioComponent() {
-  const isAuth = useIsAuthenticated(); // Hook para verificar si el usuario está autenticado
+  const isAuth = localStorage.getItem("authToken");
   const [usuarios, setUsuarios] = useState([]); // Estado para la lista de usuarios
   const [loading, setLoading] = useState(true); // Estado para indicar si se están cargando los datos
   const [errorConexion, setErrorConexion] = useState(false); // Estado para indicar si hubo un error de conexión

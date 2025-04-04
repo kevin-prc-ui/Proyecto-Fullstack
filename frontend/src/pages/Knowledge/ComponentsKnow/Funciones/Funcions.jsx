@@ -6,12 +6,12 @@ export const useFileManager = () => {
   const [currentFilter, setCurrentFilter] = useState('all');
   
   const [favorites, setFavorites] = useState(() => {
-    const saved = sessionStorage.getItem('favorites');
+    const saved = localStorage.getItem('favorites');
     return saved ? JSON.parse(saved) : [];
   });
 
   useEffect(() => {
-    sessionStorage.setItem('favorites', JSON.stringify(favorites));
+    localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
 
   const handleFileUpload = (file) => {

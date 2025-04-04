@@ -3,7 +3,7 @@ import { UseLoginHandler, UseLogoutHandler } from "./ButtonHandler";
 import { FaSignInAlt, FaSignOutAlt, FaUserPlus } from "react-icons/fa";
 
 const MyButton = () => {
-  const isAuthenticated = sessionStorage.getItem("authToken");
+  const isAuthenticated = localStorage.getItem("authToken");
   return <div>{isAuthenticated ? <Logout /> : <Login />}</div>;
 };
 
