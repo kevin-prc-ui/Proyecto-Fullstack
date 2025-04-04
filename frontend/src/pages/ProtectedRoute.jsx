@@ -26,7 +26,6 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
   const decoded = jwtDecode(accessToken).sub;
   useEffect(() => {
     let isMounted = true;
-    
     const fetchAuthData = async () => {
       try {
         if (!isAuthenticated) {

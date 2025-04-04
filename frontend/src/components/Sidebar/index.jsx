@@ -9,6 +9,7 @@ import { Container, Nav, Navbar, Button } from "react-bootstrap";
 import linkData from "../../assets/routes";
 import { jwtDecode } from 'jwt-decode';
 import PropTypes from 'prop-types';
+import { getUserRoles } from "../../services/UsuarioService";
 
 /**
  * Componente Sidebar - Barra lateral de navegación con menú colapsable
@@ -16,41 +17,79 @@ import PropTypes from 'prop-types';
  * Incluye animaciones y manejo de estado de elementos activos
  */
 const Sidebar = () => {
+  const isAuthenticated = localStorage.getItem("authToken");
   const [expandedParent, setExpandedParent] = useState(null);
   const [userRoles, setUserRoles] = useState([]);
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
 
-  // Efecto para decodificar el token JWT y obtener roles
-  useEffect(() => {
-    const fetchUserRoles = () => {
-      try {
-        const accessToken = localStorage.getItem("authToken");
-        if (!accessToken) return;
-        
-        const decoded = jwtDecode(accessToken);
-        setUserRoles(decoded.roles || []);
-      } catch (error) {
-        console.error("Error decodificando token:", error);
-        setUserRoles([]);
-      }
-    };
-    
-    fetchUserRoles();
-  }, []);
+  const [state, setState] = useState({
+      isLoading: true,
+      roles: [],
+      error: null
+    });
+    const accessToken = localStorage.getItem("authToken");
+    const decoded = jwtDecode(accessToken).sub;
+    useEffect(() => {
+      let isMounted = true;
+      const fetchAuthData = async () => {
+        try {
+          if (!isAuthenticated) {
+            return isMounted && setState(s => ({ ...s, isLoading: false }));
+          }
+          const roles = (await getUserRoles(decoded)).data;
+          if (isMounted) {
+            setState({ isLoading: false, roles, error: null });
+          }
+        } catch (error) {
+          if (isMounted) {
+            setState({ isLoading: false, roles: [], error: error.message });
+            console.error("Error fetching user roles:", error);
+          }
+        }
+      };
+      fetchAuthData();
+      return () => { isMounted = false; };
+    }, [isAuthenticated]);
 
-  // Memoización de enlaces filtrados por roles
-  const filteredLinkData = useMemo(() => 
-    linkData
-      .map(parent => ({
-        ...parent,
-        children: parent.children?.filter(child => 
-          !child.roles || child.roles.some(role => userRoles.includes(role))
-        )
-        }))
-      .filter(parent => parent.children?.length > 0),
-    [userRoles]
-  );
+    const hasRequiredRole = linkData.map(parent => ({
+      ...parent,
+      children: parent.children?.filter(child => 
+        !child.roles || child.roles.some(role => state.roles.includes(role))
+      )
+      }))
+      .filter(parent => parent.children?.length > 0);
+  
+  // // Efecto para decodificar el token JWT y obtener roles
+  // useEffect(() => {
+  //   const fetchUserRoles = () => {
+  //     try {
+  //       const accessToken = localStorage.getItem("authToken");
+  //       if (!accessToken) return;
+        
+  //       const decoded = jwtDecode(accessToken);
+  //       setUserRoles(decoded.roles || []);
+  //     } catch (error) {
+  //       console.error("Error decodificando token:", error);
+  //       setUserRoles([]);
+  //     }
+  //   };
+    
+  //   fetchUserRoles();
+  // }, []);
+
+  // // Memoización de enlaces filtrados por roles
+  // const filteredLinkData = useMemo(() => 
+  //   linkData
+  //     .map(parent => ({
+  //       ...parent,
+  //       children: parent.children?.filter(child => 
+  //         !child.roles || child.roles.some(role => userRoles.includes(role))
+  //       )
+  //       }))
+  //     .filter(parent => parent.children?.length > 0),
+  //   [userRoles]
+  // );
 
   // Manejo de expansión/colapso de menús padres
   const toggleParent = (parentLabel) => {
@@ -64,7 +103,7 @@ const Sidebar = () => {
     <Container fluid className="h-100 p-3">
       <Navbar expand="lg" className="flex-column h-100">
         <Nav className="flex-column flex-grow-1 w-full">
-          {filteredLinkData.map((parent) => (
+          {hasRequiredRole.map((parent) => (
             <ParentMenuItem
               key={parent.label}
               parent={parent}
