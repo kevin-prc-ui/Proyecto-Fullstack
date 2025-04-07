@@ -36,7 +36,6 @@ const Index = () => {
 };
 
 const ProfileContent = () => {
-  const { accounts } = useMsal();
   const isAuthenticated = localStorage.getItem("authToken");
   if (!isAuthenticated)
     return (
@@ -46,7 +45,7 @@ const ProfileContent = () => {
     );
   else return (
     <>
-      <div className="">Bienvenido, {accounts[0].name}!</div>
+      <div className="">Bienvenido</div>
     </>
   );
 };

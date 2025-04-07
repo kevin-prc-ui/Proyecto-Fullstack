@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useMsal } from "@azure/msal-react";
 
 export const UseLoginHandler = () => {
+  
   const navigate = useNavigate();
   const { instance } = useMsal();
 
