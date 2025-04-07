@@ -21,9 +21,9 @@ const ICONS = {
   3: <MdKeyboardArrowDown />,
 };
 
-const Card = ({ ticket }) => {
+const Card = ({ ticket, status}) => {
   const { user } = useSelector((state) => state.auth);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);  
 
   return (
     <>
@@ -49,7 +49,9 @@ const Card = ({ ticket }) => {
             />
             <h4 className="line-clamp-1 text-black">{ticket?.tema}</h4>
           </div>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-black-600">
+            {formatDate(new Date(ticket?.fechaCreacion))}<br></br>
+          </span><span className="text-sm text-red-600">
             {formatDate(new Date(ticket?.fechaVencimiento))}
           </span>
         </>
@@ -94,7 +96,9 @@ const Card = ({ ticket }) => {
             </h5>
 
             <div className="p-4 space-x-8">
-              <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600">
+                {formatDate(new Date(ticket?.subTickets[0]?.fechaCreacion))}
+              </span><span className="text-sm text-gray-600">
                 {formatDate(new Date(ticket?.subTickets[0]?.fechaVencimiento))}
               </span>
               <span className="bg-blue-600/10 px-3 py-1 rounded0full text-blue-700 font-medium">

@@ -1,21 +1,14 @@
-import { useIsAuthenticated, useMsal } from "@azure/msal-react";
-import { loginRequest } from "../../services/authConfig";
-import Button from "react-bootstrap/Button";
-import { callMsGraph } from "../../graph";
-import { login } from "../../services/UsuarioService";
-import { toast } from "sonner";
-import { Link, useNavigate } from "react-router-dom";
-import { UseLoginHandler, UseLogoutHandler} from "./ButtonHandler";
+import { Link } from "react-router-dom";
+import { UseLoginHandler, UseLogoutHandler } from "./ButtonHandler";
 import { FaSignInAlt, FaSignOutAlt, FaUserPlus } from "react-icons/fa";
 
 const MyButton = () => {
-  const isAuthenticated = useIsAuthenticated();
+  const isAuthenticated = localStorage.getItem("authToken");
   return <div>{isAuthenticated ? <Logout /> : <Login />}</div>;
 };
 
 export const Login = () => {
   const { handleLogin } = UseLoginHandler();
-
   return (
     <div className="flex gap-2">
       <Link
@@ -25,8 +18,7 @@ export const Login = () => {
         <FaUserPlus className="mr-1" />
         Crear cuenta
       </Link>
-      
-      <Link 
+      <Link
         onClick={handleLogin}
         className="flex items-center gap-1 bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 rounded-lg transition-colors text-decoration-none"
       >

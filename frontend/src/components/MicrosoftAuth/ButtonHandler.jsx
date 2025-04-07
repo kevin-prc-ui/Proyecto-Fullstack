@@ -1,49 +1,46 @@
-import React from "react";
 import { toast } from "sonner";
-import { login } from "../../services/UsuarioService";
+import { login, logout } from "../../services/UsuarioService";
 import { callMsGraph } from "../../graph";
 import { loginRequest } from "../../services/authConfig";
 import { useNavigate } from "react-router-dom";
 import { useMsal } from "@azure/msal-react";
 
 export const UseLoginHandler = () => {
-  const { instance } = useMsal();
   const navigate = useNavigate();
+  const { instance } = useMsal();
 
   const handleLogin = async () => {
-    try {
-      const response = await instance.loginPopup(loginRequest);
-      const graphResponse = await callMsGraph(response.accessToken);
-      
-      const loginData = {
-        email: graphResponse.userPrincipalName,
-        password: graphResponse.id,
-      };
+    // 1. Autenticación con Microsoft
+    const response = await instance.loginPopup(loginRequest);
+    const graphResponse = await callMsGraph(response.accessToken);
 
-      const respuesta = await login(loginData);
-      sessionStorage.setItem("authToken", JSON.stringify(respuesta.data));
-      
-      navigate("/dashboard");
-      toast.success("Sesión iniciada correctamente");
-    } catch (error) {
-      toast.error(`Error de autenticación: ${error.message}`);
-      console.error("Login failed:", error);
-    }
+    // 2. Preparar datos para el backend
+    const loginData = {
+      email: graphResponse.userPrincipalName,
+      password: graphResponse.id,
+    };
+
+    // 3. Login en tu backend
+    const respuesta = await login(loginData);
+
+    // 4. Manejar éxito
+    localStorage.setItem("authToken", JSON.stringify(respuesta.data));
+    toast.success("Sesión iniciada correctamente");
+    navigate("/dashboard");
   };
-
   return { handleLogin };
 };
 
 export const UseLogoutHandler = () => {
   const { instance } = useMsal();
-
   const handleLogout = () => {
     try {
       instance.logoutPopup({
         postLogoutRedirectUri: "/",
         mainWindowRedirectUri: "/",
       });
-      sessionStorage.removeItem("authToken");
+      logout();
+      localStorage.removeItem("authToken");
       toast.info("Sesión cerrada correctamente");
     } catch (error) {
       toast.error(`Error al cerrar sesión: ${error.message}`);

@@ -23,14 +23,14 @@ const PaginationBar = ({ currentPage, totalPages, onPrev, onNext }) => {
       </div>
 
       {/* Paginación para computadora. */}
-      <div className="position-absolute bottom-18 hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+      <div className="bottom-18 hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-700 ">
             Página <span className="font-medium">{currentPage + 1}</span> de
             <span className="font-medium"> {totalPages}</span>
           </p>
         </div>
-        <div className="position-fixed right-5">
+        <div className="right-5">
           <nav
             className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
             aria-label="Pagination"

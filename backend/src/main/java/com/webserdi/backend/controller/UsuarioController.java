@@ -8,9 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/users")
@@ -62,6 +61,9 @@ public class UsuarioController{
         return ResponseEntity.ok("Correo actualizado con exito.");
     }
 
-
-
+    @GetMapping("/email")
+    public ResponseEntity<Set<String>> getRole(@RequestParam String email) {
+        Set<String> role = usuarioService.getRole(email);
+        return ResponseEntity.ok(role);
+    }
 }

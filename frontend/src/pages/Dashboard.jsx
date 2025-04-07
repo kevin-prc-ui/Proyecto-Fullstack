@@ -97,7 +97,7 @@ const ProfileContent = () => {
           href="/helpdesk/tasks"
           className="flex w-96 min-h-30 h-fit bg-white m-2 p-1 justify-center rounded text-decoration-none text-black"
         >
-          <div className="flex flex-row w-90">
+          <div className="flex flex-row w-90 row-auto">
             <div className="row-1 mt-auto mb-auto">
               <LiaUserAstronautSolid className="fs-1" />
             </div>
@@ -110,10 +110,10 @@ const ProfileContent = () => {
           </div>
         </a>
         <a
-          href="/helpdesk/tasks"
+          href="/knowledge/home"
           className="flex w-96 min-h-30 h-fit bg-white m-2 p-1 justify-center rounded text-decoration-none text-black"
         >
-          <div className="flex flex-row w-90">
+          <div className="flex flex-row w-90 ">
             <div className="row-1 mt-auto mb-auto">
               <TbBulb className="fs-1" />
             </div>

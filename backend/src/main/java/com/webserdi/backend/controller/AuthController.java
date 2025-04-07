@@ -1,26 +1,22 @@
 package com.webserdi.backend.controller;
-
 import com.webserdi.backend.dto.JwtAuthResponse;
 import com.webserdi.backend.dto.LoginDto;
 import com.webserdi.backend.dto.UsuarioDto;
-import com.webserdi.backend.entity.Rol;
+import com.webserdi.backend.security.JwtTokenProvider;
 import com.webserdi.backend.service.AuthService;
 import com.webserdi.backend.service.UsuarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 @AllArgsConstructor
 @RestController
@@ -28,35 +24,39 @@ import java.util.stream.Collectors;
 public class AuthController {
     private final UsuarioService usuarioService;
     private final AuthService authService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     // Build Login REST API
     @PreAuthorize("permitAll()")
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthResponse> login(@RequestBody LoginDto loginDto) {
-        String token = authService.login(loginDto);
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+        try {
+            String token = authService.login(loginDto);
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Set<Rol> roles = authentication.getAuthorities().stream()
-                .map(authority -> {
-                    Rol rol = new Rol();
-                    rol.setNombre(authority.getAuthority());
-                    return rol;
-                })
-                .collect(Collectors.toSet());
+            JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
+            jwtAuthResponse.setAccessToken(token);
 
-        JwtAuthResponse jwtAuthResponse = new JwtAuthResponse();
-        jwtAuthResponse.setAccessToken(token);
-        jwtAuthResponse.setRoles(roles);
-
-        return new ResponseEntity<>(jwtAuthResponse, HttpStatus.OK);
+            return ResponseEntity.ok(jwtAuthResponse);
+        } catch (AuthenticationException e) { // Captura todas las excepciones de autenticación
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "Usuario o contraseña incorrectos"));
+        }
     }
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        // Lógica para cerrar la sesión del usuario
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String authorizationHeader) {
+        // Extract the token from the Authorization header
+        String token = extractTokenFromHeader(authorizationHeader);
+        System.out.println(token);
+        // Invalidate the token (add it to a blacklist or similar)
+        if (token != null) {
+            // Invalidate the token (add it to a blacklist or similar)
+            jwtTokenProvider.invalidateToken(token);
+        }
+        // Clear the security context
         SecurityContextHolder.clearContext();
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Logout successful");
     }
 
     @PreAuthorize("permitAll()")
@@ -64,5 +64,12 @@ public class AuthController {
     public ResponseEntity<UsuarioDto> signUp(@RequestBody UsuarioDto user) {
         UsuarioDto createdUser = usuarioService.createUsuario(user);
         return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    }
+
+    private String extractTokenFromHeader(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        return null;
     }
 }

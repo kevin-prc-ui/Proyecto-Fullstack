@@ -2,19 +2,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import { FaList } from "react-icons/fa";
 import { MdGridView } from "react-icons/md";
 import { useParams } from "react-router-dom";
-import Title from "../../components/Ticket/Title";
 import Button from "../../components/Button";
 import { IoMdAdd } from "react-icons/io";
 import Tabs from "../../components/Tabs/Tabs";
-import TaskTitle from "../../components/Ticket/Title";
 import BoardView from "../../components/Ticket/BoardView";
 import Table from "../../components/Ticket/Table";
 import PaginationBar from "../../components/Ticket/PaginadoTickets";
-import AddTask from "../../components/Ticket/Title";
-import { toast } from "sonner";
-import axios from "axios";
 import { listTickets } from "../../services/TicketService";
-import { useIsAuthenticated } from "@azure/msal-react";
 import { Transition } from "@headlessui/react";
 
 const TABS = [
@@ -24,67 +18,73 @@ const TABS = [
 
 const TASK_TYPE = {
   todo: "bg-blue-600",
-  "in-progress": "bg-yellow-600",
-  completed: "bg-green-600",
+  "en proceso": "bg-yellow-600",
+  completado: "bg-green-600",
 };
 
 const Tasks = () => {
   const params = useParams();
-  const isAuth = useIsAuthenticated(); // Hook para verificar si el usuario está autenticado
+  const isAuth = localStorage.getItem("authToken");
   const [pagina, setPagina] = useState(0);
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tickets, setTickets] = useState([]);
   const [errorConexion, setErrorConexion] = useState(false); // Estado para indicar si hubo un error de conexión
   const [totalPages, setTotalPages] = useState(0);
+  const [permisos, setPermisos] = useState([]);
   const [selected, setSelected] = useState(() => {
     const saved = localStorage.getItem('selectedTab');
     return saved !== null ? Number(saved) : 0;
   });
   const status = params?.status || "";
 
+
  // Usar useCallback para evitar recreación en cada render
  const handleTabChange = useCallback((index) => {
   setSelected(index);
 }, []);
 
-  useEffect(() => {
-    localStorage.setItem('selectedTab', selected);
-  }, [selected]);
-  
-  useEffect(() => {
+// useEffect(() => {
+  // localStorage.setItem('selectedTab', selected);
+// }, [selected]);
+
+useEffect(() => {
+  localStorage.setItem('selectedTab', selected);
     const fetchTickets = async () => {
-      console.log(selected)
-      await getAllTickets();
+      // await getAllTickets();
+        setLoading(true); // Mostrar el spinner de carga
+        try {
+          const response = await listTickets(pagina); // Llama al servicio para obtener los usuarios
+          setTickets(response.data.content); // Actualiza el estado con la lista de usuarios
+          setTotalPages(response.data.totalPages); // Actualiza el estado con la lista de usuarios)
+        } catch (error) {
+          setErrorConexion(error != null); // Indica que hubo un error de conexión
+        } finally {
+          setLoading(false); // Oculta el spinner de carga
+        }
     };
     if (isAuth) fetchTickets();
-  }, [isAuth, pagina]);
+  }, [isAuth, pagina, selected]);
 
   function nextPage() {
     setPagina(pagina + 1);
-    console.log(selected)
   }
 
   function prevPage() {
     setPagina(pagina - 1);
   }
 
-  /**
-   * Obtiene la lista de todos los usuarios.
-   * Actualiza el estado de `usuarios`, `loading` y `errorConexion`.
-   */
-  async function getAllTickets() {
-    setLoading(true); // Mostrar el spinner de carga
-    try {
-      const response = await listTickets(pagina); // Llama al servicio para obtener los usuarios
-      setTickets(response.data.content); // Actualiza el estado con la lista de usuarios
-      setTotalPages(response.data.totalPages); // Actualiza el estado con la lista de usuarios)
-    } catch (error) {
-      setErrorConexion(error != null); // Indica que hubo un error de conexión
-    } finally {
-      setLoading(false); // Oculta el spinner de carga
-    }
-  }
+  // async function getAllTickets() {
+  //   setLoading(true); // Mostrar el spinner de carga
+  //   try {
+  //     const response = await listTickets(pagina); // Llama al servicio para obtener los usuarios
+  //     setTickets(response.data.content); // Actualiza el estado con la lista de usuarios
+  //     setTotalPages(response.data.totalPages); // Actualiza el estado con la lista de usuarios)
+  //   } catch (error) {
+  //     setErrorConexion(error != null); // Indica que hubo un error de conexión
+  //   } finally {
+  //     setLoading(false); // Oculta el spinner de carga
+  //   }
+  // }
 
   return loading ? (
     <div className="py-10">
@@ -106,21 +106,34 @@ const Tasks = () => {
     >
       <div className="w-full">
         <div className="flex items-center justify-between mb-4">
-          {/* <Title title={status ? `${status} Tasks` : "Tasks"} /> */}
-          {!status && (
-            <Button
-              label="Create Task"
-              icon={<IoMdAdd className="text-lg" />}
-              className="flex flex-row-reverse gap-1 items-center bg-blue-800 hover:bg-blue-600 text-white rounded px-1"
-            />
-          )}
+        <div className='flex items-center justify-between mb-4'>
+        {/* <Title title={status ? `${status} Tasks` : "Tasks"} /> */}
+
+        {!status && (
+          <Button
+            label='Crear ticket'
+            icon={<IoMdAdd className='text-lg' />}
+            className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded py-2 2xl:py-2.5'
+          />
+        )}
+      </div>
         </div>
         <Tabs 
           tabs={TABS} 
           selected={selected} 
           setSelected={handleTabChange}
         >
-          {selected === 0 ? (
+          {/* {!status && (
+          <div className='w-full flex justify-between gap-4 md:gap-x-12 py-4'>
+            <TaskTitle label='Pendiente' className={TASK_TYPE.todo} />
+            <TaskTitle
+              label='En proceso'
+              className={TASK_TYPE["en proceso"]}
+            />
+            <TaskTitle label='Completado' className={TASK_TYPE.completado} />
+          </div>
+        )} */}
+          {selected !== 1 ? (
             <BoardView tickets={tickets} />
           ) : (
             <div className="w-full">

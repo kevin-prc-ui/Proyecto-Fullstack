@@ -37,8 +37,14 @@ const Index = () => {
 
 const ProfileContent = () => {
   const { accounts } = useMsal();
- 
-  return (
+  const isAuthenticated = localStorage.getItem("authToken");
+  if (!isAuthenticated)
+    return (
+      <div className="card-title">
+        Inicia sesión para ver tu información de perfil.
+      </div>
+    );
+  else return (
     <>
       <div className="">Bienvenido, {accounts[0].name}!</div>
     </>

@@ -5,11 +5,16 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
@@ -18,6 +23,8 @@ public class JwtTokenProvider {
 
     @Value("${app-jwt-expiration-milliseconds}")
     private long jwtExpirationMs; // Fixed type to long
+
+    private Set<String> blacklistedTokens = new HashSet<>();
 
     private Key key() {
         // Para un `jwtSecret` que esta en Base64-encoded:
@@ -29,13 +36,20 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
+
+        List<String> roles = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
         Instant now = Instant.now();
-        Instant expiration = now.plusMillis(jwtExpirationMs); // No parsing needed
+
         return Jwts.builder()
                 .setSubject(username)
+                .claim("roles", roles) // Incluir roles en el payload
+                .setIssuer("your-issuer") // Buenas prácticas: incluir issuer
                 .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(expiration))
-                .signWith(key())
+                .setExpiration(Date.from(now.plusMillis(jwtExpirationMs)))
+                .signWith(key(), SignatureAlgorithm.HS512) // Algoritmo más seguro
                 .compact();
     }
 
@@ -69,5 +83,9 @@ public class JwtTokenProvider {
             //logger.error("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.");
         }
         return false;
+    }
+
+    public void invalidateToken(String token) {
+        blacklistedTokens.add(token);
     }
 }

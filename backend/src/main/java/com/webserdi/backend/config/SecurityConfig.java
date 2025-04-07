@@ -26,10 +26,17 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Configuración de una stateless RESTful API segura. Prioriza la autenticación JWT, permite a los usuarios
+ * sin autenticación acceder a los endpoints de login y signup, pide autenticación para el resto de solicitudes.
+ * También, se toman medidas de seguridad usando protección CORS, CSP, y XSS. Es importante recordar que
+ * se desactivó csrf considerando que es una aplicación stateless RESTful API.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @AllArgsConstructor
+
 public class SecurityConfig {
     private JwtAuthenticationEntryPoint authenticationEntryPoint;
     private JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -40,7 +47,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {//Test
         http
                 .cors().configurationSource(corsConfigurationSource()).and()
                 .csrf(AbstractHttpConfigurer::disable)

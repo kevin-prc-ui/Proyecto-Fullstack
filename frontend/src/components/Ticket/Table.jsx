@@ -24,7 +24,6 @@ const ICONS = {
 const Table = ({ tickets }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selected, setSelected] = useState(null);
-  console.log(tickets)
 
   const deleteClicks = (id) => {
     setSelected(id);
@@ -41,11 +40,11 @@ const Table = ({ tickets }) => {
   const TableHeader = () => (
     <thead className='w-full border-b border-gray-300'>
       <tr className='w-full text-black  text-left'>
-        <th className='py-2'>Task Title</th>
-        <th className='py-2'>Priority</th>
-        <th className='py-2 line-clamp-1'>Created At</th>
+        <th className='py-2'>Titulo</th>
+        <th className='py-2'>Prioridad</th>
+        <th className='py-2 line-clamp-1'>Creado</th>
+        <th className='py-2'>Vencimiento</th>
         <th className='py-2'>Assets</th>
-        <th className='py-2'>Team</th>
       </tr>
     </thead>
   );
@@ -75,6 +74,10 @@ const Table = ({ tickets }) => {
       </td>
 
       <td className='py-2'>
+        <span className='text-sm text-gray-600'>
+          {formatDate(new Date(ticket?.fechaCreacion))}
+        </span>
+      </td><td className='py-2'>
         <span className='text-sm text-gray-600'>
           {formatDate(new Date(ticket?.fechaVencimiento))}
         </span>

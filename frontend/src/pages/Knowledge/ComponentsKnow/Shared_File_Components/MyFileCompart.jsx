@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import DocumentsReposi from './DocumentsReposi';
-import {CategoriesReposi} from './CategoriesReposi';
-import TagsReposi from './TagsReposi';
+import DocumentosCompart from './DocumentosCopart';
+import CategoriesCompart from './CategoriesCompart';
+import TagsCompart from './TagsCompart';
 import { SubMenu } from '../SubMenu/SubMenu';
 import { useFileManager } from '../Funciones/Funcions';
 import { BsFolderFill, BsFilePdf, BsImage, BsTrash, BsStar, BsStarFill } from 'react-icons/bs';
 
-const RepositoryRepsosi = () => {
+const MyFileCompart = () => {
 
   const{
     items,
@@ -27,17 +27,17 @@ const RepositoryRepsosi = () => {
   return (
     <>
       <div className="top-bar">
-        <DocumentsReposi 
+        <DocumentosCompart 
           currentFilter={currentFilter}
           setCurrentFilter={setCurrentFilter}
         />
-        <button className="top-button active">Repositorio</button>
-        <CategoriesReposi />
-        <TagsReposi />
+        <button className="top-button active">Archivos Compartidos</button>
+        <CategoriesCompart />
+        <TagsCompart />
       </div>
 
       <div className="content">
-        <h1>Repositorio {currentFolder && (
+        <h1>Archivos Compartidos {currentFolder && (
           <button className="btn btn-sm btn-outline-secondary ms-3" onClick={goBack}>
             Volver
           </button>
@@ -115,4 +115,4 @@ const RepositoryRepsosi = () => {
   );
 };
 
-export default RepositoryRepsosi;
+export default MyFileCompart;

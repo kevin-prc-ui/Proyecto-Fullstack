@@ -1,8 +1,8 @@
 import {createSlice} from "@reduxjs/toolkit"
 
 const initialState ={
-    user:sessionStorage.getItem('userInfo') 
-        ? JSON.parse(sessionStorage.getItem('userInfo'))
+    user:localStorage.getItem('userInfo') 
+        ? JSON.parse(localStorage.getItem('userInfo'))
         :null,
     isSidebarOpen: false,
 }
@@ -13,11 +13,11 @@ const authSlice= createSlice ({
     reducers:{
         setCredentials:(state,action)=>{
             state.user = action.payload;
-            sessionStorage.setItem("userInfo",JSON.stringify(action.payload))
+            localStorage.setItem("userInfo",JSON.stringify(action.payload))
         },
         logout:(state, action) =>{
             state.user=null;
-            sessionStorage.removeItem("userInfo")
+            localStorage.removeItem("userInfo")
         },
         setOpenSidebar: (state,action) => {
             state.isSidebarOpen = action.payload;
