@@ -25,13 +25,26 @@ public class TicketController {
         return ticketService.createTicket(dto);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public Page<TicketDto> getAllTickets(
             @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable,
             @RequestParam(required = false) String filtro) {
         return ticketService.getAllTickets(pageable, filtro);
     }
 
+    @GetMapping()
+    public Page<TicketDto> getTickets(
+            @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable,
+            @RequestParam(required = false) String filtro) {
+        return ticketService.getTickets(pageable, filtro);
+    }
+
+    @GetMapping("/trashed")
+    public Page<TicketDto> getAllTrashedTickets(
+            @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable,
+            @RequestParam(required = false) String filtro) {
+        return ticketService.getAllTrashedTickets(pageable, filtro);
+    }
     @GetMapping("/{id}")
     public TicketDto getTicketById(@PathVariable Long id) {
         return ticketService.getTicketById(id);

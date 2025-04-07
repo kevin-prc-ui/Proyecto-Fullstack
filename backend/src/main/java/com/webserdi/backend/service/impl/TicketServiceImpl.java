@@ -72,7 +72,20 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Page<TicketDto> getAllTickets(Pageable pageable, String filtro) {
+        if (filtro == null || filtro.trim().isEmpty()) {
+
+        }
         return ticketRepository.findAll(pageable)
+                .map(ticketMapper::toDto);
+    }
+
+    @Override
+    public Page<TicketDto> getTickets(Pageable pageable, String filtro) {
+//        if (filtro.equals("")) {
+//            return ticketRepository.findAllByEstadoId(filtro)
+//                    .map(ticketMapper::toDto);
+//        }
+        return ticketRepository.findAllByIsTrashedFalse(pageable)
                 .map(ticketMapper::toDto);
     }
 
@@ -102,7 +115,10 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public void deleteTicket(Long id) {
-        ticketRepository.deleteById(id);
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado"));
+        ticket.setIsTrashed(true);
+        ticketRepository.save(ticket);
     }
 
     private String generateNextCodigo() {
@@ -142,5 +158,12 @@ public class TicketServiceImpl implements TicketService {
             chars[0]++;
         }
         return new String(chars);
+    }
+    @Override
+    public Page<TicketDto> getAllTrashedTickets(Pageable pageable, String filtro) {
+        Page<Ticket> tickets;
+        tickets = ticketRepository.findAllByIsTrashedTrue(pageable);
+
+        return tickets.map(ticketMapper::toDto);
     }
 }

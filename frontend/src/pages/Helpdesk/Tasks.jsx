@@ -10,6 +10,8 @@ import Table from "../../components/Ticket/Table";
 import PaginationBar from "../../components/Ticket/PaginadoTickets";
 import { listTickets } from "../../services/TicketService";
 import { Transition } from "@headlessui/react";
+import TaskTitle from "../../components/Ticket/TaskTitle";
+import Title from "../../components/Ticket/Title";
 
 const TABS = [
   { title: "Cuadricula", icon: <MdGridView /> },
@@ -19,7 +21,7 @@ const TABS = [
 const TASK_TYPE = {
   todo: "bg-blue-600",
   "en proceso": "bg-yellow-600",
-  completado: "bg-green-600",
+  completados: "bg-green-600",
 };
 
 const Tasks = () => {
@@ -35,7 +37,9 @@ const Tasks = () => {
     const saved = localStorage.getItem('selectedTab');
     return saved !== null ? Number(saved) : 0;
   });
-  const status = params?.status || "";
+  const status = params?.estado || "";
+  console.log(status);
+  
 
 
  // Usar useCallback para evitar recreación en cada render
@@ -107,7 +111,7 @@ useEffect(() => {
       <div className="w-full">
         <div className="flex items-center justify-between mb-4">
         <div className='flex items-center justify-between mb-4'>
-        {/* <Title title={status ? `${status} Tasks` : "Tasks"} /> */}
+        <Title title={status ? `Tickets ${status} ` : "Tickets"} />
 
         {!status && (
           <Button
@@ -123,16 +127,16 @@ useEffect(() => {
           selected={selected} 
           setSelected={handleTabChange}
         >
-          {/* {!status && (
+          {!status && (
           <div className='w-full flex justify-between gap-4 md:gap-x-12 py-4'>
             <TaskTitle label='Pendiente' className={TASK_TYPE.todo} />
             <TaskTitle
               label='En proceso'
               className={TASK_TYPE["en proceso"]}
             />
-            <TaskTitle label='Completado' className={TASK_TYPE.completado} />
+            <TaskTitle label='Completados' className={TASK_TYPE.completados} />
           </div>
-        )} */}
+        )}
           {selected !== 1 ? (
             <BoardView tickets={tickets} />
           ) : (
