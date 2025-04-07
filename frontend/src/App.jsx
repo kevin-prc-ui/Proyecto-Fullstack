@@ -77,6 +77,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/signup" element={<MicrosoftSignUp />} />
             <Route path="/notfound" element={<NotFound />} />
+            <Route path="*" element={<Navigate to="/dashboard"/>}/>
           </Route>
         </Routes>
       </main>

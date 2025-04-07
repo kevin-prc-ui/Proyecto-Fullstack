@@ -1,7 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useIsAuthenticated } from "@azure/msal-react";
 import { useEffect, useState } from "react";
-import { getUserRolesByDecryptedToken } from "../services/auth";
 import { getUserRoles } from "../services/UsuarioService";
 import {LoadingSpinner} from "./LoadingSpinner"; // Componente de carga personalizado
 import { jwtDecode } from 'jwt-decode';
@@ -75,7 +73,6 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
   // Verificación de roles
   const hasRequiredRole = allowedRoles.length === 0 || 
     allowedRoles.some(role => state.roles.includes(role));
-
   return hasRequiredRole ? (
     <Outlet />
   ) : (

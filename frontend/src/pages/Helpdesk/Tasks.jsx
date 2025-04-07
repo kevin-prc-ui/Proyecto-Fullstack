@@ -1,20 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { FaList } from "react-icons/fa";
 import { MdGridView } from "react-icons/md";
-import { useNavigate, useParams } from "react-router-dom";
-import Title from "../../components/Ticket/Title";
+import { useParams } from "react-router-dom";
 import Button from "../../components/Button";
 import { IoMdAdd } from "react-icons/io";
 import Tabs from "../../components/Tabs/Tabs";
-import TaskTitle from "../../components/Ticket/Title";
 import BoardView from "../../components/Ticket/BoardView";
 import Table from "../../components/Ticket/Table";
 import PaginationBar from "../../components/Ticket/PaginadoTickets";
-import AddTask from "../../components/Ticket/Title";
-import { toast } from "sonner";
-import axios from "axios";
 import { listTickets } from "../../services/TicketService";
-import { useIsAuthenticated } from "@azure/msal-react";
 import { Transition } from "@headlessui/react";
 
 const TABS = [

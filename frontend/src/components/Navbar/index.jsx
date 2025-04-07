@@ -21,9 +21,6 @@ const Index = () => {
             width={"100%"}
           />
         </a>
-        {
-          
-        }
         <AuthenticatedTemplate>
           <ProfileContent />
         </AuthenticatedTemplate>
