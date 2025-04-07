@@ -11,7 +11,9 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -21,6 +23,8 @@ public class JwtTokenProvider {
 
     @Value("${app-jwt-expiration-milliseconds}")
     private long jwtExpirationMs; // Fixed type to long
+
+    private Set<String> blacklistedTokens = new HashSet<>();
 
     private Key key() {
         // Para un `jwtSecret` que esta en Base64-encoded:
@@ -79,5 +83,9 @@ public class JwtTokenProvider {
             //logger.error("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.");
         }
         return false;
+    }
+
+    public void invalidateToken(String token) {
+        blacklistedTokens.add(token);
     }
 }

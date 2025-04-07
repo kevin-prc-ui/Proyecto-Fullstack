@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { login } from "../../services/UsuarioService";
+import { login, logout } from "../../services/UsuarioService";
 import { callMsGraph } from "../../graph";
 import { loginRequest } from "../../services/authConfig";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +39,7 @@ export const UseLogoutHandler = () => {
         postLogoutRedirectUri: "/",
         mainWindowRedirectUri: "/",
       });
+      logout();
       localStorage.removeItem("authToken");
       toast.info("Sesión cerrada correctamente");
     } catch (error) {

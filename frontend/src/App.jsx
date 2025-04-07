@@ -125,13 +125,13 @@ function App() {
           {/* Rutas solo para administradores */}
           <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
             <Route element={<Layout />}>
-              <Route path="/admin/helpdesk/users" element={<Users />} />
+              <Route path="/admin/users" element={<Users />} />
               <Route
-                path="/admin/helpdesk/add-user"
+                path="/admin/add-user"
                 element={<UsersComponent />}
               />
               <Route
-                path="/admin/helpdesk/edit-user/:id"
+                path="/admin/edit-user/:id"
                 element={<UsersComponent />}
               />
               <Route path="/knowledge/admintools" element={<AdminTools />} />

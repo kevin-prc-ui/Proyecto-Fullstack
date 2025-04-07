@@ -2,8 +2,7 @@
 import { FaHome, FaFileAlt, FaFolderOpen, FaGlobe, FaTasks, FaUsers, FaDatabase, FaTools, FaTrashAlt } from "react-icons/fa";
 import {  MdSupportAgent, MdTaskAlt, MdOutlinePendingActions } from "react-icons/md";
 import { PiFolderSimpleUser } from "react-icons/pi";
-
-
+import { MdAdminPanelSettings } from "react-icons/md";
 
 const linkData = [
     {
@@ -33,12 +32,6 @@ const linkData = [
           link: "/helpdesk/todo/todo",
           icon: <MdOutlinePendingActions />,
           roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "Equipo",
-          link: "/admin/helpdesk/users",
-          icon: <FaUsers />,
-          roles: ["ROLE_ADMIN"]
         },
         {
           label: "Eliminados",
@@ -94,10 +87,16 @@ const linkData = [
           icon: <FaDatabase />,
           roles: ["ROLE_ADMIN", "ROLE_USER"]
         },
+      ]
+    },
+    {
+      label: "Administración",
+      icon: <MdAdminPanelSettings />,
+      children: [
         {
-          label: "Herramientas de Administración",
-          link: "/knowledge/admintools",
-          icon: <FaTools />,
+          label: "Usuarios",
+          link: "/admin/users",
+          icon: <FaHome />,
           roles: ["ROLE_ADMIN"]
         },
       ]
