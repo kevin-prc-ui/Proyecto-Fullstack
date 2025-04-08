@@ -311,7 +311,7 @@ const UsersComponent = () => {
                   </Button>
                   <Button
                     className="btn btn-danger"
-                    onClick={() => navigator("/admin/helpdesk/users")}
+                    onClick={() => navigator("/admin/users")}
                   >
                     Cancelar
                   </Button>

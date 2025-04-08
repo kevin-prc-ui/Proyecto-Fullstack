@@ -61,7 +61,7 @@ function ListUsuarioComponent() {
    * Navega a la página para agregar un nuevo usuario.
    */
   function addNewUser() {
-    navigator("/admin/helpdesk/add-user");
+    navigator("/admin/add-user");
   }
 
   /**
@@ -69,7 +69,7 @@ function ListUsuarioComponent() {
    * @param {number} id - ID del usuario a editar.
    */
   function updateUser(id) {
-    navigator(`/admin/helpdesk/edit-user/${id}`);
+    navigator(`/admin/edit-user/${id}`);
   }
 
   /**

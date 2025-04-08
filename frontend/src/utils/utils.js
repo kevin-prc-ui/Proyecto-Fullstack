@@ -96,8 +96,10 @@ export const formatUserRole = (rolId) => {
   };
   
   export const TICKET_TYPE = {
-    1: "bg-blue-600",
+    1: "bg-gray-600",
     2: "bg-green-600",
+    3: "bg-yellow-600",
+    4: "bg-red-600",
   };
   
   export const BGS = [

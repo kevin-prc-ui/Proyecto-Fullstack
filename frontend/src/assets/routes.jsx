@@ -29,7 +29,7 @@ const linkData = [
         },
         {
           label: "Pendientes",
-          link: "/helpdesk/todo/todo",
+          link: "/helpdesk/pendiente/pendiente",
           icon: <MdOutlinePendingActions />,
           roles: ["ROLE_ADMIN", "ROLE_USER"]
         },

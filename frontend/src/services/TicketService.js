@@ -13,16 +13,31 @@ const getHeaders = () => ({
 });
 
 export const listTickets = (id) =>
-    axios
-      .get(REST_API_BASE_URL+`/tickets?page=${id}&size=8`, getHeaders())
-      .then((response) => response)
-      .catch((error) => {
-        // Detectamos específicamente errores de conexión
-        if (!error.response) {
-          throw new Error("Error de conexion con el servidor");
-        }
-        throw error;
-      });
+  
+  axios
+    .get(REST_API_BASE_URL+`/tickets/all?page=${id}&size=8`, getHeaders())
+    .then((response) => response)
+    .catch((error) => {
+      // Detectamos específicamente errores de conexión
+      if (!error.response) {
+        throw new Error("Error de conexion con el servidor");
+      }
+      throw error;
+    });
+
+export const listFilteredTickets = (id, filtro) =>
+  axios
+    .get(REST_API_BASE_URL+`/tickets?page=${id}&size=8&filtro=${filtro}`, getHeaders())
+    .then((response) => response)
+    .catch((error) => {
+      // Detectamos específicamente errores de conexión
+      if (!error.response) {
+        throw new Error("Error de conexion con el servidor");
+      }
+      throw error;
+    });
+    
+
 
 export const deleteTicket = (ticketId) => axios.delete(`${REST_API_BASE_URL}/tickets/${ticketId}`, getHeaders());
 

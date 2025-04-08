@@ -1,7 +1,6 @@
 // TicketRepository.java
 package com.webserdi.backend.repository;
 
-import com.webserdi.backend.dto.TicketDto;
 import com.webserdi.backend.entity.Ticket;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +15,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Page<Ticket> findAllByIsTrashedTrue(Pageable pageable);
     Page<Ticket> findAllByIsTrashedFalse(Pageable pageable);
-
-    Page<Ticket> findAllByEstadoId(Long id, Pageable pageable);
+    Page<Ticket> findAllByEstadoNombre(String filtro, Pageable pageable);
 }

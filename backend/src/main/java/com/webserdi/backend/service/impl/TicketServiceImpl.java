@@ -72,19 +72,19 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public Page<TicketDto> getAllTickets(Pageable pageable, String filtro) {
-        if (filtro == null || filtro.trim().isEmpty()) {
-
-        }
+//        if (filtro == null || filtro.trim().isEmpty()) {
+//
+//        }
         return ticketRepository.findAll(pageable)
                 .map(ticketMapper::toDto);
     }
 
     @Override
     public Page<TicketDto> getTickets(Pageable pageable, String filtro) {
-//        if (filtro.equals("")) {
-//            return ticketRepository.findAllByEstadoId(filtro)
-//                    .map(ticketMapper::toDto);
-//        }
+        if (filtro != null && !filtro.trim().isEmpty()) {
+            return ticketRepository.findAllByEstadoNombre(filtro, pageable)
+                    .map(ticketMapper::toDto);
+        }
         return ticketRepository.findAllByIsTrashedFalse(pageable)
                 .map(ticketMapper::toDto);
     }
