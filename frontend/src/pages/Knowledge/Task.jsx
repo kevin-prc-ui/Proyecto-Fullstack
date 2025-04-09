@@ -1,35 +1,42 @@
 import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import "../../styles/estilos.css";
 
 const Sites = () => {
   // Estados para controlar la visibilidad de las listas
-  const [showSitesList, setShowSitesList] = useState(false);
   const [showTasksList, setShowTasksList] = useState(false);
 
-  // Funciones para alternar la visibilidad de las listas
-  const toggleSitesList = () => {
-    setShowSitesList(!showSitesList);
-  };
-
+  // Función para alternar la visibilidad de la lista
   const toggleTasksList = () => {
     setShowTasksList(!showTasksList);
   };
 
   return (
-    <div className="sites-container">
-      <h1>Tareas</h1>
+    <div className="container mt-5">
+      <h1 className="text-center mb-4">Tareas</h1>
 
-      {/* Botón para mostrar/ocultar la lista de Tareas */}
-      <button className="toggle-button" onClick={toggleTasksList}>
-        {showTasksList ? 'Ocultar Lista' : 'Mostrar Lista'}
-      </button>
+      <div className="d-flex justify-content-center mb-4">
+        <button 
+          className={`btn ${showTasksList ? 'btn-danger' : 'btn-primary'}`}
+          onClick={toggleTasksList}
+        >
+          {showTasksList ? 'Ocultar Lista' : 'Mostrar Lista'}
+        </button>
+      </div>
 
-      {/* Lista desplegable de Tareas */}
       {showTasksList && (
-        <ul className="sites-list">
-          <li>My Task</li>
-          <li>Workflows I've Started</li>
-        </ul>
+        <div className="row justify-content-center">
+          <div className="col-md-6">
+            <div className="list-group">
+              <button type="button" className="list-group-item list-group-item-action">
+                My Task
+              </button>
+              <button type="button" className="list-group-item list-group-item-action">
+                Workflows I've Started
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

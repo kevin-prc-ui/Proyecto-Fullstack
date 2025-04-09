@@ -1,33 +1,49 @@
 import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import "../../styles/estilos.css";
 
 const Sites = () => {
-  // Estado para controlar si la lista está visible
   const [showList, setShowList] = useState(false);
 
-  // Función para alternar la visibilidad de la lista
   const toggleList = () => {
     setShowList(!showList);
   };
 
   return (
-    <div className="sites-container">
-      <h1>Sitios</h1>
+    <div className="container mt-5">
+      <h1 className="text-center mb-4">Sitios</h1>
 
-      {/* Botón para mostrar/ocultar la lista */}
-      <button className="toggle-button" onClick={toggleList}>
-        {showList ? 'Ocultar Lista' : 'Mostrar Lista'}
-      </button>
+      <div className="d-flex justify-content-center mb-4">
+        <button 
+          className={`btn ${showList ? 'btn-danger' : 'btn-primary'}`}
+          onClick={toggleList}
+        >
+          {showList ? 'Ocultar Lista' : 'Mostrar Lista'}
+        </button>
+      </div>
 
-      {/* Lista desplegable */}
       {showList && (
-        <ul className="sites-list">
-          <li>Checklist Gerencial</li>
-          <li>My Sites</li>
-          <li>Sites Finder</li>
-          <li>Create Sites</li>
-          <li>Favorites</li>
-        </ul>
+        <div className="row justify-content-center">
+          <div className="col-md-6">
+            <div className="list-group">
+              <button type="button" className="list-group-item list-group-item-action">
+                Checklist Gerencial
+              </button>
+              <button type="button" className="list-group-item list-group-item-action">
+                My Sites
+              </button>
+              <button type="button" className="list-group-item list-group-item-action">
+                Sites Finder
+              </button>
+              <button type="button" className="list-group-item list-group-item-action">
+                Create Sites
+              </button>
+              <button type="button" className="list-group-item list-group-item-action">
+                Favorites
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
