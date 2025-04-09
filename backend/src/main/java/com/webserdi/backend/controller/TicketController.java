@@ -26,10 +26,8 @@ public class TicketController {
     }
 
     @GetMapping("/all")
-    public Page<TicketDto> getAllTickets(
-            @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable,
-            @RequestParam(required = false) String filtro) {
-        return ticketService.getAllTickets(pageable, filtro);
+    public Page<TicketDto> getAllTickets( @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable) {
+        return ticketService.getAllTickets(pageable);
     }
 
     @GetMapping()

@@ -7,8 +7,8 @@ import {
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
 import { useSelector } from "react-redux";
-import { BGS, PRIOTITYSTYELS, TICKET_TYPE, formatDate } from "../../utils/utils";//CREATE
-import TicketDialog from "./Dialog";//CREATE
+import { BGS, PRIOTITYSTYELS,PRIORITYNAMES, TICKET_TYPE, formatDate } from "../../utils/utils";//CREATE
+import ConfirmationDialog from "./ConfirmationDialog";//CREATE
 import { BiMessageAltDetail } from "react-icons/bi";
 import { FaList } from "react-icons/fa";
 import UserInfo from "../Users/UserInfo";//CREATE
@@ -36,10 +36,10 @@ const Card = ({ ticket, status}) => {
             )}
           >
             <span className="text-lg">{ICONS[ticket?.prioridad]}</span>
-            <span className="uppercase">prioridad {ticket?.prioridad} </span>
+            <span className="uppercase">prioridad {PRIORITYNAMES[ticket?.prioridad]} </span>
           </div>
 
-          {user?.isAdmin && <TicketDialog ticket={ticket} />}
+          {user?.isAdmin && <ConfirmationDialog ticket={ticket} />}
         </div>
 
         <>
