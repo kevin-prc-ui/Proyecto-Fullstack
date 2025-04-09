@@ -8,7 +8,6 @@ import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.mapper.TicketMapper;
 import com.webserdi.backend.repository.*;
 import com.webserdi.backend.service.TicketService;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -71,22 +68,23 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Page<TicketDto> getAllTickets(Pageable pageable, String filtro) {
-//        if (filtro == null || filtro.trim().isEmpty()) {
-//
-//        }
-        return ticketRepository.findAll(pageable)
+    public Page<TicketDto> getAllTickets(Pageable pageable) {
+        return ticketRepository.findAllByIsTrashedFalse(pageable)
                 .map(ticketMapper::toDto);
     }
 
     @Override
     public Page<TicketDto> getTickets(Pageable pageable, String filtro) {
-        if (filtro != null && !filtro.trim().isEmpty()) {
-            return ticketRepository.findAllByEstadoNombre(filtro, pageable)
-                    .map(ticketMapper::toDto);
-        }
-        return ticketRepository.findAllByIsTrashedFalse(pageable)
+        return ticketRepository.findAllByEstadoNombreAndIsTrashedFalse(filtro, pageable)
                 .map(ticketMapper::toDto);
+    }
+
+    @Override
+    public Page<TicketDto> getAllTrashedTickets(Pageable pageable, String filtro) {
+        Page<Ticket> tickets;
+        tickets = ticketRepository.findAllByIsTrashedTrue(pageable);
+
+        return tickets.map(ticketMapper::toDto);
     }
 
     @Override
@@ -158,12 +156,5 @@ public class TicketServiceImpl implements TicketService {
             chars[0]++;
         }
         return new String(chars);
-    }
-    @Override
-    public Page<TicketDto> getAllTrashedTickets(Pageable pageable, String filtro) {
-        Page<Ticket> tickets;
-        tickets = ticketRepository.findAllByIsTrashedTrue(pageable);
-
-        return tickets.map(ticketMapper::toDto);
     }
 }

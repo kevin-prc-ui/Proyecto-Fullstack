@@ -15,5 +15,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Page<Ticket> findAllByIsTrashedTrue(Pageable pageable);
     Page<Ticket> findAllByIsTrashedFalse(Pageable pageable);
-    Page<Ticket> findAllByEstadoNombre(String filtro, Pageable pageable);
+    Page<Ticket> findAllByEstadoNombreAndIsTrashedFalse(String filtro, Pageable pageable);
 }

@@ -1,5 +1,5 @@
 // c:\react\Proyecto\frontend\src\assets\routes.jsx
-import { FaHome, FaFileAlt, FaFolderOpen, FaGlobe, FaTasks, FaUsers, FaDatabase, FaTools, FaTrashAlt } from "react-icons/fa";
+import { FaHome, FaFileAlt, FaFolderOpen, FaGlobe, FaTasks, FaUsers, FaDatabase, FaTrashAlt } from "react-icons/fa";
 import {  MdSupportAgent, MdTaskAlt, MdOutlinePendingActions } from "react-icons/md";
 import { PiFolderSimpleUser } from "react-icons/pi";
 import { MdAdminPanelSettings } from "react-icons/md";
@@ -17,7 +17,7 @@ const linkData = [
         },
         {
           label: "Completados",
-          link: "/helpdesk/completado/completado",
+          link: "/helpdesk/completados/completados",
           icon: <MdTaskAlt />,
           roles: ["ROLE_ADMIN", "ROLE_USER"]
         },
@@ -29,7 +29,7 @@ const linkData = [
         },
         {
           label: "Pendientes",
-          link: "/helpdesk/pendiente/pendiente",
+          link: "/helpdesk/pendientes/pendientes",
           icon: <MdOutlinePendingActions />,
           roles: ["ROLE_ADMIN", "ROLE_USER"]
         },

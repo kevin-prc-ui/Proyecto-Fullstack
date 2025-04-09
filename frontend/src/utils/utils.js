@@ -45,19 +45,60 @@ export const formatUserRole = (rolId) => {
     }
   };
 
+  export const getVencimiento = (expirationDate) => {
+    console.log()
+    // 1. Validate Input: Ensure it's a valid Date object
+    if (!(expirationDate instanceof Date) || isNaN(expirationDate.getTime())) {
+      console.error("getVencimientoStatus received an invalid date:", expirationDate);
+      return "Invalid Date";
+    }
+  
+    // 2. Get Current Time
+    const now = new Date();
+  
+    // 3. Calculate Difference in Milliseconds
+    //    Positive value means expirationDate is in the future
+    //    Negative value means expirationDate is in the past (overdue)
+    const diffInMs = expirationDate.getTime() - now.getTime();
+  
+    // 4. Define time units in milliseconds
+    const minuteInMs = 60 * 1000;
+    const hourInMs = 60 * minuteInMs;
+    const dayInMs = 24 * hourInMs;
+  
+    // 5. Calculate absolute difference for easier unit calculation
+    const absDiffInMs = Math.abs(diffInMs);
+  
+    // 6. Determine the largest relevant unit and format the output string
+    if (absDiffInMs >= dayInMs) {
+      const days = Math.floor(absDiffInMs / dayInMs);
+      return diffInMs > 0
+        ? `Expira en ${days} dia${days > 1 ? 's' : ''}`
+        : `Expiró hace ${days} day${days > 1 ? 's' : ''}`;
+    } else if (absDiffInMs >= hourInMs) {
+      const hours = Math.floor(absDiffInMs / hourInMs);
+      return diffInMs > 0
+        ? `Expira en ${hours} hora${hours > 1 ? 's' : ''}`
+        : `Expiró hace ${hours} hora${hours > 1 ? 's' : ''}`;
+    } else if (absDiffInMs >= minuteInMs) {
+      const minutes = Math.floor(absDiffInMs / minuteInMs);
+      return diffInMs > 0
+        ? `Expires in ${minutes} minuto${minutes > 1 ? 's' : ''}`
+        : `Expiró hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
+    } else {
+      // Less than a minute difference
+      return diffInMs > 0 ? "Expires very soon" : "Just expired/Overdue";
+    }
+  };
 
   export const formatDate = (date) => {
     // Get the month, day, and year
-    const month = date.toLocaleString("en-US", { month: "short" });
-    const day = date.getDate();
     const year = date.getFullYear();
-    const hours = date.getHours();
-    let minutes = date.getMinutes();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
 
-    if(minutes<10)
-    {
-      minutes = "0" + minutes;
-    }
   
     const formattedDate = `${day}-${month}-${year}, ${hours}:${minutes}`;
   
@@ -89,6 +130,13 @@ export const formatUserRole = (rolId) => {
     return initialsStr;
   }
   
+  export const PRIORITYNAMES = {
+    1: "Alta",
+    2: "Media",
+    3: "Baja",
+  };
+  
+
   export const PRIOTITYSTYELS = {
     1: "text-red-600",
     2: "text-yellow-600",
@@ -108,5 +156,9 @@ export const formatUserRole = (rolId) => {
     "bg-red-600",
     "bg-green-600",
   ];
-  
+  export const TASK_TYPE = {
+    pendiente: "bg-blue-600",
+    "en-proceso": "bg-yellow-600", 
+    completado: "bg-green-600", 
+  };
   

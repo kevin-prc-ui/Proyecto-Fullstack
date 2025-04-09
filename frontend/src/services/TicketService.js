@@ -37,6 +37,17 @@ export const listFilteredTickets = (id, filtro) =>
       throw error;
     });
     
+export const listTrashedTickets = (id) =>
+axios
+  .get(REST_API_BASE_URL+`/tickets/trashed?page=${id}&size=8`, getHeaders())
+  .then((response) => response)
+  .catch((error) => {
+    // Detectamos específicamente errores de conexión
+    if (!error.response) {
+      throw new Error("Error de conexion con el servidor");
+    }
+    throw error;
+  });
 
 
 export const deleteTicket = (ticketId) => axios.delete(`${REST_API_BASE_URL}/tickets/${ticketId}`, getHeaders());

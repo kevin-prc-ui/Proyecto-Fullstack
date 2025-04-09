@@ -105,9 +105,9 @@ function App() {
           >
             <Route element={<Layout />}>
               <Route path="/helpdesk/tasks" element={<Tasks />} />
-              <Route path="/helpdesk/completado/:estado" element={<Tasks />} />
+              <Route path="/helpdesk/completados/:estado" element={<Tasks />} />
               <Route path="/helpdesk/en-proceso/:estado" element={<Tasks />} />
-              <Route path="/helpdesk/pendiente/:estado" element={<Tasks />} />
+              <Route path="/helpdesk/pendientes/:estado" element={<Tasks />} />
               <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
               <Route path="/helpdesk/trash" element={<Trash />} />
               <Route path="/knowledge/home" element={<Home />} />
