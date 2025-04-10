@@ -217,7 +217,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                       >
                         {users.map(user => (
                           <option key={user.id} value={user.id}>
-                            {user.name} ({user.role})
+                            {user.nombre}
                           </option>
                         ))}
                       </select>
@@ -237,7 +237,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                         >
                           {users.map(user => (
                             <option key={user.id} value={user.id}>
-                              {user.name} ({user.role})
+                              {user.nombre}
                             </option>
                           ))}
                         </select>
