@@ -16,12 +16,12 @@ public class TicketDto {
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaActualizacion;
     private LocalDate fechaVencimiento;
-    private Set<String> usuarioCreador;
-    private Set<String> usuarioAsignado;
-//    private Long usuarioCreador;
-//    private Long usuarioAsignado;
-//    private String usuarioCreadorNombres;
-//    private String usuarioAsignadoNombres;
+//    private Set<String> usuarioCreador;
+//    private Set<String> usuarioAsignado;
+    private Long usuarioCreador;
+    private Long usuarioAsignado;
+    private String usuarioCreadorNombres;
+    private String usuarioAsignadoNombres;
     private Long departamento;
     private Long fuente;
     private Long incidencia;

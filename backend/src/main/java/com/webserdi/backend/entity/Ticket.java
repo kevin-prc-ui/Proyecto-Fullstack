@@ -42,9 +42,12 @@ public class Ticket {
     @Column(name="fecha_vencimiento")
     private LocalDate fechaVencimiento;
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "usuario_creador_id", nullable = false)
+//    private Set<Usuario> usuarioCreador;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_creador_id", nullable = false)
-    private Set<Usuario> usuarioCreador;
+    private Usuario usuarioCreador;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_asignado_id")
