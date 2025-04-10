@@ -3,7 +3,7 @@ const PaginationBar = ({ currentPage, totalPages, onPrev, onNext }) => {
   const isLastPage = currentPage + 1 >= totalPages;
 
   return (
-    <div className="flex items-center justify-between mt-6 pb-4 border-b border-gray-200">
+    <div className="flex items-center justify-between mt-6 pb-4 border-b border-gray-200 ">
       {/* Paginación para celular. */}
       <div className="flex-1 flex justify-between sm:hidden">
         <button

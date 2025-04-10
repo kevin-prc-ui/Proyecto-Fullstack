@@ -12,6 +12,8 @@ const getHeaders = () => ({
   },
 });
 
+export const getTicketById = (ticketId) => axios.get(`${REST_API_BASE_URL}/tickets/${ticketId}`, getHeaders());
+
 export const listTickets = (id) =>
   
   axios
