@@ -71,10 +71,10 @@ export const formatUserRole = (rolId) => {
   
     // 6. Determine the largest relevant unit and format the output string
     if (absDiffInMs >= dayInMs) {
-      const days = Math.floor(absDiffInMs / dayInMs);
+      const dias = Math.floor(absDiffInMs / dayInMs);
       return diffInMs > 0
-        ? `Expira en ${days} dia${days > 1 ? 's' : ''}`
-        : `Expiró hace ${days} day${days > 1 ? 's' : ''}`;
+        ? `Expira en ${dias} dia${dias > 1 ? 's' : ''}`
+        : `Expiró hace ${dias} dia${dias > 1 ? 's' : ''}`;
     } else if (absDiffInMs >= hourInMs) {
       const hours = Math.floor(absDiffInMs / hourInMs);
       return diffInMs > 0
@@ -87,7 +87,7 @@ export const formatUserRole = (rolId) => {
         : `Expiró hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
     } else {
       // Less than a minute difference
-      return diffInMs > 0 ? "Expires very soon" : "Just expired/Overdue";
+      return diffInMs > 0 ? "Expira pronto" : "Expiró hace poco";
     }
   };
 

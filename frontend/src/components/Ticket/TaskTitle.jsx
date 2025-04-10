@@ -10,7 +10,7 @@ const TaskTitle = ({ label, className }) => {
           {label}
         </div>
       </div>
-      <div>asd</div>
+      <div>Test Text</div>
       <button onClick={onclick} className='hidden md:block'>
         <IoMdAdd className='text-lg text-black dark:text-gray-300' />
       </button>

@@ -127,27 +127,14 @@ const Tasks = () => {
       enterFrom="opacity-0"
       enterTo="opacity-100"
       leave="transition-opacity duration-150" // Optional: add leave transition
-      leaveFrom="opacity-100"
+      leaveFrom="opacity-0"
       leaveTo="opacity-0"
-      className="w-full" // Moved className here from Transition content
+      className="w-full"
     >
-      <div className="flex items-center justify-between mb-4">
         <Title
           title={status ? `Tickets ${status.replace("-", " ")}` : "Tickets"}
         />
-
-        {/* Conditionally render Button based on permissions or context if needed */}
-        {!status && ( // Only show "Create Ticket" if no filter is applied
-          <Button
-            label="Crear ticket"
-            icon={<IoMdAdd className="text-lg" />}
-            className="flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded py-2 2xl:py-2.5"
-            // onClick={() => { /* Add navigation or modal logic */ }}
-          />
-        )}
-      </div>
-
-      <Tabs tabs={TABS} selected={selected} setSelected={handleTabChange}>
+      <Tabs tabs={TABS} selected={selected} setSelected={handleTabChange} status={status}>
         {/* Task Titles only shown when viewing all tickets (Board View likely) */}
         {!status &&
           selected !== 1 && ( // Show titles only if no status filter AND in Board view (selected === 0)
@@ -172,9 +159,7 @@ const Tasks = () => {
         {selected !== 1 ? (
           <BoardView tickets={tickets} />
         ) : (
-          <div className="w-full overflow-x-auto">
-            {" "}
-            {/* Added overflow for smaller screens */}
+          <div className="pb-2 w-full overflow-x-auto">
             <Table tickets={tickets} />
           </div>
         )}

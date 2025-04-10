@@ -27,6 +27,7 @@ const Card = ({ ticket, status}) => {
 
   return (
     <>
+   
       <div className="w-full h-fit bg-white shadow-md p-2 rounded ">
         <div className="w-full flex justify-evenly items-center ">
           <div
@@ -41,14 +42,13 @@ const Card = ({ ticket, status}) => {
 
           {user?.isAdmin && <ConfirmationDialog ticket={ticket} />}
         </div>
-
         <>
-          <div className="flex items-center gap-2">
+          <a href={`/helpdesk/task/${ticket.id}`} className="flex items-center gap-2 hover:text-blue-700 text-decoration-none">
             <div
               className={clsx("w-4 h-4 rounded-full", TICKET_TYPE[ticket.estado])}
             />
-            <h4 className="line-clamp-1 text-black">{ticket?.tema}</h4>
-          </div>
+            <span className="font-semibold text-xl line-clamp-1 text-black">{ticket?.tema}</span>
+          </a>
           <span className="text-sm text-black-600">
             {formatDate(new Date(ticket?.fechaCreacion))}<br></br>
           </span><span className="text-sm text-red-600">
