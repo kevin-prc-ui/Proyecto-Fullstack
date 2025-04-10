@@ -20,6 +20,8 @@ const People = () => {
         const response = await listUsers();
         setUsuarios(response.data || []);
         setFilteredUsers(response.data || []);
+        console.log(usuarios);
+        
       } catch (err) {
         console.error("Error al cargar usuarios:", err);
         setError("Error al cargar los usuarios. Por favor intenta nuevamente.");
@@ -127,11 +129,11 @@ const People = () => {
                             <FaUser size={24} className="text-primary" />
                           </div>
                           <div className="flex-grow-1">
-                            <h5 className="mb-1">{user.nombre || 'Nombre no disponible'}</h5>
+                            <h5 className="mb-1">{user.nombre +" "+user.apellido}</h5>
                             <p className="mb-1 small text-muted">{user.email}</p>
-                            {user.username && (
-                              <span className="badge badge-secondary">{user.username}</span>
-                            )}
+                            {/* {user.apellido && (
+                              <span className="badge badge-secondary">{user.apellido}</span>
+                            )} */}
                           </div>
                           <div className="text-right">
                             <small className="text-muted">ID: {user.id}</small>

@@ -16,7 +16,6 @@ public class TicketMapper {
         ticketDto.setFechaCreacion(ticket.getFechaCreacion());
         ticketDto.setFechaActualizacion(ticket.getFechaActualizacion());
         ticketDto.setFechaVencimiento(ticket.getFechaVencimiento());
-//        ticketDto.setUsuarioCreador(ticket.getUsuarioCreador().stream());
         ticketDto.setUsuarioCreador(ticket.getUsuarioCreador().getId());
         ticketDto.setUsuarioAsignado(ticket.getUsuarioAsignado().getId());
         ticketDto.setUsuarioCreadorNombres(ticket.getUsuarioCreador().getNombre()+" "+ticket.getUsuarioCreador().getApellido());

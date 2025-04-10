@@ -132,7 +132,7 @@ const UsersComponent = () => {
         await signUp(userData); // Llama al servicio para crear el usuario
         toast.info("Usuario creado correctamente");
       }
-      navigator("/admin/helpdesk/users"); // Navega a la lista de usuarios
+      navigator("/admin/users"); // Navega a la lista de usuarios
     } catch (error) {
       toast.error(error, "Error al guardar los cambios del usuario");
     } finally {

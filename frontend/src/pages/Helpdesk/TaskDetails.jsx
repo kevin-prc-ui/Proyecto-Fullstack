@@ -131,7 +131,7 @@ const TaskDetails = () => {
       <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
         <div className="text-center bg-white rounded-lg shadow-md p-3">
           <FaExclamationTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-red-700 mb-2">Error</h2>
+          <div className="text-2xl font-semibold text-red-700 mb-2">Error</div>
           <p className="text-gray-600">
             {error || "El ticket solicitado no pudo ser encontrado."}
           </p>
@@ -149,23 +149,23 @@ const TaskDetails = () => {
 
   // --- Renderizado Principal (Ticket Encontrado) ---
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="min-h-fit p-4 md:p-8">
       <button
         onClick={() => window.history.back()}
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         Volver
       </button>
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-6 md:gap-8">
+      <div className="pt-2 max-w-7xl mx-auto flex flex-col md:flex-row gap-6 md:gap-8">
         {/* Columna Izquierda: Detalles del Ticket */}
         <div className="flex-1 bg-white rounded-lg shadow-md overflow-hidden">
-          <h2 className="p-2 text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center">
+          <div className="p-2 text-3xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center">
             <FaTicketAlt className="mr-3 text-blue-600" />
             Detalles del Ticket:{" "}
             <span className="ml-2 font-mono text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
               {ticket.codigo || ticket.id}
             </span>
-          </h2>
+          </div>
 
           <div className="space-y-5">
             {/* Sección Información General */}
@@ -231,10 +231,10 @@ const TaskDetails = () => {
 
         {/* Columna Derecha: Chat (Placeholder) */}
         <div className="w-full md:w-1/3 lg:w-1/4 bg-white rounded-lg shadow-md flex flex-col p-2">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center">
+          <div className=" text-xl font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center">
             <FaComments className="mr-2 text-indigo-600" />
             Chat del Ticket
-          </h3>
+          </div>
           {/* Área de Mensajes (Placeholder) */}
           <div className="flex-grow border border-gray-200 rounded-md p-4 mb-4 bg-gray-50 flex items-center justify-center text-center">
             <p className="text-gray-500 italic">
@@ -275,14 +275,14 @@ const TaskDetails = () => {
  * @returns {JSX.Element}
  */
 const DetailSection = ({ title, icon, children }) => (
-  <div className="border border-gray-200 rounded-md p-2 m-2">
-    <h3 className="text-lg font-medium text-gray-700 mb-3 flex items-center">
+  <div className="font-semibold border border-gray-200 rounded-md p-2 m-2">
+    <div className="text-2xl font-medium text-gray-700 mb-3 flex items-center">
       {icon &&
         React.cloneElement(icon, {
-          className: `${icon.props.className} mr-2 w-5 h-5`,
+          className: `${icon.props.className} p mr-2 w-5 h-5`,
         })}
       {title}
-    </h3>
+    </div>
     <div className="space-y-2">{children}</div>
   </div>
 );

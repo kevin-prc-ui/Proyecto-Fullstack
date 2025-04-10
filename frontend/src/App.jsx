@@ -49,12 +49,12 @@ function Layout() {
 
         {/* Contenido principal */}
         <div
-          className={`flex-1 flex flex-col overflow-y-auto ${
-            isDashboard ? "w-full" : ""
+          className={`w-full flex flex-col overflow-y-auto ${
+            isDashboard ? "w-1" : ""
           }`}
         >
           <Navbar />
-          <div className="p-4 2xl:px-10 flex flex-col">
+          <div className="pt-2 pb-0 p-3 2xl:px-10 flex flex-col">
             <Outlet />
           </div>
           <Footer />
