@@ -118,8 +118,8 @@ const TaskDetails = () => {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-6 md:gap-8">
 
         {/* Columna Izquierda: Detalles del Ticket */}
-        <div className="flex-1 bg-white p-2 rounded-lg shadow-md overflow-hidden">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center">
+        <div className="flex-1 bg-white rounded-lg shadow-md overflow-hidden">
+          <h2 className="p-2 text-2xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center">
             <FaTicketAlt className="mr-3 text-blue-600" />
             Detalles del Ticket: <span className="ml-2 font-mono text-blue-700 bg-blue-100 px-2 py-0.5 rounded">{ticket.codigo || ticket.id}</span>
           </h2>
@@ -197,7 +197,7 @@ const TaskDetails = () => {
  * @returns {JSX.Element}
  */
 const DetailSection = ({ title, icon, children }) => (
-  <div className="border border-gray-200 rounded-md p-4">
+  <div className="border border-gray-200 rounded-md p-2 m-2">
     <h3 className="text-lg font-medium text-gray-700 mb-3 flex items-center">
       {icon && React.cloneElement(icon, { className: `${icon.props.className} mr-2 w-5 h-5` })}
       {title}
@@ -224,11 +224,11 @@ const DetailItem = ({ label, value, badgeColor, icon }) => (
     <dd className={`text-sm text-gray-900 col-span-2 flex items-center ${badgeColor ? 'inline-block' : ''}`}>
       {icon && React.cloneElement(icon, { className: `${icon.props.className} mr-1.5 w-4 h-4` })}
       {badgeColor ? (
-        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${badgeColor}`}>
+        <span className={`px-1 py-0.5 rounded-full font-semibold ${badgeColor}`}>
           {value || 'N/A'}
         </span>
       ) : (
-        value || <span className="text-gray-400 italic">No especificado</span>
+        value || <span className="text-gray-400 italic m-5">No especificado</span>
       )}
     </dd>
   </div>
