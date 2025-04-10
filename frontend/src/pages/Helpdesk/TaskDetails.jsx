@@ -218,11 +218,11 @@ const TaskDetails = () => {
             >
               <DetailItem
                 label="Usuario Creador"
-                value={ticket.usuarioCreador?.nombre || "No asignado"}
+                value={ticket.usuarioCreadorNombres || "No asignado"}
               />
               <DetailItem
                 label="Usuario Asignado"
-                value={ticket.usuarioAsignado?.nombre || "No asignado"}
+                value={ticket.usuarioAsignadoNombres || "No asignado"}
               />
               {/* Podrías añadir más detalles del usuario si están disponibles, como email o rol */}
             </DetailSection>

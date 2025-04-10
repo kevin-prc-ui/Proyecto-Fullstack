@@ -1,122 +1,100 @@
 // c:\react\Proyecto\frontend\src\components\Sidebar\index.jsx
-/* eslint-disable react/prop-types */
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { MdSettings } from "react-icons/md";
-import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
-import { Container, Nav, Navbar, Button } from "react-bootstrap";
-import linkData from "../../assets/routes";
-import { jwtDecode } from 'jwt-decode';
+import { Container, Nav, Navbar, Button, Spinner, Alert } from "react-bootstrap"; // Added Spinner, Alert
 import PropTypes from 'prop-types';
-import { getUserRoles } from "../../services/UsuarioService";
 
+import linkData from "../../assets/routes"; // Data source for links
+import { useUserRoles } from "../../hooks/useUserRoles"; // Import the custom hook
 /**
- * Componente Sidebar - Barra lateral de navegación con menú colapsable
- * Muestra opciones de navegación filtradas por roles de usuario
- * Incluye animaciones y manejo de estado de elementos activos
+ * Componente Sidebar - Barra lateral de navegación mejorada.
+ * Muestra opciones de navegación filtradas por roles de usuario.
+ * Incluye transiciones suaves y manejo de estado de carga/error.
  */
 const Sidebar = () => {
-  const isAuthenticated = localStorage.getItem("authToken");
+  const { roles, isLoading, error } = useUserRoles(); // Use the custom hook
   const [expandedParent, setExpandedParent] = useState(null);
-  const [userRoles, setUserRoles] = useState([]);
-  const { user } = useSelector((state) => state.auth);
   const location = useLocation();
 
-  const [state, setState] = useState({
-      isLoading: true,
-      roles: [],
-      error: null
-    });
-    const accessToken = localStorage.getItem("authToken");
-    const decoded = jwtDecode(accessToken).sub;
-    useEffect(() => {
-      let isMounted = true;
-      const fetchAuthData = async () => {
-        try {
-          if (!isAuthenticated) {
-            return isMounted && setState(s => ({ ...s, isLoading: false }));
-          }
-          const roles = (await getUserRoles(decoded)).data;
-          if (isMounted) {
-            setState({ isLoading: false, roles, error: null });
-          }
-        } catch (error) {
-          if (isMounted) {
-            setState({ isLoading: false, roles: [], error: error.message });
-            console.error("Error fetching user roles:", error);
-          }
-        }
-      };
-      fetchAuthData();
-      return () => { isMounted = false; };
-    }, [isAuthenticated]);
+  // Memoize filtered link data based on user roles
+  const filteredLinkData = useMemo(() => {
+    if (isLoading || error) return []; // Don't filter until roles are loaded successfully
 
-    const hasRequiredRole = linkData.map(parent => ({
-      ...parent,
-      children: parent.children?.filter(child => 
-        !child.roles || child.roles.some(role => state.roles.includes(role))
-      )
+    return linkData
+      .map(parent => ({
+        ...parent,
+        // Filter children based on roles. Show if no roles defined or user has at least one required role.
+        children: parent.children?.filter(child =>
+          !child.roles || child.roles.length === 0 || child.roles.some(role => roles.includes(role))
+        )
       }))
-      .filter(parent => parent.children?.length > 0);
-  
-  // // Efecto para decodificar el token JWT y obtener roles
-  // useEffect(() => {
-  //   const fetchUserRoles = () => {
-  //     try {
-  //       const accessToken = localStorage.getItem("authToken");
-  //       if (!accessToken) return;
-        
-  //       const decoded = jwtDecode(accessToken);
-  //       setUserRoles(decoded.roles || []);
-  //     } catch (error) {
-  //       console.error("Error decodificando token:", error);
-  //       setUserRoles([]);
-  //     }
-  //   };
-    
-  //   fetchUserRoles();
-  // }, []);
+      // Keep parent only if it has children after filtering OR if the parent itself is a direct link (optional)
+      .filter(parent => parent.children?.length > 0 || (!parent.children && parent.link)); // Adjust if parents can be direct links
 
-  // // Memoización de enlaces filtrados por roles
-  // const filteredLinkData = useMemo(() => 
-  //   linkData
-  //     .map(parent => ({
-  //       ...parent,
-  //       children: parent.children?.filter(child => 
-  //         !child.roles || child.roles.some(role => userRoles.includes(role))
-  //       )
-  //       }))
-  //     .filter(parent => parent.children?.length > 0),
-  //   [userRoles]
-  // );
+  }, [roles, isLoading, error]); // Recalculate when roles, loading, or error changes
 
-  // Manejo de expansión/colapso de menús padres
+  // Handle expand/collapse toggle
   const toggleParent = (parentLabel) => {
-    setExpandedParent(prev => prev === parentLabel ? null : parentLabel);
+    setExpandedParent(prev => (prev === parentLabel ? null : parentLabel));
   };
 
-  // Verificación de enlace activo
-  const isActiveLink = (link) => location.pathname.startsWith(link);
+  // Check if a link (or any child link) is active
+  const isParentActive = (parent) => {
+    // Check if parent link itself is active
+    if (parent.link && location.pathname.startsWith(parent.link)) {
+        return true;
+    }
+    // Check if any child link is active
+    return parent.children?.some(child => location.pathname.startsWith(child.link)) ?? false;
+  };
 
+  const isChildActive = (link) => location.pathname.startsWith(link);
+
+  // Render loading state
+  if (isLoading) {
+    return (
+      <Container fluid className="h-100 p-3 d-flex justify-content-center align-items-center">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </Spinner>
+      </Container>
+    );
+  }
+
+  // Render error state
+  if (error) {
+      return (
+          <Container fluid className="h-100 p-3">
+              <Alert variant="danger">Error al cargar menú, inicia sesion nuevamente: {error}</Alert>
+          </Container>
+      );
+  }
+
+  // Render sidebar content
   return (
-    <Container fluid className="h-100 p-3">
-      <Navbar expand="lg" className="flex-column h-100">
-        <Nav className="flex-column flex-grow-1 w-full">
-          {hasRequiredRole.map((parent) => (
+    <Container fluid className="h-100 p-3 bg-light border-end"> {/* Added bg-light and border */}
+      <Navbar expand="lg" className=" flex-column h-100 align-items-stretch"> {/* Ensure Navbar stretches */}
+        <Nav className="flex-column flex-grow-1 w-100"> {/* Use w-100 */}
+          {filteredLinkData.length === 0 && !isLoading && (
+             <p className="text-muted text-center mt-3">No hay opciones de menú disponibles.</p>
+          )}
+
+          {filteredLinkData.map((parent) => (
             <ParentMenuItem
               key={parent.label}
               parent={parent}
-              expandedParent={expandedParent}
+              isExpanded={expandedParent === parent.label}
+              isActive={isParentActive(parent)}
               toggleParent={toggleParent}
-              isActiveLink={isActiveLink}
-              location={location}
+              isChildActive={isChildActive} // Pass down for child highlighting
             />
           ))}
 
-          {/* Sección de Configuración */}
+          {/* Separator and Settings Section */}
           <div className="w-100 border-top pt-3 mt-auto">
-            <SettingsButton />
+            <SettingsButton isActive={location.pathname.startsWith('/settings')} />
           </div>
         </Nav>
       </Navbar>
@@ -124,33 +102,47 @@ const Sidebar = () => {
   );
 };
 
-// Componente para ítems de menú padre
-const ParentMenuItem = ({ parent, expandedParent, toggleParent, isActiveLink, location }) => (
-  <div className="w-full">
+// --- Sub-Components ---
+
+const ParentMenuItem = ({ parent, isExpanded, isActive, toggleParent, isChildActive }) => (
+  <div className="w-100 mb-1"> {/* Use mb-1 for spacing */}
     <Button
-      variant="link"
+      variant="link" // Use link variant for custom styling
       className={clsx(
-        "w-full d-flex gap-2 px-3 py-2 rounded items-center mb-2",
-        "text-decoration-none text-start",
-        parent.children?.some(child => location.pathname.includes(child.link))
-          ? "bg-primary text-white"
-          : "text-dark hover:bg-[#2564ed2d]"
+        "sidebar-parent-button ", // Custom class for styling/hover
+        "w-100 d-flex gap-2 px-3 py-2 rounded align-items-center",
+        "text-decoration-none mb-1 text-start text-dark", // Base text color
+        isActive && "active" // Active class for highlighting
       )}
       onClick={() => toggleParent(parent.label)}
-      aria-expanded={expandedParent === parent.label}
+      aria-expanded={isExpanded}
+      aria-controls={`submenu-${parent.label}`} // Accessibility
     >
-      <span className="fs-5">{parent.icon}</span>
-      <span className="fs-6">{parent.label}</span>
+      {parent.icon && <span className="fs-5">{parent.icon}</span>}
+      <span className="fs-6 fw-medium">{parent.label}</span> {/* Slightly bolder label */}
+      {/* Add dropdown indicator if it has children */}
+      {parent.children && parent.children.length > 0 && (
+         <span className="ms-auto"> {/* Push indicator to the right */}
+            {/* Simple chevron indicator - replace with icons if preferred */}
+            {isExpanded ? '⮝' : '⮟'}
+         </span>
+      )}
     </Button>
 
-    {expandedParent === parent.label && (
-      <div className="child-links ms-4 ps-2 border-start" role="menu">
-        {parent.children?.map((child, index) => (
+    {/* Conditionally render children with transitions */}
+    {parent.children && parent.children.length > 0 && (
+      <div
+        id={`submenu-${parent.label}`} // Match aria-controls
+        className={clsx("child-links", isExpanded && "child-links-expanded")}
+        role="menu"
+        aria-hidden={!isExpanded}
+      >
+        {parent.children.map((child, index) => (
           <ChildMenuItem
             key={child.label}
             child={child}
-            index={index}
-            isActiveLink={isActiveLink}
+            index={index} // Keep index if needed for animation delay (though CSS handles fade-in now)
+            isActive={isChildActive(child.link)}
           />
         ))}
       </div>
@@ -158,50 +150,68 @@ const ParentMenuItem = ({ parent, expandedParent, toggleParent, isActiveLink, lo
   </div>
 );
 
-// Componente para ítems de menú hijos
-const ChildMenuItem = ({ child, index, isActiveLink }) => (
+ParentMenuItem.propTypes = {
+  parent: PropTypes.shape({
+    label: PropTypes.string.isRequired,
+    icon: PropTypes.node,
+    link: PropTypes.string, // Parent might be a direct link
+    children: PropTypes.arrayOf(PropTypes.object)
+  }).isRequired,
+  isExpanded: PropTypes.bool.isRequired,
+  isActive: PropTypes.bool.isRequired,
+  toggleParent: PropTypes.func.isRequired,
+  isChildActive: PropTypes.func.isRequired,
+};
+
+const ChildMenuItem = ({ child, index, isActive }) => (
   <Link
     to={child.link}
     className={clsx(
-      "child-link",
-      "w-full lg-w-90 d-flex gap-2 px-3 py-2 rounded items-center mb-2",
-      "text-decoration-none hover-bg-[#2564ed2d]",
-      isActiveLink(child.link) ? "bg-primary text-white" : "text-dark"
+      "child-link", // Custom class for styling/animation
+      "w-100 d-flex gap-2 px-3 py-2 rounded align-items-center mb-1", // Use mb-1
+      "text-decoration-none text-dark", // Base text color
+      isActive && "active" // Active class
     )}
-    style={{ animationDelay: `${index * 0.05}s` }}
+    style={{ animationDelay: `${index * 0.03}s` }} // Subtle staggered fade-in
     role="menuitem"
   >
-    <span className="fs-5">{child.icon}</span>
+    {child.icon && <span className="fs-5">{child.icon}</span>}
     <span className="fs-6">{child.label}</span>
   </Link>
 );
 
-// Componente para botón de configuración
-const SettingsButton = () => (
+ChildMenuItem.propTypes = {
+  child: PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      icon: PropTypes.node,
+      link: PropTypes.string.isRequired,
+      roles: PropTypes.arrayOf(PropTypes.string) // Keep roles info if needed elsewhere
+  }).isRequired,
+  index: PropTypes.number.isRequired,
+  isActive: PropTypes.bool.isRequired,
+};
+
+
+const SettingsButton = ({ isActive }) => (
   <Button
     variant="link"
-    className="text-dark d-flex align-items-center gap-2 w-100"
+    className={clsx(
+        "settings-button", // Custom class
+        "text-dark d-flex align-items-center gap-2 w-100 px-3 py-2 rounded",
+        "text-decoration-none",
+        isActive && "active" // Apply active style if settings page is active
+        )}
     as={Link}
-    to="/settings"
+    to="/helpdesk/tasks" // Assuming settings route is /settings
   >
     <MdSettings className="fs-5" />
-    <span className="fs-6">Configuración</span>
+    <span className="fs-6 fw-medium">Configuración</span>
   </Button>
 );
 
-// Propiedades esperadas
-ParentMenuItem.propTypes = {
-  parent: PropTypes.object.isRequired,
-  expandedParent: PropTypes.string,
-  toggleParent: PropTypes.func.isRequired,
-  isActiveLink: PropTypes.func.isRequired,
-  location: PropTypes.object.isRequired
+SettingsButton.propTypes = {
+    isActive: PropTypes.bool.isRequired,
 };
 
-ChildMenuItem.propTypes = {
-  child: PropTypes.object.isRequired,
-  index: PropTypes.number.isRequired,
-  isActiveLink: PropTypes.func.isRequired
-};
 
 export default Sidebar;

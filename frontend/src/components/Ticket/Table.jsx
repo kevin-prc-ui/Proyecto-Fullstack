@@ -57,9 +57,9 @@ const Table = ({ tickets }) => {
           style={{minWidth:"5px", minHeight:"5px"}}
             className={clsx("w-5 h-5 rounded-full", TICKET_TYPE[ticket.estado])}
           />
-          <div className='w-full line-clamp-2 text-base text-black'>
+          <a href={`/helpdesk/task/${ticket.id}`} className='text-decoration-none w-full line-clamp-2 text-base text-black'>
             {ticket?.tema}
-          </div>
+          </a>
         </div>
       </td>
 

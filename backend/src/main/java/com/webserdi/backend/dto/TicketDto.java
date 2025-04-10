@@ -4,6 +4,7 @@ import com.webserdi.backend.entity.*;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 
@@ -15,8 +16,12 @@ public class TicketDto {
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaActualizacion;
     private LocalDate fechaVencimiento;
-    private Long usuarioCreador;
-    private Long usuarioAsignado;
+    private Set<String> usuarioCreador;
+    private Set<String> usuarioAsignado;
+//    private Long usuarioCreador;
+//    private Long usuarioAsignado;
+//    private String usuarioCreadorNombres;
+//    private String usuarioAsignadoNombres;
     private Long departamento;
     private Long fuente;
     private Long incidencia;

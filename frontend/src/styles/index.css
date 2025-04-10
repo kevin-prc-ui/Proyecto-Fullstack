@@ -395,3 +395,69 @@ h1 {
     transition-delay: 0s !important;
   }
 }
+
+.sidebar-parent-button {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  /* Use Bootstrap's hover/focus states or define custom ones */
+}
+.sidebar-parent-button:hover:not(.active) {
+    background-color: rgba(37, 100, 237, 0.1); /* Light blue background on hover */
+}
+
+.child-links {
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  max-height: 0; /* Initially collapsed */
+  opacity: 0;   /* Initially hidden */
+  border-left: 2px solid #dee2e6; /* Bootstrap's default border color */
+  margin-left: 1.5rem; /* Indentation */
+  padding-left: 0.5rem; /* Space from border */
+}
+
+.child-links-expanded {
+  max-height: 500px; /* Adjust if needed for many items */
+  opacity: 1;
+}
+
+.child-link {
+  display: flex; /* Ensure flex properties work */
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  opacity: 0; /* Start hidden for fade-in */
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+.child-link:hover:not(.active) {
+     background-color: rgba(37, 100, 237, 0.1); /* Light blue background on hover */
+}
+
+/* Simple fade-in animation for child links */
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Style for active links (using .active class) */
+.sidebar-parent-button.active,
+.child-link.active {
+  background-color: var(--bs-primary); /* Bootstrap primary color */
+  color: var(--bs-white); /* Bootstrap white color */
+}
+.sidebar-parent-button.active:hover, /* Prevent hover effect on active items */
+.child-link.active:hover {
+    background-color: var(--bs-primary);
+    color: var(--bs-white);
+}
+
+/* Ensure icons in active links are also white */
+.sidebar-parent-button.active .fs-5,
+.child-link.active .fs-5 {
+    color: var(--bs-white);
+}
+
+/* Settings button specific styles if needed */
+.settings-button {
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+.settings-button:hover {
+     background-color: rgba(0, 0, 0, 0.05); /* Subtle dark hover */
+}

@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -43,7 +44,7 @@ public class Ticket {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_creador_id", nullable = false)
-    private Usuario usuarioCreador;
+    private Set<Usuario> usuarioCreador;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_asignado_id")
