@@ -3,6 +3,7 @@ import { FiPlus, FiClipboard, FiChevronDown, FiChevronUp, FiFilter } from 'react
 import { MdOutlineWorkOutline, MdTaskAlt } from 'react-icons/md';
 import TaskList from './ComponentsKnow/Task_Components/TaskList';
 import TaskForm from './ComponentsKnow/Task_Components/TaskForm';
+import {listUsers} from '../../services/UsuarioService';
 
 const Task = () => {
   const [activities, setActivities] = useState([]);
@@ -10,12 +11,22 @@ const Task = () => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [editingTask, setEditingTask] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [usuarios, setUsuarios] = useState([]); // Estado para la lista de usuarios
+  const isAuth = localStorage.getItem("authToken");
 
-  const users = [
-    { id: 1, name: 'Ana López', role: 'Diseñadora', avatar: 'AL' },
-    { id: 2, name: 'Carlos Ruiz', role: 'Desarrollador', avatar: 'CR' },
-    { id: 3, name: 'María García', role: 'QA', avatar: 'MG' }
-  ];
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      await getAllUsers();
+    };
+
+    if (isAuth) fetchUsers();
+  }, [isAuth]);
+
+  async function getAllUsers() {
+      const response = await listUsers(); // Llama al servicio para obtener los usuarios
+      setUsuarios(response.data); // Actualiza el estado con la lista de usuarios
+  }
 
   // Cargar y guardar datos
   useEffect(() => {
@@ -108,7 +119,7 @@ const Task = () => {
         <TaskList 
           tasks={tasks}
           workflows={workflows}
-          users={users}
+          users={usuarios}
           onEditTask={(task) => {
             setEditingTask(task);
             setShowTaskForm(true);
@@ -133,7 +144,7 @@ const Task = () => {
             setEditingTask(null);
           }}
           onSave={handleSaveActivity}
-          users={users}
+          users={usuarios}
           taskToEdit={editingTask}
         />
       )}
