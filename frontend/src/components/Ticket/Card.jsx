@@ -23,7 +23,7 @@ const ICONS = {
 
 const Card = ({ ticket, status}) => {
   const { user } = useSelector((state) => state.auth);
-  const [open, setOpen] = useState(false);  
+  const [open, setOpen] = useState(false);    
 
   return (
     <>
