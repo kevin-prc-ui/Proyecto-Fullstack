@@ -23,6 +23,9 @@ public class Ticket {
     private Long id;
 
     @Column(nullable = false)
+    private String descripcion;
+
+    @Column(nullable = false)
     private String tema;
 
     @Column(nullable = false, unique = true)

@@ -41,7 +41,7 @@ export const UseLogoutHandler = () => {
         mainWindowRedirectUri: "/",
       });
       logout();
-      localStorage.removeItem("authToken");
+      localStorage.clear();
       toast.info("Sesión cerrada correctamente");
     } catch (error) {
       toast.error(`Error al cerrar sesión: ${error.message}`);

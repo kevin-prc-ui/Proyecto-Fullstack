@@ -68,15 +68,18 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
-    public Page<TicketDto> getAllTickets(Pageable pageable) {
-        return ticketRepository.findAllByIsTrashedFalse(pageable)
+    public Page<TicketDto> getAllTickets(Pageable pageable, String departamento) {
+        if (departamento != null)return ticketRepository.findAllByDepartamentoNombreAndIsTrashedFalse(departamento, pageable)
                 .map(ticketMapper::toDto);
+        return ticketRepository.findAllByIsTrashedFalse(pageable).map(ticketMapper::toDto);
     }
 
     @Override
-    public Page<TicketDto> getTickets(Pageable pageable, String filtro) {
-        return ticketRepository.findAllByEstadoNombreAndIsTrashedFalse(filtro, pageable)
-                .map(ticketMapper::toDto);
+    public Page<TicketDto> getTickets(Pageable pageable, String filtro, String departamento) {
+        if (departamento != null )
+            return ticketRepository.findAllByEstadoNombreAndDepartamentoNombreAndIsTrashedFalse(filtro, departamento, pageable)
+                    .map(ticketMapper::toDto);
+        return ticketRepository.findAllByEstadoNombreAndIsTrashedFalse(filtro, pageable).map(ticketMapper::toDto);
     }
 
     @Override

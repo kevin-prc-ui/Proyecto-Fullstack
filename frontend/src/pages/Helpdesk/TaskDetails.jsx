@@ -12,7 +12,6 @@ import {
   FaCalendarAlt,
   FaClock,
   FaExclamationTriangle,
-  FaTag,
 } from "react-icons/fa"; // Iconos para mejorar la UI
 
 /**
@@ -176,17 +175,18 @@ const TaskDetails = () => {
               <DetailItem label="Tema" value={ticket.tema} />
               <DetailItem
                 label="Estado"
-                value={ticket.estado}
+                value={ticket.estadoNombre}
                 badgeColor={getBadgeColor(ticket.estado)}
               />
               <DetailItem
                 label="Prioridad"
-                value={ticket.prioridad}
+                value={ticket.prioridadNombre}
                 badgeColor={getPriorityColor(ticket.prioridad)}
               />
-              <DetailItem label="Fuente" value={ticket.fuente} />
-              <DetailItem label="Incidencia" value={ticket.incidencia} />
-              <DetailItem label="Motivo" value={ticket.motivo} />
+              <DetailItem label="Departamento" value={ticket.departamentoNombre} />
+              <DetailItem label="Incidencia" value={ticket.incidenciaNombre} />
+              <DetailItem label="Motivo" value={ticket.motivoNombre} />
+              <DetailItem label="Fuente" value={ticket.fuenteNombre} />
             </DetailSection>
 
             {/* Sección Fechas */}
@@ -364,17 +364,17 @@ const getBadgeColor = (status) => {
 
   switch (lowerStatus) {
     case "pendiente":
-    case "0": // Añade casos numéricos si tu API los devuelve
-      return "bg-yellow-100 text-yellow-800";
+    case "1": // Añade casos numéricos si tu API los devuelve
+      return "bg-red-100 text-red-800";
     case "en proceso":
     case "en-proceso":
-    case "1": // Añade casos numéricos si tu API los devuelve
-      return "bg-blue-100 text-blue-800";
-    case "completado":
     case "2": // Añade casos numéricos si tu API los devuelve
       return "bg-green-100 text-green-800";
-    case "cancelado":
+    case "completado":
     case "3": // Añade casos numéricos si tu API los devuelve
+      return "bg-yellow-100 text-yellow-800";
+    case "cancelado":
+    case "4": // Añade casos numéricos si tu API los devuelve
       return "bg-red-100 text-red-800";
     default:
       return "bg-gray-100 text-gray-800";

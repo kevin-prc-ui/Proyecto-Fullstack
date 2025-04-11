@@ -6,8 +6,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface TicketService {
     TicketDto createTicket(TicketDto dto);
-    Page<TicketDto> getAllTickets(Pageable pageable);
-    Page<TicketDto> getTickets(Pageable pageable, String filtro);
+    Page<TicketDto> getAllTickets(Pageable pageable, String departamento);
+    Page<TicketDto> getTickets(Pageable pageable, String filtro, String departamento);
     Page<TicketDto> getAllTrashedTickets(Pageable pageable, String filtro);
     TicketDto getTicketById(Long id);
     TicketDto updateTicket(Long id, TicketDto dto);

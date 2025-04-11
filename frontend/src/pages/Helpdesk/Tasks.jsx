@@ -13,8 +13,13 @@ import TaskTitle from "../../components/Ticket/TaskTitle";
 import Title from "../../components/Ticket/Title";
 
 // Servicios y utilidades
-import { listTickets, listFilteredTickets } from "../../services/TicketService";
+import {
+  listTickets,
+  listFilteredTickets,
+  listDepartamentos,
+} from "../../services/TicketService";
 import { TASK_TYPE } from "../../utils/utils"; // Objeto para mapear estados a clases CSS
+import Button from "../../components/Button";
 
 /**
  * @constant TABS
@@ -85,6 +90,12 @@ const Tasks = () => {
     return [0, 1].includes(initialSelected) ? initialSelected : 0;
   });
 
+  // --- New State for Departamentos ---
+  const [departamentos, setDepartamentos] = useState([]);
+  const [selectedDepartamento, setSelectedDepartamento] = useState(""); // Store selected department ID, "" means all
+  const [loadingDepartamentos, setLoadingDepartamentos] = useState(false);
+  // --- End of New State ---
+
   /**
    * @description Estado del ticket extraído de los parámetros de la URL (ej. "pendiente", "en-proceso").
    * Si no hay estado en la URL, es una cadena vacía.
@@ -127,61 +138,94 @@ const Tasks = () => {
    * @param {string} [filterStatus=""] - El estado por el cual filtrar los tickets (opcional).
    * @returns {Promise<void>}
    */
-  const fetchTickets = useCallback(async (page, filterStatus = "") => {
-    setLoading(true);
-    setErrorConexion(false);
+
+  // --- Fetch Departamentos ---
+  const fetchDepartamentos = useCallback(async () => {
+    if (!isAuth) return; // Don't fetch if not authenticated
+    setLoadingDepartamentos(true);
     try {
-      let response;
-      // Llama al servicio correspondiente según si hay filtro de estado o no
-      if (filterStatus) {
-        response = await listFilteredTickets(page, filterStatus);
-      } else {
-        response = await listTickets(page);
-      }
-      // Actualiza el estado con los datos recibidos
-      setTickets(response.data.content);
-      setTotalPages(response.data.totalPages);
+      const response = await listDepartamentos();
+      // Assuming response.data is an array of department objects { id: '...', name: '...' }
+      setDepartamentos(response.data || []);
     } catch (error) {
-      // Manejo de errores
-      setErrorConexion(true);
-      showErrorToast("Error al obtener los tickets.");
-      console.error("Error fetching tickets:", error);
-      // Opcionalmente, limpia los tickets y páginas en caso de error
-      setTickets([]);
-      setTotalPages(0);
+      showErrorToast("Error al cargar los departamentos.");
+      console.error("Error fetching departamentos:", error);
+      setDepartamentos([]); // Clear departamentos on error
     } finally {
-      // Asegura que el estado de carga se desactive al finalizar
-      setLoading(false);
+      setLoadingDepartamentos(false);
     }
-    // Dependencias para useCallback:
-    // - Las funciones de servicio importadas (listTickets, listFilteredTickets) se asumen estables.
-    // - Los setters de estado (setLoading, etc.) son estables por defecto en React.
-    // - showErrorToast es estable porque se define fuera y sus dependencias (toast) son estables.
-    // Por lo tanto, el array de dependencias puede estar vacío o incluir showErrorToast si se prefiere ser explícito.
-  }, []); // Array de dependencias vacío es aceptable aquí.
+  }, [isAuth]); // Dependency on isAuth
+
+  useEffect(() => {
+    fetchDepartamentos();
+  }, [fetchDepartamentos]); // Fetch departamentos on mount or when fetchDepartamentos changes (due to isAuth)
+
+  const fetchTickets = useCallback(
+    async (page, filterStatus = "", filterDepartamento = "") => {
+      setLoading(true);
+      setErrorConexion(false);
+      try {
+        let response;
+        // Pass departmentId to the service functions
+        if (filterStatus) {
+          response = await listFilteredTickets(
+            page,
+            filterStatus,
+            filterDepartamento
+          );
+        } else {
+          response = await listTickets(page, filterDepartamento);
+        }
+        setTickets(response.data.content);
+        setTotalPages(response.data.totalPages);
+      } catch (error) {
+        setErrorConexion(true);
+        showErrorToast("Error al obtener los tickets.");
+        console.error("Error fetching tickets:", error);
+        setTickets([]);
+        setTotalPages(0);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  ); // Array de dependencias vacío es aceptable aquí.
 
   /**
    * @effect Ejecuta `fetchTickets` cuando cambian la autenticación, la página,
    * el estado del filtro o la propia función `fetchTickets` (aunque esta última es estable por `useCallback`).
    * Se activa al montar el componente y cada vez que una de estas dependencias cambia.
    */
+  // --- Update useEffect to fetch tickets when department changes ---
   useEffect(() => {
     if (isAuth) {
-      // Llama a fetchTickets con la página actual y el estado del filtro
-      fetchTickets(pagina, status);
+      // Pass selectedDepartamento to fetchTickets
+      fetchTickets(pagina, status, selectedDepartamento);
     }
-    // fetchTickets está memoizada con useCallback, por lo que no causará ejecuciones innecesarias.
-    // Se incluye isAuth para reaccionar a cambios de login/logout (aunque recargar la página suele ser más común).
-    // Se incluye pagina y status para reaccionar a cambios de paginación o filtro.
-  }, [isAuth, pagina, status, fetchTickets]);
+    // Add selectedDepartamento to the dependency array
+  }, [isAuth, pagina, status, selectedDepartamento, fetchTickets]);
 
   /**
    * @effect Reinicia la paginación a la primera página (índice 0)
    * cada vez que cambia el filtro de estado (`status`).
    */
+
+  // --- Update useEffect to reset page when department changes ---
   useEffect(() => {
     setPagina(0);
-  }, [status]);
+  }, [status, selectedDepartamento]); // Reset page if status OR department changes
+
+  // --- Handler for Departamento Change ---
+  const handleDepartamentoChange = useCallback((departamento) => {
+    setSelectedDepartamento(departamento);
+    // No need to call fetchTickets here, the useEffect above will handle it
+  }, []); // No dependencies needed as setSelectedDepartamento is stable
+
+  // --- Navigation Handler for Create Ticket ---
+  const handleCreateTicket = () => {
+    navigate("/create-ticket"); // Or your actual route for creating a ticket
+  };
+  // --- End Navigation Handler ---
 
   /**
    * @function nextPage
@@ -206,6 +250,26 @@ const Tasks = () => {
       setPagina(pagina - 1);
     }
   }
+
+  // Determine the title based on filters
+  const getPageTitle = () => {
+    let title = "Tickets";
+    if (status) {
+      title += ` ${status.replace("-", " ")}`;
+    }
+    if (selectedDepartamento && departamentos.length > 0) {
+      const dept = departamentos.find(
+        (d) => d.nombre.toString() === selectedDepartamento
+      );
+      if (dept) {
+        title += ` en ${dept.nombre}`;
+      }
+    }
+    if (!status && !selectedDepartamento) {
+      title = "Todos los Tickets";
+    }
+    return title;
+  };
 
   /**
    * @function getTaskTypeClass
@@ -247,12 +311,7 @@ const Tasks = () => {
       enterTo="opacity-100"
       className="w-full" // Asegura que ocupe todo el ancho disponible
     >
-      {/* Título de la página, dinámico según el filtro de estado */}
-      <Title
-        title={
-          status ? `Tickets ${status.replace("-", " ")}` : "Todos los Tickets"
-        }
-      />
+      <Title title={getPageTitle()} />
 
       {/* Pestañas para cambiar entre vista de Cuadrícula y Lista */}
       <Tabs
@@ -260,6 +319,10 @@ const Tasks = () => {
         selected={selected}
         setSelected={handleTabChange}
         status={status}
+        departamentos={departamentos}
+        selectedDepartamento={selectedDepartamento}
+        onDepartamentoChange={handleDepartamentoChange}
+        onCreateTicket={handleCreateTicket}
       >
         {/* Renderizado condicional de los títulos de columna (solo en vista Cuadrícula y sin filtro de estado) */}
         {!status &&
@@ -318,8 +381,9 @@ const Tasks = () => {
       {!loading && !errorConexion && tickets.length === 0 && (
         <div className="text-gray-500 text-center mt-4">
           No se encontraron tickets
-          {/* Añade información sobre el filtro si está activo */}
-          {status ? ` con el estado "${status.replace("-", " ")}"` : ""}.
+          {status ? ` con el estado "${status.replace("-", " ")}"` : ""}
+          {selectedDepartamento ? ` en el departamento seleccionado` : ""}
+          .
         </div>
       )}
     </Transition>

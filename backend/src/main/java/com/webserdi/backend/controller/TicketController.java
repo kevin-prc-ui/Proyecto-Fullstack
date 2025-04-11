@@ -10,8 +10,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/tickets")
 @RequiredArgsConstructor
@@ -26,15 +24,18 @@ public class TicketController {
     }
 
     @GetMapping("/all")
-    public Page<TicketDto> getAllTickets( @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable) {
-        return ticketService.getAllTickets(pageable);
+    public Page<TicketDto> getAllTickets(
+            @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable,
+            @RequestParam(required = false) String departamento) {
+        return ticketService.getAllTickets(pageable, departamento);
     }
 
     @GetMapping()
     public Page<TicketDto> getTickets(
             @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable,
-            @RequestParam(required = false) String filtro) {
-        return ticketService.getTickets(pageable, filtro);
+            @RequestParam(required = false) String filtro,
+            @RequestParam(required = false) String departamento) {
+        return ticketService.getTickets(pageable, filtro, departamento);
     }
 
     @GetMapping("/trashed")

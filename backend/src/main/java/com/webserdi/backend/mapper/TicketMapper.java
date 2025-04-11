@@ -21,11 +21,17 @@ public class TicketMapper {
         ticketDto.setUsuarioCreadorNombres(ticket.getUsuarioCreador().getNombre()+" "+ticket.getUsuarioCreador().getApellido());
         ticketDto.setUsuarioAsignadoNombres(ticket.getUsuarioAsignado().getNombre() +" "+ticket.getUsuarioAsignado().getApellido());
         ticketDto.setDepartamento(ticket.getDepartamento().getId());
+        ticketDto.setDepartamentoNombre(ticket.getDepartamento().getNombre());
         ticketDto.setFuente(ticket.getFuente().getId());
+        ticketDto.setFuenteNombre(ticket.getFuente().getNombre());
         ticketDto.setIncidencia(ticket.getIncidencia().getId());
+        ticketDto.setIncidenciaNombre(ticket.getIncidencia().getNombre());
         ticketDto.setMotivo(ticket.getMotivo().getId());
+        ticketDto.setMotivoNombre(ticket.getMotivo().getNombre());
         ticketDto.setPrioridad(ticket.getPrioridad().getId());
+        ticketDto.setPrioridadNombre(ticket.getPrioridad().getNombre());
         ticketDto.setEstado(ticket.getEstado().getId());
+        ticketDto.setEstadoNombre(ticket.getEstado().getNombre());
         return ticketDto;
     }
 

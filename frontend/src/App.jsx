@@ -46,7 +46,6 @@ function Layout() {
             <Sidebar />
           </div>
         )}
-
         {/* Contenido principal */}
         <div
           className={`w-full flex flex-col overflow-y-auto ${
@@ -66,7 +65,7 @@ function Layout() {
 
 function App() {
   const isAuthenticated = localStorage.getItem("authToken");
-
+  
   if (!isAuthenticated)
     return (
       <main className="w-full min-h-screen bg-[#e7ebf3] ">
@@ -87,14 +86,12 @@ function App() {
       <main className="w-full min-h-screen bg-[#e7ebf3] ">
         <Routes>
           <Route index path="/" element={<Navigate to="/dashboard" />} />
-
           {/* Rutas públicas */}
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/signup" element={<MicrosoftSignUp />} />
             <Route path="/notfound" element={<NotFound />} />
           </Route>
-
           {/* Rutas protegidas para usuarios autenticados */}
           <Route
             element={
@@ -121,7 +118,6 @@ function App() {
               <Route path="/notfound" element={<NotFound />} />
             </Route>
           </Route>
-
           {/* Rutas solo para administradores */}
           <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
             <Route element={<Layout />}>
