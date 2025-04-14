@@ -27,7 +27,7 @@ const Home = () => {
               <option value="recent">Recientes</option>
             </select>
           </div>
-          <p>Aquí puedes gestionar tus sitios web.</p>
+          <p>Aquí puedes gestionar tus sitios</p>
         </div>
 
         {/* Contenedor 2: Mis Actividades */}
