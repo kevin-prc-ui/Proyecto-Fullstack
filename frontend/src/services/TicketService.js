@@ -62,7 +62,6 @@ export const listTickets = (page, departamento = "") => {
   }
 
   const url = `${REST_API_BASE_URL}/tickets/all?${params.toString()}`;
-  console.log("Requesting URL (listTickets):", url); // For debugging
 
   return axios.get(url, getHeaders()).catch((error) => {
     if (!error.response) {
@@ -95,8 +94,6 @@ export const listFilteredTickets = (page, status, departamento = "") => {
   }
 
   const url = `${REST_API_BASE_URL}/tickets?${params.toString()}`;
-  console.log("Requesting URL (listFilteredTickets):", url); // For debugging
-
   return axios.get(url, getHeaders()).catch((error) => {
     if (!error.response) {
       console.error("Network Error or Server Down:", error.message);
@@ -113,8 +110,6 @@ export const listTrashedTickets = (page) => {
     size: 8,
   });
   const url = `${REST_API_BASE_URL}/tickets/trashed?${params.toString()}`;
-  console.log("Requesting URL (listTrashedTickets):", url); // For debugging
-
   return axios.get(url, getHeaders()).catch((error) => {
     if (!error.response) {
       console.error("Network Error or Server Down:", error.message);
@@ -128,6 +123,10 @@ export const listTrashedTickets = (page) => {
 
 export const deleteTicket = (ticketId) =>
   axios.delete(`${REST_API_BASE_URL}/tickets/${ticketId}`, getHeaders());
+
+export const restoreTicket = (ticketId) =>
+  axios.post(`${REST_API_BASE_URL}/tickets/restore/${ticketId}`, getHeaders());
+
 
 // Add other necessary functions like createTicket, updateTicket if needed...
 

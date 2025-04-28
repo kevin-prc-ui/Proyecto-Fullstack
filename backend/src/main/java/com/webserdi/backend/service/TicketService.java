@@ -12,4 +12,5 @@ public interface TicketService {
     TicketDto getTicketById(Long id);
     TicketDto updateTicket(Long id, TicketDto dto);
     void deleteTicket(Long id);
+    void restoreTicket(Long id);
 }

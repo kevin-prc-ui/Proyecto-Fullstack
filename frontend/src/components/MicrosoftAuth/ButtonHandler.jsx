@@ -33,6 +33,7 @@ export const UseLoginHandler = () => {
 };
 
 export const UseLogoutHandler = () => {
+  
   const { instance } = useMsal();
   const handleLogout = () => {
     try {

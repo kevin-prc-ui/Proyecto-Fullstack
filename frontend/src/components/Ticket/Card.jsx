@@ -6,7 +6,6 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
-import { useSelector } from "react-redux";
 import { BGS, PRIOTITYSTYELS,PRIORITYNAMES, TICKET_TYPE, formatDate } from "../../utils/utils";//CREATE
 import ConfirmationDialog from "./ConfirmationDialog";//CREATE
 import { BiMessageAltDetail } from "react-icons/bi";
@@ -22,7 +21,6 @@ const ICONS = {
 };
 
 const Card = ({ ticket, status}) => {
-  const { user } = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);    
 
   return (
@@ -40,7 +38,6 @@ const Card = ({ ticket, status}) => {
             <span className="uppercase">prioridad {PRIORITYNAMES[ticket?.prioridad]} </span>
           </div>
 
-          {user?.isAdmin && <ConfirmationDialog ticket={ticket} />}
         </div>
         <>
           <a href={`/helpdesk/task/${ticket.id}`} className="flex items-center gap-2 hover:text-blue-700 text-decoration-none">

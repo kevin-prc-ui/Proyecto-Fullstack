@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiMessageAltDetail } from "react-icons/bi";
 import {
   MdAttachFile,
@@ -20,7 +20,7 @@ import { FaList } from "react-icons/fa";
 import UserInfo from "../../components/Users/UserInfo";
 import Button from "../../components/Button";
 import ConfirmationDialog from "../../components/Ticket/ConfirmationDialog";
-import { deleteTicket, listTrashedTickets } from "../../services/TicketService";
+import { restoreTicket, listTrashedTickets } from "../../services/TicketService";
 
 const ICONS = {
   1: <MdKeyboardDoubleArrowUp />,
@@ -61,15 +61,15 @@ const Trash = ( ) => {
       if (isAuth) fetchTickets();
     }, [isAuth, pagina, selected]);
 
-  const deleteClicks = (id) => {
+  const restoreClicks = (id) => {
     setSelected(id);
     setOpenDialog(true);
   };
 
-  const deleteHandler = () => {
-    deleteTicket(selected);
+  const restoreHandler = () => {
+    restoreTicket(selected);
     setOpenDialog(false);
-    window.location.reload();
+    // window.location.reload();
     toast.success("Ticket deleted successfully");
   };
 
@@ -168,13 +168,8 @@ const Trash = ( ) => {
           className="text-green-700 hover:text-red-500 sm:px-0 text-sm md:text-base"
           label="Recuperar"
           type="button"
-          onClick={() => deleteClicks(ticket.id)}
-        /><Button
-        className="text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base"
-        label="Eliminar"
-        type="button"
-        onClick={() => deleteClicks(ticket.id)}
-      />
+          onClick={() => restoreClicks(ticket.id)}
+        />
       </td>
     </tr>
   );
@@ -198,7 +193,7 @@ const Trash = ( ) => {
       <ConfirmationDialog
         open={openDialog}
         setOpen={setOpenDialog}
-        onClick={deleteHandler}
+        onClick={restoreHandler}
       />
     </>
   );

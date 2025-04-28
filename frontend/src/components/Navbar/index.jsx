@@ -3,6 +3,7 @@ import MicrosoftLoginButton from "../MicrosoftAuth/LoginButton";
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
+  useMsal,
 } from "@azure/msal-react";
 
 const Index = () => {
@@ -20,14 +21,27 @@ const Index = () => {
             width={"100%"}
           />
         </a>
-        <AuthenticatedTemplate/>
-        <UnauthenticatedTemplate>
-          <div className="card-title">
-            Inicia sesión para ver tu información de perfil.
-          </div>
-        </UnauthenticatedTemplate>
+        <AuthenticatedTemplate>
+          <ProfileContent/>
+        </AuthenticatedTemplate>
+        <UnauthenticatedTemplate/>
         <MicrosoftLoginButton /> {/* Reemplaza el Button anterior */}
       </Navbar>
+    </>
+  );
+};
+const ProfileContent = () => {
+  const { accounts } = useMsal();
+  const isAuthenticated = localStorage.getItem("authToken");
+  if (!isAuthenticated)
+    return (
+      <div className="card-title">
+        Inicia sesión para ver tu información de perfil.
+      </div>
+    );
+  else return (
+    <>
+      <div className="">Bienvenido, {accounts[0].name}!</div>
     </>
   );
 };

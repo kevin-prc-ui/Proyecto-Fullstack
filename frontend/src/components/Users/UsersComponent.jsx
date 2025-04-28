@@ -19,17 +19,17 @@ const UsersComponent = () => {
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
-  const [rol, setRol] = useState([]);
+  const [rol, setRol] = useState("");
   const [selectedPermisos, setSelectedPermisos] = useState([]);
   const [permisosDisponibles, setPermisosDisponibles] = useState([]);
-  const [roles, setRoles] = useState([]);
+  const [roles, setRoles] = useState([]); // Esto guarda una lista de los roles disponibles
 
   // Estado para almacenar los errores de validación
   const [errors, setErrors] = useState({
     nombre: "",
     apellido: "",
     email: "",
-    rol: "",
+    rol: "", 
   });
 
   const { id } = useParams(); // Obtiene el ID del usuario de los parámetros de la URL
@@ -52,25 +52,23 @@ const UsersComponent = () => {
         const data = await response.data;
         setRoles(data);
       } catch (error) {
-        toast.error("Error al cargar los roles",error);
+        toast.error("Error al cargar los roles", error);
       }
     };
     fetchRoles();
   }, []);
 
-  //Efecto para cargar los permisos disponibles
   useEffect(() => {
     const fetchPermisos = async () => {
       try {
         const response = await axios.get("/api/permisos", getHeaders());
         const data = await response.data;
-        // Filter permissions with modulo_id=1
         const filteredPermisos = data.filter(
           (permiso) => permiso.moduloId === 1
         );
         setPermisosDisponibles(filteredPermisos);
       } catch (error) {
-        toast.error("Error al cargar los permisos",error);
+        toast.error("Error al cargar los permisos", error);
       }
     };
     fetchPermisos();
@@ -85,16 +83,24 @@ const UsersComponent = () => {
       setLoading(true);
       getUserById(id) // Llama al servicio para obtener el usuario por ID
         .then((response) => {
-          setNombre(response.data.nombre);
-          setApellido(response.data.apellido);
-          setEmail(response.data.email);
-          setRol(response.data.rol);
-          setSelectedPermisos(response.data.permisos || []);
+          const userData = response.data;
+          setNombre(userData.nombre);
+          setApellido(userData.apellido);
+          setEmail(userData.email);
+          setRol(userData.roles && userData.roles.length > 0 ? userData.roles[0] : "");
+          setSelectedPermisos(userData.permisos || []);
         })
         .catch((error) => {
-          toast.error("Error al cargar el usuario",error);
+          toast.error("Error al cargar el usuario", error);
         })
         .finally(() => setLoading(false));
+    } else {
+      setNombre("");
+      setApellido("");
+      setEmail("");
+      setRol("");
+      setSelectedPermisos([]);
+      setErrors({ nombre: "", apellido: "", email: "", rol: "" });
     }
   }, [id]);
 
@@ -117,12 +123,13 @@ const UsersComponent = () => {
       nombre,
       apellido,
       email,
-      roles: [rol],
+      roles: rol ? [rol] : [],
       permisos: selectedPermisos,
     };
-    console.log(userData);
-    // Verifica si el formulario es válido
-    if (!isFormValid(userData)) return; // Si no es valido, retorna sin ejecutar la peticion
+
+    // Pass the single rol string for validation
+    if (!isFormValid({ nombre, apellido, email, rol })) return;
+
     setLoading(true);
     try {
       if (id) {
@@ -134,7 +141,10 @@ const UsersComponent = () => {
       }
       navigator("/admin/users"); // Navega a la lista de usuarios
     } catch (error) {
-      toast.error(error, "Error al guardar los cambios del usuario");
+      // Improved error logging
+      const errorMessage = error.response?.data?.message || error.message || "Error desconocido";
+      toast.error(`Error al guardar los cambios del usuario: ${errorMessage}`);
+      console.error("Save/Update User Error:", error.response || error);
     } finally {
       setLoading(false);
     }
@@ -146,39 +156,40 @@ const UsersComponent = () => {
    */
   const isFormValid = (formData) => {
     let valid = true;
-    const errorsCopy = { ...errors }; // Creamos una copia para no modificar el original directamente
+    const newErrors = {
+        nombre: "",
+        apellido: "",
+        email: "",
+        rol: "",
+    };
 
     // Validaciones
-    if (formData.nombre.trim() === "") {
-      errorsCopy.nombre = "El nombre es obligatorio";
+    if (!formData.nombre || formData.nombre.trim() === "") {
+      newErrors.nombre = "El nombre es obligatorio";
       valid = false;
-    } else {
-      errorsCopy.nombre = "";
     }
 
-    if (formData.apellido.trim() === "") {
-      errorsCopy.apellido = "El apellido es obligatorio";
+    if (!formData.apellido || formData.apellido.trim() === "") {
+      newErrors.apellido = "El apellido es obligatorio";
       valid = false;
-    } else {
-      errorsCopy.apellido = "";
     }
 
-    if (formData.email.trim() === "") {
-      errorsCopy.email = "El email es obligatorio";
+    if (!formData.email || formData.email.trim() === "") {
+      newErrors.email = "El email es obligatorio";
       valid = false;
-    } else {
-      errorsCopy.email = "";
+    }
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = "El formato del email no es válido";
+        valid = false;
     }
 
-    if (formData.roles[0].trim() === "") {
-      errorsCopy.roles = "El Rol es obligatorio";
+    if (!formData.rol || formData.rol.trim() === "") {
+      newErrors.rol = "El Rol es obligatorio";
       valid = false;
-    } else {
-      errorsCopy.roles = "";
     }
 
     // Actualizamos los errores
-    setErrors(errorsCopy);
+    setErrors(newErrors);
     return valid;
   };
 
@@ -196,135 +207,141 @@ const UsersComponent = () => {
 
   return (
     <>
-      <div className="container">
-        <div className="row">
-          <div className="card col-md-6 offset-md-3">
-            <div className="text-center">{pageTitle()}</div>
+      <div className="container mt-4"> 
+        <div className="row justify-content-center"> 
+          <div className="card col-md-8 col-lg-6"> 
+            <div className="card-header text-center">{pageTitle()}</div> 
             <div className="card-body">
               {/* Formulario */}
-              <form>
+              <Form noValidate onSubmit={saveOrUpdateUser}> 
                 {/* Nombre */}
-                <div className="form-group mb-2">
-                  <label className="form-label">Nombre:</label>
-                  <input
+                <Form.Group className="mb-3" controlId="formNombre">
+                  <Form.Label>Nombre:</Form.Label>
+                  <Form.Control
                     required
                     type="text"
                     placeholder="Ingresa el nombre"
                     name="nombre"
                     value={nombre}
-                    className={`form-control ${
-                      errors.nombre ? "is-invalid" : ""
-                    }`}
                     onChange={(e) => setNombre(e.target.value)}
+                    isInvalid={!!errors.nombre} 
                   />
-                  {errors.nombre && (
-                    <div className="invalid-feedback">{errors.nombre}</div>
-                  )}
-                </div>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.nombre}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
                 {/* Apellido */}
-                <div className="form-group mb-2">
-                  <label className="form-label">Apellido:</label>
-                  <input
+                <Form.Group className="mb-3" controlId="formApellido">
+                  <Form.Label>Apellido:</Form.Label>
+                  <Form.Control
                     required
                     type="text"
-                    placeholder="Ingresa el apelido"
+                    placeholder="Ingresa el apellido" 
                     name="apellido"
                     value={apellido}
-                    className={`form-control ${
-                      errors.apellido ? "is-invalid" : ""
-                    }`}
                     onChange={(e) => setApellido(e.target.value)}
+                    isInvalid={!!errors.apellido}
                   />
-                  {errors.apellido && (
-                    <div className="invalid-feedback">{errors.apellido}</div>
-                  )}
-                </div>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.apellido}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
                 {/* Email */}
-                <div className="form-group mb-2">
-                  <label className="form-label">Email:</label>
-                  <input
+                <Form.Group className="mb-3" controlId="formEmail">
+                  <Form.Label>Email:</Form.Label>
+                  <Form.Control
                     required
-                    type="text"
+                    type="email" 
                     placeholder="Ingresa el Email"
-                    name="Email"
+                    name="email" 
                     value={email}
-                    className={`form-control ${
-                      errors.email ? "is-invalid" : ""
-                    }`}
                     onChange={(e) => setEmail(e.target.value)}
+                    isInvalid={!!errors.email}
                   />
-                  {errors.email && (
-                    <div className="invalid-feedback">{errors.email}</div>
-                  )}
-                </div>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.email}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
                 {/* Rol */}
-                <div className="form-group mb-2">
-                  <label className="form-label">Rol:</label>
-                  <select
+                <Form.Group className="mb-3" controlId="formRol">
+                  <Form.Label>Rol:</Form.Label>
+                  <Form.Select 
                     required
                     name="rol"
+                    value={rol} 
                     onChange={(e) => setRol(e.target.value)}
-                    className={`form-control ${errors.rol ? "is-invalid" : ""}`}
+                    isInvalid={!!errors.rol}
                   >
-                    <option value="">Seleccione</option>
-                    {roles.map((rol) => (
-                      <option key={rol.nombre} value={rol.nombre}>
-                        {rol.nombre}
+                    <option value="">Seleccione un rol</option>
+                    {roles.map((r) => ( 
+                      <option key={r.nombre} value={r.nombre}>
+                        {r.nombre}
                       </option>
                     ))}
-                  </select>
-                  {errors.rol && (
-                    <div className="invalid-feedback">{errors.rol}</div>
-                  )}
-                </div>
-                <Form.Group>
-                  <Form.Label>Permisos:</Form.Label>
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.rol}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                {/* Permisos */}
+                <Form.Group className="mb-3"> 
+                  <Form.Label>Permisos (Módulo Usuarios):</Form.Label>
                   <Row>
-                    {permisosDisponibles.map((permiso) => (
-                      <Col key={permiso.nombre} md={6}>
-                        <Form.Check
-                          type="checkbox"
-                          id={permiso.nombre}
-                          label={permiso.nombre}
-                          checked={selectedPermisos.includes(permiso.nombre)}
-                          onChange={() =>
-                            handlePermissionChange(permiso.nombre)
-                          }
-                          className="mb-2"
-                        />
+                    {permisosDisponibles.length > 0 ? (
+                      permisosDisponibles.map((permiso) => (
+                        <Col key={permiso.nombre} md={6}>
+                          <Form.Check
+                            type="checkbox"
+                            id={`permiso-${permiso.nombre}`} 
+                            label={permiso.nombre}
+                            checked={selectedPermisos.includes(permiso.nombre)}
+                            onChange={() =>
+                              handlePermissionChange(permiso.nombre)
+                            }
+                            className="mb-2"
+                          />
+                        </Col>
+                      ))
+                    ) : (
+                      <Col>
+                        <small className="text-muted">No hay permisos de usuario disponibles.</small>
                       </Col>
-                    ))}
+                    )}
                   </Row>
                 </Form.Group>
-                {/* Botones */}
                 {loading && (
-                  <Alert variant="info" className="mt-3">
+                  <Alert variant="info" className="mt-3 text-center">
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     Cargando...
                   </Alert>
                 )}
-                <div className="flex justify-content-evenly">
+
+                {/* Botones */}
+                <div className="d-flex justify-content-evenly mt-4"> 
                   <Button
-                    className="btn btn-success"
-                    onClick={saveOrUpdateUser}
+                    variant="success"
+                    type="submit" 
+                    disabled={loading} 
                   >
-                    Enviar
+                    {id ? "Actualizar" : "Guardar"} 
                   </Button>
                   <Button
-                    className="btn btn-danger"
+                    variant="danger" 
                     onClick={() => navigator("/admin/users")}
+                    disabled={loading}
                   >
                     Cancelar
                   </Button>
                 </div>
-                {/* Permisos */}
-                <div className="flex justify-content-evenly">
-                  <div className="form-group mb-4"></div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
+              </Form>
+            </div> 
+          </div> 
+        </div> 
+      </div> 
     </>
   );
 };

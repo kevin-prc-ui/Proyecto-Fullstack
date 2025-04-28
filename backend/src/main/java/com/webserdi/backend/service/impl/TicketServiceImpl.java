@@ -122,6 +122,15 @@ public class TicketServiceImpl implements TicketService {
         ticketRepository.save(ticket);
     }
 
+    @Override
+    public void restoreTicket(Long id) {
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado"));
+        ticket.setIsTrashed(false);
+        ticket.setFechaActualizacion(LocalDateTime.now());
+        ticketRepository.save(ticket);
+    }
+
     private String generateNextCodigo() {
         String maxCodigo = ticketRepository.findMaxCodigo();
 

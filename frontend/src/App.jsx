@@ -1,7 +1,6 @@
 import MicrosoftSignUp from "./components/MicrosoftAuth/SignupButton";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import UsersComponent from "./components/Users/UsersComponent";
-import { useIsAuthenticated } from "@azure/msal-react";
 import TaskDetails from "./pages/Helpdesk/TaskDetails";
 import SharedFile from "./pages/Knowledge/SharedFile";
 import Repository from "./pages/Knowledge/Repository";
