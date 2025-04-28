@@ -22,8 +22,8 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String descripcion;
+//    @Column(nullable = false)
+//    private String descripcion;
 
     @Column(nullable = false)
     private String tema;
