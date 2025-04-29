@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getTicketById } from "../../services/TicketService";
+import { listTickets } from "../../services/TicketService";
 import { toast } from "sonner";
 import {
   FaPaperPlane,
@@ -13,6 +14,8 @@ import {
   FaClock,
   FaExclamationTriangle,
 } from "react-icons/fa"; // Iconos para mejorar la UI
+import { listMessages } from "../../services/ChatService";
+import Chat from "../../components/Chat"
 
 /**
  * @component TaskDetails
@@ -48,6 +51,16 @@ const TaskDetails = () => {
    * @type {string | null}
    */
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (id) {
+      listMessages(id).then((response) => {
+        if (response.data) {
+          console.log(response.data.content);
+        }
+      });
+    }
+  }, []);
 
   /**
    * @effect fetchTicketDetails
@@ -183,7 +196,10 @@ const TaskDetails = () => {
                 value={ticket.prioridadNombre}
                 badgeColor={getPriorityColor(ticket.prioridad)}
               />
-              <DetailItem label="Departamento" value={ticket.departamentoNombre} />
+              <DetailItem
+                label="Departamento"
+                value={ticket.departamentoNombre}
+              />
               <DetailItem label="Incidencia" value={ticket.incidenciaNombre} />
               <DetailItem label="Motivo" value={ticket.motivoNombre} />
               <DetailItem label="Fuente" value={ticket.fuenteNombre} />
@@ -230,34 +246,7 @@ const TaskDetails = () => {
         </div>
 
         {/* Columna Derecha: Chat (Placeholder) */}
-        <div className="w-full md:w-1/3 lg:w-1/4 bg-white rounded-lg shadow-md flex flex-col p-2">
-          <div className=" text-xl font-semibold text-gray-800 mb-4 border-b pb-2 flex items-center">
-            <FaComments className="mr-2 text-indigo-600" />
-            Chat del Ticket
-          </div>
-          {/* Área de Mensajes (Placeholder) */}
-          <div className="flex-grow border border-gray-200 rounded-md p-4 mb-4 bg-gray-50 flex items-center justify-center text-center">
-            <p className="text-gray-500 italic">
-              La funcionalidad de chat estará disponible próximamente.
-            </p>
-          </div>
-          {/* Input de Mensaje (Placeholder) */}
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              placeholder="Escribe tu mensaje..."
-              className="flex-1 border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-              // Deshabilitado hasta que se implemente
-            />
-            <button
-              className="p-2 rounded bg-blue-500 text-white m-1 hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              // Deshabilitado
-              aria-label="Enviar mensaje"
-            >
-              <FaPaperPlane />
-            </button>
-          </div>
-        </div>
+        <Chat/>
       </div>
     </div>
   );

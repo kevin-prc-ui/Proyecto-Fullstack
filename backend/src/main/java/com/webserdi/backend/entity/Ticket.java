@@ -73,9 +73,17 @@ public class Ticket {
     @JoinColumn(name = "prioridad_id", nullable = false)
     private Prioridad prioridad;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "chat_id")
-//    private Chat chat;
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, optional = false, orphanRemoval = true)
+    @JoinColumn(name = "chat_id", referencedColumnName = "id", unique = true) // Foreign key in Ticket table
+    private Chat chat;
+
+    @PrePersist
+    private void ensureChatExists() {
+        if (this.chat == null) {
+            this.chat = new Chat();
+            // No need to set ticket here, JPA handles it via @JoinColumn
+        }
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "estado_id", nullable = false)

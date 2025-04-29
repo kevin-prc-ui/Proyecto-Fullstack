@@ -59,4 +59,9 @@ public class TicketController {
     public void deleteTicket(@PathVariable Long id) {
         ticketService.deleteTicket(id);
     }
+
+    @PutMapping("/restore/{id}")
+    public void restoreTicket(@PathVariable Long id) {
+        ticketService.restoreTicket(id);
+    }
 }
