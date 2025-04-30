@@ -16,7 +16,8 @@ const Index = () => {
       >
         <a className="w-45" href="/">
           <img
-            src="https://serdiaceros.com.mx/wp-content/uploads/2022/08/SERDI-logo-web-1.png"
+            // src="https://serdiaceros.com.mx/wp-content/uploads/2022/08/SERDI-logo-web-1.png"
+            src="https://tienda.serdi.com.mx/static/media/LOGO%20COLOR_navbar.0c4356a0.svg"
             alt=""
             width={"100%"}
           />

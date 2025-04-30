@@ -33,6 +33,7 @@ public class ChatServiceImpl implements ChatService {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatServiceImpl.class);
     private static final List<String> ALLOWED_IMAGE_TYPES = Arrays.asList(MimeTypeUtils.IMAGE_JPEG_VALUE, MimeTypeUtils.IMAGE_PNG_VALUE, MimeTypeUtils.IMAGE_GIF_VALUE);
+    private static final String ALLOWED_PDF_TYPE = "application/pdf";
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 
     private final TicketRepository ticketRepository;
@@ -96,9 +97,12 @@ public class ChatServiceImpl implements ChatService {
 
             if (ALLOWED_IMAGE_TYPES.contains(file.getContentType())) {
                 message.setMessageType(ChatMessage.MessageType.IMAGE);
+            }else if (ALLOWED_PDF_TYPE.equals(file.getContentType())) {
+                message.setMessageType(ChatMessage.MessageType.PDF);
             }
+
             // Optionally set content based on file type, or leave it null
-            // message.setContent("Archivo adjunto: " + message.getAttachmentFilename());
+             message.setContent("Archivo adjunto: " + message.getAttachmentFilename());
 
         } else if (messageDto.getContent() != null && !messageDto.getContent().isBlank()) {
             // Handle text message

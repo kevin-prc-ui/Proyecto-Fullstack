@@ -1,134 +1,243 @@
-// c:\React\Proyecto-Fullstack\frontend\src\pages\Helpdesk\TaskDetails.jsx
-import React, { useEffect, useState } from "react";
+// c:\React\Proyecto\frontend\src\pages\Helpdesk\TaskDetails.jsx
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { getTicketById } from "../../services/TicketService";
-import { listTickets } from "../../services/TicketService";
-import { toast } from "sonner";
-import {
-  FaPaperPlane,
-  FaComments,
-  FaTicketAlt,
-  FaInfoCircle,
-  FaUser,
-  FaCalendarAlt,
-  FaClock,
-  FaExclamationTriangle,
-} from "react-icons/fa"; // Iconos para mejorar la UI
+// Assuming listMessages fetches messages for a TICKET ID and backend links it to chat
 import { listMessages } from "../../services/ChatService";
-import Chat from "../../components/Chat"
+import { toast } from "sonner";
+import { Client } from '@stomp/stompjs'; // Import StompJS Client
+import {
+  FaPaperPlane, FaComments, FaTicketAlt, FaInfoCircle, FaUser,
+  FaCalendarAlt, FaClock, FaExclamationTriangle, FaSpinner,
+} from "react-icons/fa";
+import ChatComponent from "../../components/Chat"; // Renamed import for clarity
+
+// --- Configuration ---
+const WEBSOCKET_URL = 'ws://localhost:8080/ws'; // Replace with your backend WebSocket URL
+const CHAT_SUB_TOPIC = '/ticket/chat/'; // Base topic for chat subscriptions
+const CHAT_SEND_ENDPOINT = '/app/chat/'; // Base endpoint for sending messages
+
+// --- Mock Current User ID (Replace with your actual auth logic) ---
+const MOCK_CURRENT_USER_ID = 11; // Example: Get this from context or auth state
 
 /**
  * @component TaskDetails
- * @description Muestra los detalles completos de un ticket específico obtenido por su ID.
- * Incluye información del ticket y una sección placeholder para un futuro chat.
- * @returns {JSX.Element} El componente renderizado con los detalles del ticket.
+ * @description Muestra los detalles completos de un ticket y su chat asociado.
  */
 const TaskDetails = () => {
   const params = useParams();
-  /**
-   * @description ID del ticket obtenido de los parámetros de la URL.
-   * @type {string}
-   */
-  const id = params?.id || "";
+  const id = params?.id || ""; // Ticket ID
 
-  /**
-   * @state loading
-   * @description Indica si los datos del ticket se están cargando.
-   * @type {boolean}
-   */
-  const [loading, setLoading] = useState(true); // Inicia en true ya que siempre cargará al inicio
-
-  /**
-   * @state ticket
-   * @description Almacena los datos del ticket obtenidos de la API. Null si no se encuentra o hay error.
-   * @type {object | null}
-   */
+  // --- Ticket State ---
+  const [loadingTicket, setLoadingTicket] = useState(true);
   const [ticket, setTicket] = useState(null);
+  const [ticketError, setTicketError] = useState(null);
 
-  /**
-   * @state error
-   * @description Almacena un mensaje de error si la carga falla.
-   * @type {string | null}
-   */
-  const [error, setError] = useState(null);
+  // --- Chat State ---
+  const [chatMessages, setChatMessages] = useState([]);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false); // Separate loading for messages
+  const [stompClient, setStompClient] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [chatError, setChatError] = useState(null); // WebSocket/STOMP specific errors
+  const subscriptionRef = useRef(null); // To hold the subscription object
 
+  // --- Fetch Ticket Details ---
   useEffect(() => {
     if (id) {
-      listMessages(id).then((response) => {
-        if (response.data) {
-          console.log(response.data.content);
-        }
-      });
-    }
-  }, []);
-
-  /**
-   * @effect fetchTicketDetails
-   * @description Efecto para obtener los detalles del ticket cuando el componente se monta o el ID cambia.
-   * Actualiza los estados `loading`, `ticket`, y `error`.
-   */
-  useEffect(() => {
-    // Solo ejecuta si hay un ID válido
-    if (id) {
-      setLoading(true);
-      setError(null); // Resetea el error en cada nueva carga
+      setLoadingTicket(true);
+      setTicketError(null);
       getTicketById(id)
         .then((response) => {
-          if (response.data) {
+          if (response.data ) { // *** CRUCIAL: Check for chatId ***
             setTicket(response.data);
+            // Fetch initial messages AFTER getting ticket details (and chatId)
+            fetchInitialMessages(response.data.chatId); // Use chatId
+          } //else if (response.data && !response.data.chatId) {
+          //    setTicketError("Error: No se encontró el ID del chat asociado a este ticket. Contacte al administrador.");
+          //    setTicket(null);
+          //    toast.error("Falta información del chat para este ticket.");
+          // }
+          // else {
+          //   setTicketError("No se encontraron datos para este ticket.");
+          //   setTicket(null);
+          //   toast.warning("Ticket no encontrado.");
+          // }
+        })
+        .catch((err) => {
+          console.error("Error al cargar el ticket:", err);
+          const errorMessage = err.response?.data?.message || "Error al cargar el ticket.";
+          setTicketError(errorMessage);
+          setTicket(null);
+          toast.error(errorMessage);
+        })
+        .finally(() => setLoadingTicket(false));
+    } else {
+      setTicketError("No se proporcionó un ID de ticket válido.");
+      setLoadingTicket(false);
+      toast.error("ID de ticket inválido.");
+    }
+    // Cleanup function for component unmount or ID change
+    return () => {
+        // Disconnect WebSocket when leaving the page or ID changes
+        stompClient?.deactivate();
+        setIsConnected(false);
+        setStompClient(null);
+        console.log("WebSocket client deactivated on cleanup.");
+    };
+  }, [id]); // Re-run if ticket ID changes
+
+  // --- Fetch Initial Chat Messages ---
+  const fetchInitialMessages = useCallback((chatId) => {
+      // Note: Using listMessages which might expect ticketId.
+      // Ideally, backend provides an endpoint like /api/chats/{chatId}/messages
+      // Adjust this call based on your actual ChatService implementation.
+      // For now, assuming listMessages(ticketId) works or you adapt it.
+      setIsLoadingMessages(true);
+      setChatMessages([]); // Clear previous messages
+      listMessages(id) // Using ticket ID 'id' as per original code
+        .then((response) => {
+          if (response.data?.content) {
+            // Assuming response.data.content is the array of ChatMessageDto
+            setChatMessages(response.data.content);
+            
           } else {
-            // Si la API devuelve una respuesta exitosa pero sin datos (poco común, pero posible)
-            setError("No se encontraron datos para este ticket.");
-            setTicket(null);
-            toast.warning("Ticket no encontrado.");
+             console.warn("No initial messages found or unexpected response format:", response.data);
+             setChatMessages([]); // Ensure it's an empty array
           }
         })
         .catch((err) => {
-          console.error("Error al cargar el ticket:", err); // Log detallado para depuración
-          const errorMessage =
-            err.response?.data?.message ||
-            "Error al cargar el ticket. Inténtalo de nuevo.";
-          setError(errorMessage);
-          setTicket(null);
-          toast.error(errorMessage); // Muestra error al usuario
+          console.error("Error al cargar mensajes iniciales:", err);
+          toast.error("No se pudieron cargar los mensajes anteriores.");
+          setChatMessages([]); // Ensure it's an empty array on error
         })
-        .finally(() => setLoading(false)); // Desactiva el loading al finalizar (éxito o error)
-    } else {
-      // Si no hay ID en la URL
-      setError("No se proporcionó un ID de ticket válido.");
-      setLoading(false);
-      toast.error("ID de ticket inválido.");
+        .finally(() => setIsLoadingMessages(false));
+  }, [id]); // Depend on ticket ID for the current listMessages service
+
+  // --- WebSocket Connection Effect ---
+  useEffect(() => {
+    // Only connect if we have a ticket with a chatId and no active client
+    if (ticket?.chatId && !stompClient) {
+      console.log(`Attempting to connect WebSocket for chat ID: ${ticket.chatId}`);
+      setChatError(null); // Reset error on new connection attempt
+
+      const client = new Client({
+        brokerURL: WEBSOCKET_URL,
+        reconnectDelay: 5000, // Attempt reconnect every 5 seconds
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000,
+        debug: (str) => { // Optional logging
+          console.log('STOMP Debug:', str);
+        },
+        onConnect: (frame) => {
+          console.log('WebSocket Connected:', frame);
+          setIsConnected(true);
+          setChatError(null); // Clear error on successful connect
+
+          // Subscribe to the specific chat topic
+          const topic = `${CHAT_SUB_TOPIC}${ticket.chatId}`;
+          console.log(`Subscribing to ${topic}`);
+          subscriptionRef.current = client.subscribe(topic, (message) => {
+            try {
+              const receivedMessage = JSON.parse(message.body);
+              console.log('Message received:', receivedMessage);
+              // Update message list state
+              setChatMessages((prevMessages) => [...prevMessages, receivedMessage]);
+            } catch (e) {
+              console.error("Error parsing received message:", e, message.body);
+              toast.error("Error al procesar mensaje recibido.");
+            }
+          }, { id: `sub-${ticket.chatId}` }); // Optional: give subscription an ID
+           toast.success("Chat conectado.");
+        },
+        onStompError: (frame) => {
+          console.error('Broker reported error: ' + frame.headers['message']);
+          console.error('Additional details: ' + frame.body);
+          setIsConnected(false);
+          setChatError(`Error del Broker: ${frame.headers['message'] || 'Error desconocido'}`);
+          toast.error("Error de conexión con el chat (STOMP).");
+        },
+        onWebSocketError: (event) => {
+          console.error("WebSocket error:", event);
+          setIsConnected(false);
+          setChatError("Error de conexión WebSocket. Intentando reconectar...");
+          // No toast here, reconnectDelay handles retries silently unless it fails permanently
+        },
+        onDisconnect: (frame) => {
+            console.log('WebSocket Disconnected:', frame);
+            setIsConnected(false);
+            // Don't set error on manual disconnect/cleanup
+            if (stompClient) { // Avoid error message if it was manually deactivated
+                 setChatError("Chat desconectado.");
+                 toast.info("Chat desconectado.");
+            }
+            subscriptionRef.current = null; // Clear subscription ref
+        },
+      });
+
+      client.activate();
+      setStompClient(client);
     }
-  }, [id]); // Dependencia: se re-ejecuta si el ID cambia
 
-  // --- Renderizado Condicional ---
+    // No return cleanup here, handled in the main useEffect [id]
+  }, [ticket, stompClient]); // Depend on ticket (for chatId) and stompClient instance
 
-  // Estado de Carga
-  if (loading) {
+
+  // --- Send Message Handler ---
+  const handleSendMessage = useCallback((messageContent, files) => {
+    if (!stompClient || !isConnected || !ticket?.chatId) {
+      toast.error("No se puede enviar mensaje. Chat no conectado.");
+      return;
+    }
+
+    if (!messageContent.trim() && files.length === 0) {
+        return; // Don't send empty messages
+    }
+
+    // --- File Handling Placeholder ---
+    if (files.length > 0) {
+        // TODO: Implement file upload logic
+        // 1. Show a loading indicator for the file(s)
+        // 2. Upload each file via a separate HTTP POST request to a dedicated endpoint
+        //    (e.g., /api/files/upload?chatId=...).
+        // 3. On successful upload, the backend should return file details (URL, filename, type).
+        // 4. Send a STOMP message of type 'FILE' including the file details received in step 3.
+        console.warn("File sending not implemented yet. Sending text message only.");
+        toast.info("La subida de archivos aún no está implementada.");
+        // For now, we just proceed to send the text message if any.
+        if (!messageContent.trim()) return; // Don't send if only files were selected and no text
+    }
+
+    // --- Send Text Message ---
+    const destination = `${CHAT_SEND_ENDPOINT}${ticket.chatId}/sendMessage`;
+    const chatMessage = {
+      // Structure matching backend's ChatMessageCreateDto (or similar)
+      content: messageContent,
+      // messageType: 'TEXT', // Backend might infer this if content is present
+      // senderId: MOCK_CURRENT_USER_ID // Backend should get sender from authenticated principal
+    };
+
+    try {
+        console.log(`Sending message to ${destination}:`, chatMessage);
+        stompClient.publish({
+            destination: destination,
+            body: JSON.stringify(chatMessage),
+        });
+        // Optimistic UI update could be added here if desired
+    } catch (error) {
+        console.error("Error sending message:", error);
+        toast.error("Error al enviar el mensaje.");
+        setChatError("Error al enviar mensaje.");
+    }
+
+  }, [stompClient, isConnected, ticket?.chatId]);
+
+
+  // --- Render Loading State ---
+  if (loadingTicket) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="text-center">
-          {/* Puedes reemplazar esto con un componente Spinner más elaborado */}
-          <svg
-            className="animate-spin h-8 w-8 text-blue-500 mx-auto mb-2"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            ></circle>
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
+          <FaSpinner className="animate-spin h-8 w-8 text-blue-500 mx-auto mb-2" />
           <p className="text-lg font-medium text-gray-600">
             Cargando detalles del ticket...
           </p>
@@ -137,20 +246,19 @@ const TaskDetails = () => {
     );
   }
 
-  // Estado de Error o Ticket No Encontrado
-  if (error || !ticket) {
+  // --- Render Error State ---
+  if (ticketError || !ticket) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
-        <div className="text-center bg-white rounded-lg shadow-md p-3">
+        <div className="text-center bg-white rounded-lg shadow-lg p-6 max-w-md">
           <FaExclamationTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <div className="text-2xl font-semibold text-red-700 mb-2">Error</div>
+          <h2 className="text-2xl font-semibold text-red-700 mb-2">Error</h2>
           <p className="text-gray-600">
-            {error || "El ticket solicitado no pudo ser encontrado."}
+            {ticketError || "El ticket solicitado no pudo ser encontrado o está incompleto."}
           </p>
-          {/* Opcional: Botón para volver atrás o a la lista de tickets */}
           <button
             onClick={() => window.history.back()}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="mt-6 px-5 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
           >
             Volver
           </button>
@@ -159,245 +267,140 @@ const TaskDetails = () => {
     );
   }
 
-  // --- Renderizado Principal (Ticket Encontrado) ---
+  // --- Render Main Content (Ticket Details + Chat) ---
   return (
-    <div className="min-h-fit p-4 md:p-8">
-      <button
-        onClick={() => window.history.back()}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Volver
-      </button>
-      <div className="pt-2 max-w-7xl mx-auto flex flex-col md:flex-row gap-6 md:gap-8">
+    <div className="min-h-fit min-w-250 bg-gray-50 p-4 md:p-6">
+       <button
+         onClick={() => window.history.back()}
+         className="mb-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"
+       >
+         &larr; Volver
+       </button>
+      <div className="max-w-7x2 mx-auto flex flex-col lg:flex-row gap-6 md:gap-8">
         {/* Columna Izquierda: Detalles del Ticket */}
-        <div className="flex-1 bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="p-2 text-3xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center">
-            <FaTicketAlt className="mr-3 text-blue-600" />
-            Detalles del Ticket:{" "}
-            <span className="ml-2 font-mono text-blue-700 bg-blue-100 px-2 py-0.5 rounded">
-              {ticket.codigo || ticket.id}
-            </span>
+        <div className="lg:w-1/2 xl:w-2/5 flex-shrink-0 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+          <div className="p-4 border-b border-gray-200 bg-gray-50">
+             <h1 className="text-xl font-semibold text-gray-800 flex items-center">
+                <FaTicketAlt className="mr-3 text-blue-600" />
+                Ticket:{" "}
+                <span className="ml-2 font-mono text-blue-700 bg-blue-100 px-2 py-0.5 rounded text-lg">
+                  {ticket.codigo || ticket.id}
+                </span>
+             </h1>
           </div>
 
-          <div className="space-y-5">
-            {/* Sección Información General */}
-            <DetailSection
-              title="Información General"
-              icon={<FaInfoCircle className="text-green-600" />}
-            >
+          <div className="p-4 space-y-5">
+            {/* Sections remain the same as before */}
+            <DetailSection title="Información General" icon={<FaInfoCircle className="text-green-600" />}>
               <DetailItem label="Tema" value={ticket.tema} />
-              <DetailItem
-                label="Estado"
-                value={ticket.estadoNombre}
-                badgeColor={getBadgeColor(ticket.estado)}
-              />
-              <DetailItem
-                label="Prioridad"
-                value={ticket.prioridadNombre}
-                badgeColor={getPriorityColor(ticket.prioridad)}
-              />
-              <DetailItem
-                label="Departamento"
-                value={ticket.departamentoNombre}
-              />
+              <DetailItem label="Estado" value={ticket.estadoNombre} badgeColor={getBadgeColor(ticket.estadoNombre)} />
+              <DetailItem label="Prioridad" value={ticket.prioridadNombre} badgeColor={getPriorityColor(ticket.prioridadNombre)} />
+              <DetailItem label="Departamento" value={ticket.departamentoNombre} />
               <DetailItem label="Incidencia" value={ticket.incidenciaNombre} />
               <DetailItem label="Motivo" value={ticket.motivoNombre} />
               <DetailItem label="Fuente" value={ticket.fuenteNombre} />
             </DetailSection>
 
-            {/* Sección Fechas */}
-            <DetailSection
-              title="Fechas Relevantes"
-              icon={<FaCalendarAlt className="text-purple-600" />}
-            >
-              <DetailItem
-                label="Fecha de Creación"
-                value={formatDateTime(ticket.fechaCreacion)}
-                icon={<FaClock className="text-gray-400" />}
-              />
-              <DetailItem
-                label="Última Actualización"
-                value={formatDateTime(ticket.fechaActualizacion)}
-                icon={<FaClock className="text-gray-400" />}
-              />
-              <DetailItem
-                label="Fecha de Vencimiento"
-                value={formatDateTime(ticket.fechaVencimiento)}
-                icon={<FaClock className="text-gray-400" />}
-              />
+            <DetailSection title="Fechas Relevantes" icon={<FaCalendarAlt className="text-purple-600" />}>
+              <DetailItem label="Creación" value={formatDateTime(ticket.fechaCreacion)} icon={<FaClock className="text-gray-400" />} />
+              <DetailItem label="Actualización" value={formatDateTime(ticket.fechaActualizacion)} icon={<FaClock className="text-gray-400" />} />
+              <DetailItem label="Vencimiento" value={formatDateTime(ticket.fechaVencimiento)} icon={<FaClock className="text-gray-400" />} />
             </DetailSection>
 
-            {/* Sección Usuarios */}
-            <DetailSection
-              title="Usuarios"
-              icon={<FaUser className="text-yellow-600" />}
-            >
-              <DetailItem
-                label="Usuario Creador"
-                value={ticket.usuarioCreadorNombres || "No asignado"}
-              />
-              <DetailItem
-                label="Usuario Asignado"
-                value={ticket.usuarioAsignadoNombres || "No asignado"}
-              />
-              {/* Podrías añadir más detalles del usuario si están disponibles, como email o rol */}
+            <DetailSection title="Usuarios" icon={<FaUser className="text-yellow-600" />}>
+              <DetailItem label="Creador" value={ticket.usuarioCreadorNombres || "No asignado"} />
+              <DetailItem label="Asignado" value={ticket.usuarioAsignadoNombres || "No asignado"} />
             </DetailSection>
           </div>
         </div>
 
-        {/* Columna Derecha: Chat (Placeholder) */}
-        <Chat/>
+        {/* Columna Derecha: Chat */}
+        <div className="flex-1 lg:w-1/2 xl:w-3/5 min-h-[600px] lg:min-h-0">
+          {/* Pass necessary props to ChatComponent */}
+          <ChatComponent
+            chatId={ticket.chatId}
+            messages={chatMessages}
+            onSendMessage={handleSendMessage}
+            isConnected={isConnected}
+            isLoadingMessages={isLoadingMessages}
+            currentUserId={MOCK_CURRENT_USER_ID} // *** Replace with actual user ID ***
+            connectionError={chatError}
+          />
+        </div>
       </div>
     </div>
   );
 };
 
-// --- Componentes Auxiliares para Estructura ---
-
-/**
- * @component DetailSection
- * @description Componente para agrupar detalles relacionados bajo un título con icono.
- * @param {object} props
- * @param {string} props.title - Título de la sección.
- * @param {React.ReactNode} props.icon - Icono para la sección.
- * @param {React.ReactNode} props.children - Contenido de la sección (DetailItems).
- * @returns {JSX.Element}
- */
+// --- Componentes Auxiliares (DetailSection, DetailItem - unchanged) ---
 const DetailSection = ({ title, icon, children }) => (
-  <div className="font-semibold border border-gray-200 rounded-md p-2 m-2">
-    <div className="text-2xl font-medium text-gray-700 mb-3 flex items-center">
-      {icon &&
-        React.cloneElement(icon, {
-          className: `${icon.props.className} p mr-2 w-5 h-5`,
-        })}
-      {title}
+    <div className="border border-gray-200 rounded-md p-3">
+      <h3 className="text-md font-semibold text-gray-700 mb-3 flex items-center border-b pb-2">
+        {icon && React.cloneElement(icon, { className: `${icon.props.className} mr-2 w-4 h-4` })}
+        {title}
+      </h3>
+      <div className="space-y-2 pl-1">{children}</div>
     </div>
-    <div className="space-y-2">{children}</div>
-  </div>
-);
+  );
 
-/**
- * @component DetailItem
- * @description Muestra un par etiqueta-valor para un detalle del ticket.
- * @param {object} props
- * @param {string} props.label - La etiqueta del detalle.
- * @param {string | number | null | undefined} props.value - El valor del detalle.
- * @param {string} [props.badgeColor] - Color de fondo para el valor si se quiere mostrar como badge (Tailwind class).
- * @param {React.ReactNode} [props.icon] - Icono opcional junto al valor.
- * @returns {JSX.Element}
- */
 const DetailItem = ({ label, value, badgeColor, icon }) => (
-  <div className="grid grid-cols-3 gap-x-4 items-start">
-    <dt className="text-sm font-medium text-gray col-span-1">{label}:</dt>
-    <dd
-      className={`text-sm text-gray-900 col-span-2 flex items-center ${
-        badgeColor ? "inline-block" : ""
-      }`}
-    >
-      {icon &&
-        React.cloneElement(icon, {
-          className: `${icon.props.className} mr-1.5 w-4 h-4`,
-        })}
-      {badgeColor ? (
-        <span
-          className={`px-1 py-0.5 rounded-full font-semibold ${badgeColor}`}
-        >
-          {value || "N/A"}
-        </span>
-      ) : (
-        value || (
-          <span className="text-gray-400 italic m-5">No especificado</span>
-        )
-      )}
-    </dd>
-  </div>
-);
+    <div className="grid grid-cols-3 gap-x-2 items-start">
+      <dt className="text-xs font-medium text-gray-500 col-span-1 truncate">{label}:</dt>
+      <dd className={`text-xs text-gray-800 col-span-2 flex items-center ${badgeColor ? "inline-block" : ""}`}>
+        {icon && React.cloneElement(icon, { className: `${icon.props.className} mr-1 w-3 h-3 flex-shrink-0` })}
+        {badgeColor ? (
+          <span className={`px-1.5 py-0.5 rounded-full font-semibold text-[11px] leading-tight ${badgeColor}`}>
+            {value || "N/A"}
+          </span>
+        ) : (
+          value || <span className="text-gray-400 italic">No especificado</span>
+        )}
+      </dd>
+    </div>
+  );
 
-// --- Funciones Auxiliares ---
 
-/**
- * @function formatDateTime
- * @description Formatea una cadena de fecha/hora ISO a un formato legible.
- * @param {string | null | undefined} dateTimeString - La cadena de fecha/hora ISO.
- * @returns {string} La fecha/hora formateada o 'N/A'.
- */
+// --- Funciones Auxiliares (formatDateTime, getBadgeColor, getPriorityColor - slightly adapted) ---
 const formatDateTime = (dateTimeString) => {
-  if (!dateTimeString) return "N/A";
-  try {
-    const date = new Date(dateTimeString);
-    return date.toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      // hour: '2-digit', minute: '2-digit' // Descomenta si quieres la hora
-    });
-  } catch (error) {
-    console.error("Error formatting date:", error);
-    return dateTimeString;
-  }
-};
+    if (!dateTimeString) return "N/A";
+    try {
+      const date = new Date(dateTimeString);
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+          return "Fecha inválida";
+      }
+      return date.toLocaleDateString("es-ES", {
+        year: "numeric", month: "short", day: "numeric",
+        hour: '2-digit', minute: '2-digit' // Added time
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return dateTimeString; // Return original string on error
+    }
+  };
 
-/**
- * @function getBadgeColor
- * @description Devuelve clases de Tailwind para un badge de estado.
- * @param {string | number | null | undefined} status - El estado del ticket (puede ser string o número).
- * @returns {string} Clases CSS de Tailwind.
- */
-const getBadgeColor = (status) => {
-  // --- INICIO CAMBIO ---
-  // 1. Convierte a string explícitamente.
-  // 2. Usa '??' para manejar null/undefined y asignar ''.
-  // 3. Llama a toLowerCase() sobre la cadena resultante.
-  const lowerStatus = String(status ?? "").toLowerCase();
-  // --- FIN CAMBIO ---
+// Updated to use names directly as passed in ticket object
+const getBadgeColor = (statusName) => {
+    const lowerStatus = String(statusName ?? "").toLowerCase();
+    switch (lowerStatus) {
+      case "pendiente": return "bg-yellow-100 text-yellow-800";
+      case "en proceso": return "bg-blue-100 text-blue-800";
+      case "resuelto": return "bg-green-100 text-green-800";
+      case "cerrado": return "bg-gray-200 text-gray-700";
+      case "cancelado": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
 
-  switch (lowerStatus) {
-    case "pendiente":
-    case "1": // Añade casos numéricos si tu API los devuelve
-      return "bg-red-100 text-red-800";
-    case "en proceso":
-    case "en-proceso":
-    case "2": // Añade casos numéricos si tu API los devuelve
-      return "bg-green-100 text-green-800";
-    case "completado":
-    case "3": // Añade casos numéricos si tu API los devuelve
-      return "bg-yellow-100 text-yellow-800";
-    case "cancelado":
-    case "4": // Añade casos numéricos si tu API los devuelve
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
+const getPriorityColor = (priorityName) => {
+    const lowerPriority = String(priorityName ?? "").toLowerCase();
+    switch (lowerPriority) {
+      case "alta": return "bg-red-100 text-red-800";
+      case "media": return "bg-yellow-100 text-yellow-800";
+      case "baja": return "bg-green-100 text-green-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
 
-/**
- * @function getPriorityColor
- * @description Devuelve clases de Tailwind para un badge de prioridad.
- * @param {string | number | null | undefined} priority - La prioridad del ticket (puede ser string o número).
- * @returns {string} Clases CSS de Tailwind.
- */
-const getPriorityColor = (priority) => {
-  // --- INICIO CAMBIO ---
-  // Aplica la misma lógica de conversión segura a string
-  const lowerPriority = String(priority ?? "").toLowerCase();
-  // --- FIN CAMBIO ---
-
-  switch (lowerPriority) {
-    case "alta":
-    case "high": // Considera otros posibles valores
-    case "3": // Ejemplo numérico
-      return "bg-red-100 text-red-800";
-    case "media":
-    case "medium":
-    case "2": // Ejemplo numérico
-      return "bg-yellow-100 text-yellow-800";
-    case "baja":
-    case "low":
-    case "1": // Ejemplo numérico
-      return "bg-green-100 text-green-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
 
 export default TaskDetails;

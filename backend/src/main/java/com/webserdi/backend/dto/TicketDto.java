@@ -10,6 +10,7 @@ import java.util.Set;
 
 public class TicketDto {
     private Long id;
+    private Long chatId;
     private String tema;
     private String codigo;
     private Boolean isTrashed;

@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +25,6 @@ public class ChatController {
     // Get messages for a ticket's chat
     @GetMapping("/messages")
     // Add appropriate authorization check - e.g., user must have read access to the ticket
-    @PreAuthorize("hasRole('ROLE_ADMIN')") // Example using Spring's permission evaluator
     public Page<ChatMessageDto> getChatMessages(
             @PathVariable Long ticketId,
             @PageableDefault(size = 20) Pageable pageable) { // Default sort by timestamp
