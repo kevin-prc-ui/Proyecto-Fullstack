@@ -1,3 +1,4 @@
+// c:\react\Proyecto\frontend\src\components\TaskList.js
 import React from 'react';
 import { 
   FiCheck, FiEdit2, FiTrash2, FiClock, FiUser, 
@@ -6,22 +7,14 @@ import {
 import { MdOutlineWorkOutline, MdTaskAlt } from 'react-icons/md';
 import { RiFlowChart } from 'react-icons/ri';
 
-const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete }) => {
+const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete, onDeleteTask }) => {
   const getAssignedUsers = (ids) => {
     return users.filter(user => ids.includes(user.id));
   };
 
-  const handleDelete = (id, e) => {
-    e.stopPropagation();
-    if (window.confirm('¿Eliminar esta actividad?')) {
-      const updatedActivities = [...tasks, ...workflows].filter(a => a.id !== id);
-      localStorage.setItem('activities', JSON.stringify(updatedActivities));
-      window.location.reload(); // Simplificación para actualizar el estado
-    }
-  };
-
   return (
     <div className="row g-4">
+
       {/* Sección de Tareas */}
       <div className="col-lg-6">
         <div className="card border-0 shadow-sm">
@@ -32,25 +25,20 @@ const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete }) => 
               <span className="badge bg-primary ms-2">{tasks.length}</span>
             </h5>
           </div>
+
           <div className="card-body p-0">
             {tasks.length > 0 ? (
               <div className="list-group list-group-flush">
                 {tasks.map(task => (
                   <div 
                     key={task.id} 
-                    className={`list-group-item list-group-item-action p-3 hover-shadow ${
-                      task.status === 'Completado' ? 'bg-light' : ''
-                    }`}
+                    className={`list-group-item list-group-item-action p-3 hover-shadow ${task.status === 'Completado' ? 'bg-light' : ''}`}
                     onClick={() => onEditTask(task)}
                   >
                     <div className="d-flex justify-content-between align-items-start mb-2">
                       <div className="d-flex align-items-center">
                         <button 
-                          className={`btn btn-sm me-2 ${
-                            task.status === 'Completado' 
-                              ? 'btn-success' 
-                              : 'btn-outline-secondary'
-                          }`}
+                          className={`btn btn-sm me-2 ${task.status === 'Completado' ? 'btn-success' : 'btn-outline-secondary'}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             onToggleComplete(task.id);
@@ -69,6 +57,7 @@ const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete }) => 
                           {task.name}
                         </h6>
                       </div>
+
                       <div>
                         <button 
                           className="btn btn-sm btn-outline-primary me-1"
@@ -81,26 +70,33 @@ const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete }) => 
                         </button>
                         <button 
                           className="btn btn-sm btn-outline-danger"
-                          onClick={(e) => handleDelete(task.id, e)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm('¿Eliminar esta actividad?')) {
+                              onDeleteTask(task.id);
+                            }
+                          }}
                         >
                           <FiTrash2 size={14} />
                         </button>
                       </div>
                     </div>
-                    
+
                     <div className="d-flex flex-wrap gap-3 mt-2">
                       <small className="text-muted d-flex align-items-center">
                         <FiUser className="me-1" />
-                        {getAssignedUsers(task.assignees).map(u => u.avatar).join(', ')}
+                        {getAssignedUsers(task.assignees).length > 0 
+                          ? getAssignedUsers(task.assignees).map(u => u.avatar).join(', ') 
+                          : 'Sin asignados'}
                       </small>
-                      
+
                       {task.dueDate && (
                         <small className="text-muted d-flex align-items-center">
                           <FiClock className="me-1" />
                           {new Date(task.dueDate).toLocaleDateString()}
                         </small>
                       )}
-                      
+
                       {task.status === 'Completado' && task.completedAt && (
                         <small className="text-success d-flex align-items-center">
                           <FiCheck className="me-1" />
@@ -132,25 +128,20 @@ const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete }) => 
               <span className="badge bg-info ms-2">{workflows.length}</span>
             </h5>
           </div>
+
           <div className="card-body p-0">
             {workflows.length > 0 ? (
               <div className="list-group list-group-flush">
                 {workflows.map(workflow => (
                   <div 
                     key={workflow.id} 
-                    className={`list-group-item list-group-item-action p-3 hover-shadow ${
-                      workflow.status === 'Completado' ? 'bg-light' : ''
-                    }`}
+                    className={`list-group-item list-group-item-action p-3 hover-shadow ${workflow.status === 'Completado' ? 'bg-light' : ''}`}
                     onClick={() => onEditTask(workflow)}
                   >
                     <div className="d-flex justify-content-between align-items-start mb-2">
                       <div className="d-flex align-items-center">
                         <button 
-                          className={`btn btn-sm me-2 ${
-                            workflow.status === 'Completado' 
-                              ? 'btn-success' 
-                              : 'btn-outline-secondary'
-                          }`}
+                          className={`btn btn-sm me-2 ${workflow.status === 'Completado' ? 'btn-success' : 'btn-outline-secondary'}`}
                           onClick={(e) => {
                             e.stopPropagation();
                             onToggleComplete(workflow.id);
@@ -163,6 +154,7 @@ const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete }) => 
                           {workflow.name}
                         </h6>
                       </div>
+
                       <div>
                         <button 
                           className="btn btn-sm btn-outline-primary me-1"
@@ -175,29 +167,36 @@ const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete }) => 
                         </button>
                         <button 
                           className="btn btn-sm btn-outline-danger"
-                          onClick={(e) => handleDelete(workflow.id, e)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm('¿Eliminar esta actividad?')) {
+                              onDeleteTask(workflow.id);
+                            }
+                          }}
                         >
                           <FiTrash2 size={14} />
                         </button>
                       </div>
                     </div>
-                    
+
                     <div className="d-flex flex-wrap gap-3 mt-2">
                       <small className="text-muted d-flex align-items-center">
                         <FiUser className="me-1" />
-                        {getAssignedUsers(workflow.assignees).map(u => u.avatar).join(', ')}
+                        {getAssignedUsers(workflow.assignees).length > 0 
+                          ? getAssignedUsers(workflow.assignees).map(u => u.avatar).join(', ') 
+                          : 'Sin asignados'}
                       </small>
-                      
+
                       <small className="text-muted d-flex align-items-center">
                         <FiUser className="me-1" />
                         {workflow.reviewers.length} revisores
                       </small>
-                      
+
                       <small className="text-muted d-flex align-items-center">
                         <FiCheck className="me-1" />
                         {workflow.approvalPercentage}% aprobación
                       </small>
-                      
+
                       {workflow.status === 'Completado' && workflow.completedAt && (
                         <small className="text-success d-flex align-items-center">
                           <FiCheck className="me-1" />
@@ -205,7 +204,7 @@ const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete }) => 
                         </small>
                       )}
                     </div>
-                    
+
                     {workflow.items?.length > 0 && (
                       <div className="mt-2">
                         <small className="text-muted d-block mb-1">Items:</small>
@@ -236,6 +235,7 @@ const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete }) => 
           </div>
         </div>
       </div>
+
     </div>
   );
 };
