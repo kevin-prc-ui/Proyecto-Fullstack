@@ -249,8 +249,8 @@ const TaskDetails = () => {
   // --- Render Error State ---
   if (ticketError || !ticket) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
-        <div className="text-center bg-white rounded-lg shadow-lg p-6 max-w-md">
+      <div className="flex justify-center items-center min-h-screen px-4">
+        <div className="text-center rounded-lg shadow-lg p-6 max-w-md">
           <FaExclamationTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-semibold text-red-700 mb-2">Error</h2>
           <p className="text-gray-600">
@@ -269,7 +269,7 @@ const TaskDetails = () => {
 
   // --- Render Main Content (Ticket Details + Chat) ---
   return (
-    <div className="min-h-fit min-w-250 bg-gray-50 p-4 md:p-6">
+    <div className="min-h-fit min-w-250 p-4 md:p-6">
        <button
          onClick={() => window.history.back()}
          className="mb-3 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm"

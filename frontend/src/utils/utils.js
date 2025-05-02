@@ -46,48 +46,49 @@ export const formatUserRole = (rolId) => {
   };
 
   export const getVencimiento = (expirationDate) => {
-    console.log()
-    // 1. Validate Input: Ensure it's a valid Date object
-    if (!(expirationDate instanceof Date) || isNaN(expirationDate.getTime())) {
-      console.error("getVencimientoStatus received an invalid date:", expirationDate);
-      return "Invalid Date";
-    }
-  
-    // 2. Get Current Time
-    const now = new Date();
-  
-    // 3. Calculate Difference in Milliseconds
-    //    Positive value means expirationDate is in the future
-    //    Negative value means expirationDate is in the past (overdue)
-    const diffInMs = expirationDate.getTime() - now.getTime();
-  
-    // 4. Define time units in milliseconds
-    const minuteInMs = 60 * 1000;
-    const hourInMs = 60 * minuteInMs;
-    const dayInMs = 24 * hourInMs;
-  
-    // 5. Calculate absolute difference for easier unit calculation
-    const absDiffInMs = Math.abs(diffInMs);
-  
-    // 6. Determine the largest relevant unit and format the output string
-    if (absDiffInMs >= dayInMs) {
-      const dias = Math.floor(absDiffInMs / dayInMs);
-      return diffInMs > 0
-        ? `Expira en ${dias} dia${dias > 1 ? 's' : ''}`
-        : `Expiró hace ${dias} dia${dias > 1 ? 's' : ''}`;
-    } else if (absDiffInMs >= hourInMs) {
-      const hours = Math.floor(absDiffInMs / hourInMs);
-      return diffInMs > 0
-        ? `Expira en ${hours} hora${hours > 1 ? 's' : ''}`
-        : `Expiró hace ${hours} hora${hours > 1 ? 's' : ''}`;
-    } else if (absDiffInMs >= minuteInMs) {
-      const minutes = Math.floor(absDiffInMs / minuteInMs);
-      return diffInMs > 0
-        ? `Expires in ${minutes} minuto${minutes > 1 ? 's' : ''}`
-        : `Expiró hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
-    } else {
-      // Less than a minute difference
-      return diffInMs > 0 ? "Expira pronto" : "Expiró hace poco";
+    if (!expirationDate) {
+      // 1. Validate Input: Ensure it's a valid Date object
+      if (!(expirationDate instanceof Date) || isNaN(expirationDate.getTime())) {
+        console.error("getVencimientoStatus received an invalid date:", expirationDate);
+        return "Invalid Date";
+      }
+    
+      // 2. Get Current Time
+      const now = new Date();
+    
+      // 3. Calculate Difference in Milliseconds
+      //    Positive value means expirationDate is in the future
+      //    Negative value means expirationDate is in the past (overdue)
+      const diffInMs = expirationDate.getTime() - now.getTime();
+    
+      // 4. Define time units in milliseconds
+      const minuteInMs = 60 * 1000;
+      const hourInMs = 60 * minuteInMs;
+      const dayInMs = 24 * hourInMs;
+    
+      // 5. Calculate absolute difference for easier unit calculation
+      const absDiffInMs = Math.abs(diffInMs);
+    
+      // 6. Determine the largest relevant unit and format the output string
+      if (absDiffInMs >= dayInMs) {
+        const dias = Math.floor(absDiffInMs / dayInMs);
+        return diffInMs > 0
+          ? `Expira en ${dias} dia${dias > 1 ? 's' : ''}`
+          : `Expiró hace ${dias} dia${dias > 1 ? 's' : ''}`;
+      } else if (absDiffInMs >= hourInMs) {
+        const hours = Math.floor(absDiffInMs / hourInMs);
+        return diffInMs > 0
+          ? `Expira en ${hours} hora${hours > 1 ? 's' : ''}`
+          : `Expiró hace ${hours} hora${hours > 1 ? 's' : ''}`;
+      } else if (absDiffInMs >= minuteInMs) {
+        const minutes = Math.floor(absDiffInMs / minuteInMs);
+        return diffInMs > 0
+          ? `Expires in ${minutes} minuto${minutes > 1 ? 's' : ''}`
+          : `Expiró hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
+      } else {
+        // Less than a minute difference
+        return diffInMs > 0 ? "Expira pronto" : "Expiró hace poco";
+      }
     }
   };
 

@@ -10,9 +10,10 @@ export default function ConfirmationDialog({
   msg,
   setMsg = () => {},
   onClick = () => {},
-  type = "delete",
+  type = "",
   setType = () => {},
-}) {
+}) 
+{
   const closeDialog = () => {
     setType("delete");
     setMsg(null);
@@ -37,7 +38,7 @@ export default function ConfirmationDialog({
           </Dialog.Title>
 
           <p className='text-center text-gray-500'>
-            {msg ?? "Are you sure you want to delete the selected record?"}
+          {msg ?? "¿Estás seguro de que quieres eliminar el registro seleccionado?"}
           </p>
 
           <div className='bg-gray-50 py-3 sm:flex sm:flex-row-reverse gap-4'>
@@ -50,14 +51,14 @@ export default function ConfirmationDialog({
                   : "bg-red-600 hover:bg-red-500"
               )}
               onClick={onClick}
-              label={type === "restore" ? "Restore" : "Delete"}
+              label={type === "restore" ? "Restaurar" : "Eliminar"}
             />
 
             <Button
               type='button'
               className='bg-white px-8 text-sm font-semibold text-gray-900 sm:w-auto border'
               onClick={() => closeDialog()}
-              label='Cancel'
+              label='Cancelar'
             />
           </div>
         </div>
@@ -82,7 +83,7 @@ export function UserAction({ open, setOpen, onClick = () => {} }) {
           </Dialog.Title>
 
           <p className='text-center text-gray-500'>
-            {"Are you sure you want to activate or deactive this account?"}
+          {"¿Estás seguro de que quieres activar o desactivar esta cuenta?"}
           </p>
 
           <div className='bg-gray-50 py-3 sm:flex sm:flex-row-reverse gap-4'>
@@ -93,14 +94,14 @@ export function UserAction({ open, setOpen, onClick = () => {} }) {
                 "bg-red-600 hover:bg-red-500"
               )}
               onClick={onClick}
-              label={"Yes"}
+              label={"Sí."}
             />
 
             <Button
               type='button'
               className='bg-white px-8 text-sm font-semibold text-gray-900 sm:w-auto border'
               onClick={() => closeDialog()}
-              label='No'
+              label='No.'
             />
           </div>
         </div>

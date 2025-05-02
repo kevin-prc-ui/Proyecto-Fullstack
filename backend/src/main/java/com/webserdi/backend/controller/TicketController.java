@@ -44,6 +44,7 @@ public class TicketController {
             @RequestParam(required = false) String filtro) {
         return ticketService.getAllTrashedTickets(pageable, filtro);
     }
+
     @GetMapping("/{id}")
     public TicketDto getTicketById(@PathVariable Long id) {
         return ticketService.getTicketById(id);

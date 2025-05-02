@@ -41,7 +41,7 @@ function Layout() {
       <div className="w-full h-screen flex flex-col md:flex-row">
         {/* Sidebar condicional */}
         {isAuthenticated!==null && !isDashboard && (
-          <div className="w-1/6 h-screen bg-white min-w-53 sticky top-0 hidden md:block">
+          <div className="w-1/6 h-screen bg-white min-w-50 sticky top-0 hidden md:block">
             <Sidebar />
           </div>
         )}

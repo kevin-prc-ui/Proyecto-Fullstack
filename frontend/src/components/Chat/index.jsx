@@ -158,6 +158,7 @@ const ChatComponent = ({
     setSelectedFiles([]);
     setFileError("");
   };
+  
 
   // --- Render Logic ---
   return (
@@ -389,5 +390,4 @@ const ChatComponent = ({
     </div>
   );
 };
-
 export default ChatComponent;

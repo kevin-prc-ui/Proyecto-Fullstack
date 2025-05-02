@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { FaList } from "react-icons/fa";
 import { MdGridView } from "react-icons/md";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Transition } from "@headlessui/react";
 // Componentes locales
@@ -11,6 +11,7 @@ import Table from "../../components/Ticket/Table";
 import PaginationBar from "../../components/Ticket/PaginadoTickets";
 import TaskTitle from "../../components/Ticket/TaskTitle";
 import Title from "../../components/Ticket/Title";
+import CreateTicket  from "../../components/Ticket/CreateTicket";
 
 // Servicios y utilidades
 import {
@@ -19,7 +20,6 @@ import {
   listDepartamentos,
 } from "../../services/TicketService";
 import { TASK_TYPE } from "../../utils/utils"; // Objeto para mapear estados a clases CSS
-import Button from "../../components/Button";
 
 /**
  * @constant TABS
@@ -28,7 +28,7 @@ import Button from "../../components/Button";
  */
 const TABS = [
   { title: "Cuadricula", icon: <MdGridView /> },
-  { title: "Lista View", icon: <FaList /> },
+  { title: "Lista", icon: <FaList /> },
 ];
 
 /**
@@ -39,6 +39,9 @@ const TABS = [
  * @returns {JSX.Element} El componente renderizado.
  */
 const Tasks = () => {
+    const [openDialog, setOpenDialog] = useState(false);
+  
+  const navigate = useNavigate();
   const params = useParams();
   const isAuth = localStorage.getItem("authToken"); // Verifica si el usuario está autenticado
 
@@ -223,7 +226,9 @@ const Tasks = () => {
 
   // --- Navigation Handler for Create Ticket ---
   const handleCreateTicket = () => {
-    navigate("/create-ticket"); // Or your actual route for creating a ticket
+    toast.info("Creando ticket...")
+    setOpenDialog(true)
+    // navigate("/create-ticket"); // Or your çctual route for creating a ticket
   };
   // --- End Navigation Handler ---
 
@@ -312,7 +317,6 @@ const Tasks = () => {
       className="w-full" // Asegura que ocupe todo el ancho disponible
     >
       <Title title={getPageTitle()} />
-
       {/* Pestañas para cambiar entre vista de Cuadrícula y Lista */}
       <Tabs
         tabs={TABS}
@@ -386,6 +390,7 @@ const Tasks = () => {
           .
         </div>
       )}
+      <CreateTicket open={openDialog} setOpen={setOpenDialog}/>
     </Transition>
   );
 };

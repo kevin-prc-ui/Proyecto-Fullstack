@@ -70,7 +70,7 @@ const Trash = ( ) => {
     restoreTicket(selected);
     setOpenDialog(false);
     // window.location.reload();
-    toast.success("Ticket deleted successfully");
+    toast.success("Ticket restored successfully");
   };
 
   const TableHeader = () => (
@@ -92,9 +92,9 @@ const Trash = ( ) => {
           <div
             className={clsx("w-4 h-4 rounded-full", TICKET_TYPE[ticket.estado])}
           />
-          <p className="w-full line-clamp-2 text-base text-black">
+          <a href={`/helpdesk/task/${ticket.id}`} className="w-full line-clamp-2 text-base text-black text-decoration-none">
             {ticket?.tema}
-          </p>
+          </a>
         </div>
       </td>
 
@@ -193,6 +193,8 @@ const Trash = ( ) => {
       <ConfirmationDialog
         open={openDialog}
         setOpen={setOpenDialog}
+        type="restore"
+        msg={"Quieres recuperar este ticket?"}
         onClick={restoreHandler}
       />
     </>

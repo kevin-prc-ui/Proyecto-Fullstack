@@ -125,7 +125,19 @@ export const deleteTicket = (ticketId) =>
   axios.delete(`${REST_API_BASE_URL}/tickets/${ticketId}`, getHeaders());
 
 export const restoreTicket = (ticketId) =>
-  axios.post(`${REST_API_BASE_URL}/tickets/restore/${ticketId}`, getHeaders());
+  //Se envia null debido a que la firma de axios.put es axios.put(url[,data[,config]]).
+  //Debemos pasar el header como 3er argumento y no como 2do, mandando null de segundo argumento
+  axios.put(`${REST_API_BASE_URL}/tickets/restore/${ticketId}`,null, getHeaders()); 
+
+  // Función para crear un nuevo ticket
+export const createTicket = (ticketData) =>
+  axios.post(`${REST_API_BASE_URL}/tickets`, ticketData, getHeaders());
+
+export const listAllIncidencias = () => {
+  return axios.get(`${REST_API_BASE_URL}/incidencias`, { // Endpoint a crear en el backend
+      headers: { Authorization: `Bearer ${getAuthToken()}` }
+  });
+};
 
 
 // Add other necessary functions like createTicket, updateTicket if needed...
