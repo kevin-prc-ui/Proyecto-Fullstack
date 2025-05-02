@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  FiX, FiSave, FiCheck, FiPlus, FiTrash2, FiUser, 
-  FiCalendar, FiAlertTriangle, FiEye, FiPercent, 
-  FiList, FiFileText, FiMail, FiChevronDown, FiChevronUp 
-} from 'react-icons/fi';
-import { MdOutlineWorkOutline, MdTaskAlt } from 'react-icons/md';
+import { FiX, FiSave, FiPlus, FiTrash2, FiUser, FiFileText, FiChevronDown, FiChevronUp, FiMail, FiList } from 'react-icons/fi';
+import { MdTaskAlt } from 'react-icons/md';
 import { RiFlowChart } from 'react-icons/ri';
+import { createActivity, getAllActivities } from '../../../../services/ActivityService';
+
 
 const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
   const [formData, setFormData] = useState({
@@ -22,7 +20,6 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
   });
 
   const [currentItem, setCurrentItem] = useState('');
-  const [activeSection, setActiveSection] = useState('details');
   const [expandedSections, setExpandedSections] = useState({
     details: true,
     assignment: true,
@@ -30,7 +27,6 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     options: true
   });
 
-  // Inicializar con datos de edición si existe
   useEffect(() => {
     if (taskToEdit) {
       setFormData(taskToEdit);
@@ -74,7 +70,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) {
       alert('El nombre es requerido');
@@ -84,8 +80,43 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
       alert('Debe seleccionar al menos un revisor para flujos');
       return;
     }
-    onSave(formData);
+  
+    const preparedData = {
+      ...formData,
+      items: formData.items.map(item => item.name)
+    };
+
+    createActivity(preparedData)
+  
+    // try {
+    //   const url = taskToEdit ? `/api/tasks/${taskToEdit.id}` : '/api/tasks';
+    //   const method = taskToEdit ? 'PUT' : 'POST';
+  
+    //   const token = localStorage.getItem('token'); // 👉 Obtener el token desde localStorage
+  
+    //   const response = await fetch(url, {
+    //     method: method,
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${token}` // 👉 Incluir el token en el encabezado
+    //     },
+    //     body: JSON.stringify(preparedData)
+    //   });
+  
+    //   if (response.ok) {
+    //     const result = await response.json();
+    //     onSave(result); // Notifica al componente padre que la tarea fue guardada
+    //     onClose(); // Cierra el modal
+    //   } else {
+    //     alert('Hubo un error al guardar la tarea');
+    //   }
+    // } catch (error) {
+    //   console.error('Error al conectar con el backend:', error);
+    //   alert('Hubo un error al procesar la solicitud');
+    // }
   };
+  
+  
 
   return (
     <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
@@ -100,29 +131,21 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
               )}
               {taskToEdit ? 'Editar Actividad' : 'Nueva Actividad'}
             </h5>
-            <button 
-              type="button" 
-              className="btn-close btn-close-white"
-              onClick={onClose}
-              aria-label="Close"
-            ></button>
+            <button type="button" className="btn-close btn-close-white" onClick={onClose}></button>
           </div>
-          
+
           <form onSubmit={handleSubmit}>
             <div className="modal-body">
               {/* Sección de Detalles Básicos */}
               <div className="mb-4">
-                <div 
-                  className="d-flex justify-content-between align-items-center mb-3 cursor-pointer"
-                  onClick={() => toggleSection('details')}
-                >
+                <div className="d-flex justify-content-between align-items-center mb-3 cursor-pointer" onClick={() => toggleSection('details')}>
                   <h6 className="mb-0 d-flex align-items-center">
                     <FiFileText className="me-2" />
                     Detalles Básicos
                   </h6>
                   {expandedSections.details ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
-                
+
                 {expandedSections.details && (
                   <div className="row g-3">
                     <div className="col-md-6">
@@ -192,17 +215,14 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
 
               {/* Sección de Asignación */}
               <div className="mb-4">
-                <div 
-                  className="d-flex justify-content-between align-items-center mb-3 cursor-pointer"
-                  onClick={() => toggleSection('assignment')}
-                >
+                <div className="d-flex justify-content-between align-items-center mb-3 cursor-pointer" onClick={() => toggleSection('assignment')}>
                   <h6 className="mb-0 d-flex align-items-center">
                     <FiUser className="me-2" />
                     Asignación
                   </h6>
                   {expandedSections.assignment ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
-                
+
                 {expandedSections.assignment && (
                   <div className="row g-3">
                     <div className="col-md-6">
@@ -270,17 +290,14 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
 
               {/* Sección de Items */}
               <div className="mb-4">
-                <div 
-                  className="d-flex justify-content-between align-items-center mb-3 cursor-pointer"
-                  onClick={() => toggleSection('items')}
-                >
+                <div className="d-flex justify-content-between align-items-center mb-3 cursor-pointer" onClick={() => toggleSection('items')}>
                   <h6 className="mb-0 d-flex align-items-center">
                     <FiList className="me-2" />
                     Items
                   </h6>
                   {expandedSections.items ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
-                
+
                 {expandedSections.items && (
                   <div>
                     <div className="border rounded p-3 mb-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
@@ -329,50 +346,38 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
 
               {/* Sección de Opciones */}
               <div className="mb-3">
-                <div 
-                  className="d-flex justify-content-between align-items-center mb-3 cursor-pointer"
-                  onClick={() => toggleSection('options')}
-                >
+                <div className="d-flex justify-content-between align-items-center mb-3 cursor-pointer" onClick={() => toggleSection('options')}>
                   <h6 className="mb-0 d-flex align-items-center">
-                    <FiList className="me-2" />
+                    <FiMail className="me-2" />
                     Opciones
                   </h6>
                   {expandedSections.options ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
-                
+
                 {expandedSections.options && (
-                  <div className="form-check form-switch">
+                  <div className="form-check">
                     <input
-                      className="form-check-input"
                       type="checkbox"
+                      className="form-check-input"
+                      id="sendNotifications"
                       name="sendNotifications"
                       checked={formData.sendNotifications}
                       onChange={handleChange}
                     />
-                    <label className="form-check-label">
-                      <FiMail className="me-2" />
-                      Enviar notificaciones por email
+                    <label className="form-check-label" htmlFor="sendNotifications">
+                      Enviar notificaciones
                     </label>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="modal-footer border-top-0">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={onClose}
-              >
-                <FiX className="me-1" />
-                Cancelar
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={onClose}>
+                <FiX className="me-1" /> Cancelar
               </button>
-              <button
-                type="submit"
-                className="btn btn-primary"
-              >
-                <FiSave className="me-1" />
-                {taskToEdit ? 'Actualizar' : 'Guardar'}
+              <button type="submit" className="btn btn-primary">
+                <FiSave className="me-1" /> Guardar
               </button>
             </div>
           </form>

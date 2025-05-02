@@ -17,6 +17,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
