@@ -1,4 +1,3 @@
-// c:\react\Proyecto\frontend\src\services\TicketService.js
 import axios from "axios";
 
 const REST_API_BASE_URL = "http://localhost:8080/api"; //update the base url
@@ -21,22 +20,22 @@ const getAuthToken = () => {
 };
 
 const getHeaders = () => {
-    const accessToken = getAuthToken();
-    if (!accessToken) {
-      // Handle case where token is not available, maybe redirect to login or throw error
-      console.warn("No access token found for API request.");
-      // Depending on your app's logic, you might want to throw an error
-      // or return empty headers, which will likely cause the API call to fail (401/403)
-      return {};
-    }
-    return {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
+  const accessToken = getAuthToken();
+  if (!accessToken) {
+    // Handle case where token is not available, maybe redirect to login or throw error
+    console.warn("No access token found for API request.");
+    // Depending on your app's logic, you might want to throw an error
+    // or return empty headers, which will likely cause the API call to fail (401/403)
+    return {};
+  }
+  return {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
   };
+};
 
-  export const createActivity = (activity) => axios.post(`${REST_API_BASE_URL}/activities/save`, activity, getHeaders());
+export const createActivity = (activity) => axios.post(`${REST_API_BASE_URL}/activities/save`, activity, getHeaders());
 
-
-
+// Nueva función para obtener todas las actividades
+export const getAllActivities = () => axios.get(`${REST_API_BASE_URL}/activities/`, getHeaders());

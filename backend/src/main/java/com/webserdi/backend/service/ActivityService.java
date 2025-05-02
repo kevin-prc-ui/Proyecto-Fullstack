@@ -54,6 +54,10 @@ public class ActivityService {
 
         // Guardar todo (cascade = ALL se encargará de items)
         return activityRepo.save(activity);
+    }
 
+    // Método para obtener todas las actividades
+    public List<Activity> getAllActivities() {
+        return activityRepo.findAll(); // Devuelve todas las actividades desde la base de datos
     }
 }

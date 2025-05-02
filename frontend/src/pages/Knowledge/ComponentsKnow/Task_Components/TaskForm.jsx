@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FiX, FiSave, FiPlus, FiTrash2, FiUser, FiFileText, FiChevronDown, FiChevronUp, FiMail, FiList } from 'react-icons/fi';
 import { MdTaskAlt } from 'react-icons/md';
 import { RiFlowChart } from 'react-icons/ri';
-import { createActivity } from '../../../../services/ActivityService';
+import { createActivity, getAllActivities } from '../../../../services/ActivityService';
 
 
 const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
@@ -87,7 +87,6 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     };
 
     createActivity(preparedData)
-
   
     // try {
     //   const url = taskToEdit ? `/api/tasks/${taskToEdit.id}` : '/api/tasks';
