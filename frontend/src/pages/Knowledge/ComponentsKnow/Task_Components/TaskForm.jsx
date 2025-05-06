@@ -4,8 +4,8 @@ import { MdTaskAlt } from 'react-icons/md';
 import { RiFlowChart } from 'react-icons/ri';
 import { createActivity, getAllActivities } from '../../../../services/ActivityService';
 
-
 const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
+  // Estado para almacenar los datos del formulario
   const [formData, setFormData] = useState({
     name: '',
     type: 'task',
@@ -20,6 +20,8 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
   });
 
   const [currentItem, setCurrentItem] = useState('');
+
+  // Estado para manejar la visibilidad de las secciones (acordeón)
   const [expandedSections, setExpandedSections] = useState({
     details: true,
     assignment: true,
@@ -27,12 +29,14 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     options: true
   });
 
+  // Si se está editando una tarea existente, precargar los datos
   useEffect(() => {
     if (taskToEdit) {
       setFormData(taskToEdit);
     }
   }, [taskToEdit]);
 
+  // Toggle para expandir o contraer las secciones del formulario
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
       ...prev,
@@ -40,6 +44,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     }));
   };
 
+  // Manejador genérico para cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -48,11 +53,13 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     }));
   };
 
+  // Manejador para selects múltiples (asignados, revisores)
   const handleMultiSelect = (e, field) => {
     const selected = Array.from(e.target.selectedOptions, opt => parseInt(opt.value));
     setFormData(prev => ({ ...prev, [field]: selected }));
   };
 
+  // Agregar un item a la lista de items
   const handleAddItem = () => {
     if (currentItem.trim()) {
       setFormData(prev => ({
@@ -63,6 +70,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     }
   };
 
+  // Eliminar un item de la lista de items
   const handleRemoveItem = (id) => {
     setFormData(prev => ({
       ...prev,
@@ -70,84 +78,62 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     }));
   };
 
+  // Lógica principal para validar y enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validación mínima de campos requeridos
     if (!formData.name.trim()) {
       alert('El nombre es requerido');
       return;
     }
+
+    // Validación específica para flujos (workflow)
     if (formData.type === 'workflow' && formData.reviewers.length === 0) {
       alert('Debe seleccionar al menos un revisor para flujos');
       return;
     }
-  
+
+    // Preparamos los datos para el backend (solo nombres de items)
     const preparedData = {
       ...formData,
       items: formData.items.map(item => item.name)
     };
 
-    createActivity(preparedData)
-  
-    // try {
-    //   const url = taskToEdit ? `/api/tasks/${taskToEdit.id}` : '/api/tasks';
-    //   const method = taskToEdit ? 'PUT' : 'POST';
-  
-    //   const token = localStorage.getItem('token'); // 👉 Obtener el token desde localStorage
-  
-    //   const response = await fetch(url, {
-    //     method: method,
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       'Authorization': `Bearer ${token}` // 👉 Incluir el token en el encabezado
-    //     },
-    //     body: JSON.stringify(preparedData)
-    //   });
-  
-    //   if (response.ok) {
-    //     const result = await response.json();
-    //     onSave(result); // Notifica al componente padre que la tarea fue guardada
-    //     onClose(); // Cierra el modal
-    //   } else {
-    //     alert('Hubo un error al guardar la tarea');
-    //   }
-    // } catch (error) {
-    //   console.error('Error al conectar con el backend:', error);
-    //   alert('Hubo un error al procesar la solicitud');
-    // }
+    // Llamamos al servicio para crear o actualizar la actividad
+    createActivity(preparedData);
   };
-  
-  
 
   return (
     <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
       <div className="modal-dialog modal-lg modal-dialog-centered">
         <div className="modal-content border-0 shadow-lg">
+
+          {/* HEADER DEL MODAL */}
           <div className="modal-header bg-primary text-white">
             <h5 className="modal-title d-flex align-items-center">
-              {formData.type === 'task' ? (
-                <MdTaskAlt size={20} className="me-2" />
-              ) : (
-                <RiFlowChart size={20} className="me-2" />
-              )}
+              {formData.type === 'task' ? <MdTaskAlt size={20} className="me-2" /> : <RiFlowChart size={20} className="me-2" />}
               {taskToEdit ? 'Editar Actividad' : 'Nueva Actividad'}
             </h5>
             <button type="button" className="btn-close btn-close-white" onClick={onClose}></button>
           </div>
 
+          {/* FORMULARIO */}
           <form onSubmit={handleSubmit}>
             <div className="modal-body">
-              {/* Sección de Detalles Básicos */}
+
+              {/* SECCIÓN DETALLES BÁSICOS */}
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-3 cursor-pointer" onClick={() => toggleSection('details')}>
                   <h6 className="mb-0 d-flex align-items-center">
-                    <FiFileText className="me-2" />
-                    Detalles Básicos
+                    <FiFileText className="me-2" /> Detalles Básicos
                   </h6>
                   {expandedSections.details ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
 
                 {expandedSections.details && (
                   <div className="row g-3">
+                    {/* Nombre de la actividad */}
                     <div className="col-md-6">
                       <label className="form-label">Nombre *</label>
                       <input
@@ -160,6 +146,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                       />
                     </div>
 
+                    {/* Tipo de actividad (task o workflow) */}
                     <div className="col-md-6">
                       <label className="form-label">Tipo</label>
                       <select
@@ -167,13 +154,14 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                         name="type"
                         value={formData.type}
                         onChange={handleChange}
-                        disabled={!!taskToEdit}
+                        disabled={!!taskToEdit} // No se puede cambiar el tipo si se está editando
                       >
                         <option value="task">Tarea</option>
                         <option value="workflow">Flujo de Trabajo</option>
                       </select>
                     </div>
 
+                    {/* Fecha límite y prioridad */}
                     <div className="col-md-6">
                       <label className="form-label">Fecha Límite</label>
                       <input
@@ -199,6 +187,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                       </select>
                     </div>
 
+                    {/* Descripción de la actividad */}
                     <div className="col-12">
                       <label className="form-label">Descripción</label>
                       <textarea
@@ -213,18 +202,18 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                 )}
               </div>
 
-              {/* Sección de Asignación */}
+              {/* SECCIÓN ASIGNACIÓN */}
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-3 cursor-pointer" onClick={() => toggleSection('assignment')}>
                   <h6 className="mb-0 d-flex align-items-center">
-                    <FiUser className="me-2" />
-                    Asignación
+                    <FiUser className="me-2" /> Asignación
                   </h6>
                   {expandedSections.assignment ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
 
                 {expandedSections.assignment && (
                   <div className="row g-3">
+                    {/* Asignados */}
                     <div className="col-md-6">
                       <label className="form-label">Asignados *</label>
                       <select
@@ -244,62 +233,63 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                       <small className="text-muted">Mantén Ctrl/Cmd para seleccionar múltiples</small>
                     </div>
 
+                    {/* Revisores y porcentaje de aprobación (solo si es workflow) */}
                     {formData.type === 'workflow' && (
-                      <div className="col-md-6">
-                        <label className="form-label">Revisores *</label>
-                        <select
-                          className="form-select"
-                          multiple
-                          size="4"
-                          value={formData.reviewers}
-                          onChange={(e) => handleMultiSelect(e, 'reviewers')}
-                          required
-                        >
-                          {users.map(user => (
-                            <option key={user.id} value={user.id}>
-                              {user.nombre}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    {formData.type === 'workflow' && (
-                      <div className="col-md-6">
-                        <label className="form-label">% Aprobación Requerida</label>
-                        <div className="d-flex align-items-center gap-3">
-                          <input
-                            type="range"
-                            className="form-range flex-grow-1"
-                            min="50"
-                            max="100"
-                            step="5"
-                            name="approvalPercentage"
-                            value={formData.approvalPercentage}
-                            onChange={handleChange}
-                          />
-                          <span className="badge bg-primary fs-6">
-                            {formData.approvalPercentage}%
-                          </span>
+                      <>
+                        <div className="col-md-6">
+                          <label className="form-label">Revisores *</label>
+                          <select
+                            className="form-select"
+                            multiple
+                            size="4"
+                            value={formData.reviewers}
+                            onChange={(e) => handleMultiSelect(e, 'reviewers')}
+                            required
+                          >
+                            {users.map(user => (
+                              <option key={user.id} value={user.id}>
+                                {user.nombre}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-                      </div>
+
+                        <div className="col-md-6">
+                          <label className="form-label">% Aprobación Requerida</label>
+                          <div className="d-flex align-items-center gap-3">
+                            <input
+                              type="range"
+                              className="form-range flex-grow-1"
+                              min="50"
+                              max="100"
+                              step="5"
+                              name="approvalPercentage"
+                              value={formData.approvalPercentage}
+                              onChange={handleChange}
+                            />
+                            <span className="badge bg-primary fs-6">
+                              {formData.approvalPercentage}%
+                            </span>
+                          </div>
+                        </div>
+                      </>
                     )}
                   </div>
                 )}
               </div>
 
-              {/* Sección de Items */}
+              {/* SECCIÓN ITEMS */}
               <div className="mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-3 cursor-pointer" onClick={() => toggleSection('items')}>
                   <h6 className="mb-0 d-flex align-items-center">
-                    <FiList className="me-2" />
-                    Items
+                    <FiList className="me-2" /> Items
                   </h6>
                   {expandedSections.items ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
 
                 {expandedSections.items && (
                   <div>
+                    {/* Lista de items */}
                     <div className="border rounded p-3 mb-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                       {formData.items.length > 0 ? (
                         <ul className="list-group">
@@ -322,6 +312,8 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                         </div>
                       )}
                     </div>
+
+                    {/* Campo para agregar nuevo item */}
                     <div className="input-group">
                       <input
                         type="text"
@@ -336,20 +328,18 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                         onClick={handleAddItem}
                         disabled={!currentItem.trim()}
                       >
-                        <FiPlus className="me-1" />
-                        Agregar
+                        <FiPlus className="me-1" /> Agregar
                       </button>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Sección de Opciones */}
+              {/* SECCIÓN OPCIONES */}
               <div className="mb-3">
                 <div className="d-flex justify-content-between align-items-center mb-3 cursor-pointer" onClick={() => toggleSection('options')}>
                   <h6 className="mb-0 d-flex align-items-center">
-                    <FiMail className="me-2" />
-                    Opciones
+                    <FiMail className="me-2" /> Opciones
                   </h6>
                   {expandedSections.options ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
@@ -372,6 +362,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
               </div>
             </div>
 
+            {/* BOTONES DEL FOOTER */}
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={onClose}>
                 <FiX className="me-1" /> Cancelar
@@ -381,6 +372,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
               </button>
             </div>
           </form>
+
         </div>
       </div>
     </div>
