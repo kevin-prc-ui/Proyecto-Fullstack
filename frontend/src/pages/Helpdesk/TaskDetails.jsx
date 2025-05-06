@@ -18,7 +18,7 @@ const CHAT_SUB_TOPIC = '/ticket/chat/'; // Base topic for chat subscriptions
 const CHAT_SEND_ENDPOINT = '/app/chat/'; // Base endpoint for sending messages
 
 // --- Mock Current User ID (Replace with your actual auth logic) ---
-const MOCK_CURRENT_USER_ID = 11; // Example: Get this from context or auth state
+const MOCK_CURRENT_USER_ID = 2; // Example: Get this from context or auth state
 
 /**
  * @component TaskDetails
@@ -301,9 +301,9 @@ const TaskDetails = () => {
               <DetailItem label="Fuente" value={ticket.fuenteNombre} />
             </DetailSection>
 
-            <DetailSection title="Fechas Relevantes" icon={<FaCalendarAlt className="text-purple-600" />}>
-              <DetailItem label="Creación" value={formatDateTime(ticket.fechaCreacion)} icon={<FaClock className="text-gray-400" />} />
-              <DetailItem label="Actualización" value={formatDateTime(ticket.fechaActualizacion)} icon={<FaClock className="text-gray-400" />} />
+            <DetailSection title="Detalles" icon={<FaCalendarAlt className="text-purple-600" />}>
+              <DetailItem label="Creado" value={formatDateTime(ticket.fechaCreacion)} icon={<FaClock className="text-gray-400" />} />
+              <DetailItem label="Modificado" value={formatDateTime(ticket.fechaActualizacion)} icon={<FaClock className="text-gray-400" />} />
               <DetailItem label="Vencimiento" value={formatDateTime(ticket.fechaVencimiento)} icon={<FaClock className="text-gray-400" />} />
             </DetailSection>
 
