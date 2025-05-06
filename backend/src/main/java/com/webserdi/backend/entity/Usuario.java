@@ -1,6 +1,7 @@
 package com.webserdi.backend.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,6 +36,11 @@ public class Usuario {
     private String apellido;
 
     private boolean enabled;
+
+    @ManyToOne(fetch = FetchType.LAZY) // LAZY es bueno para el rendimiento
+    @JoinColumn(name = "departamento_id", nullable = true)
+    @JsonBackReference // Evita que se serialice el departamento al serializar la incidencia
+    private Departamento departamento;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",

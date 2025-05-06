@@ -12,6 +12,7 @@ public class TicketDto {
     private Long id;
     private Long chatId;
     private String tema;
+    private String descripcion;
     private String codigo;
     private Boolean isTrashed;
     private LocalDateTime fechaCreacion;

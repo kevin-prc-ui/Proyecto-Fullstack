@@ -13,6 +13,7 @@ public class TicketMapper {
         ticketDto.setTema(ticket.getTema());
         ticketDto.setCodigo(ticket.getCodigo());
         ticketDto.setIsTrashed(ticket.getIsTrashed());
+        ticketDto.setDescripcion(ticket.getDescripcion());
         ticketDto.setFechaCreacion(ticket.getFechaCreacion());
         ticketDto.setFechaActualizacion(ticket.getFechaActualizacion());
         ticketDto.setFechaVencimiento(ticket.getFechaVencimiento());
@@ -41,6 +42,7 @@ public class TicketMapper {
         ticket.setTema(dto.getTema());
         ticket.setCodigo(dto.getCodigo());
         ticket.setIsTrashed(dto.getIsTrashed());
+        ticket.setDescripcion(dto.getDescripcion()); // Agregamos esta línea
         ticket.setFechaCreacion(dto.getFechaCreacion());
         ticket.setFechaActualizacion(dto.getFechaActualizacion());
         ticket.setFechaVencimiento(dto.getFechaVencimiento());

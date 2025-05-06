@@ -12,6 +12,7 @@ public class UsuarioDto {
     private String email;
     private String password;
     private boolean enabled;
+    private DepartamentoDto departamento;
     private Set<String> roles=new HashSet<>();
     private Set<String> permisos=new HashSet<>();
 }

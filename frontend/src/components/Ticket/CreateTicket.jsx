@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Dialog } from "@headlessui/react";
+import { DialogTitle } from "@headlessui/react";
 import ModalWrapper from "../ModalWrapper";
 import Button from "../Button";
 import clsx from "clsx";
@@ -7,21 +7,24 @@ import { useForm, Controller } from "react-hook-form"; // Importa Controller
 import {
     createTicket,
     listDepartamentos,
-    listAllIncidencias, // Necesitamos una nueva función en el servicio
-    // listIncidenciasByDepartamentoId // Opcional: si prefieres cargar bajo demanda
+    listAllIncidencias,
+    listAllPrioridades, // Necesitamos una nueva función en el servicio
+    // listIncidenciasBydepartamento // Opcional: si prefieres cargar bajo demanda
 } from "../../services/TicketService"; // Asume que crearás listAllIncidencias
+import { listUsers} from "../../services/UsuarioService";
 import { toast } from "sonner";
-
-const PRIORITIES = ["Baja", "Media", "Alta"];
+// const PRIORITIES = ["Baja", "Media", "Alta"];
 
 export default function CreateTicket({ open, setOpen, refreshTickets }) {
     const [loading, setLoading] = useState(false);
     const [loadingDeps, setLoadingDeps] = useState(false);
     const [loadingIncs, setLoadingIncs] = useState(false);
     const [departamentos, setDepartamentos] = useState([]);
+    const [prioridades, setPrioridades] = useState([]);
     const [usuarios, setUsuarios] = useState([]);
+    const [filteredUsuarios, setFilteredUsuarios] = useState([]);
     const [allIncidencias, setAllIncidencias] = useState([]); // Guarda todas las incidencias
-    const [filteredIncidencias, setFilteredIncidencias] = useState([]); // Incidencias filtradas para el select
+    // const { isAuth, getAllUsers } = useAuth();
 
     const {
         register,
@@ -34,47 +37,54 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
     } = useForm({
         defaultValues: { // Establece valores iniciales
             tema: "",
-            usuarioAsignado: "",
-            usuarioCreador: "",
             descripcion: "",
-            departamentoId: "",
-            incidenciaId: "",
-            motivo: "",
+            usuarioCreador: "",
+            usuarioAsignado: "",
+            departamento: "",
+            fuente:"",
+            incidencia: "",
+            motivo:"",
             estado: "",
-            prioridad: "",
-            
+            prioridad: "" // Estandarizado a prioridad
         }
     });
+    // Incidencias filtradas basadas en el departamento seleccionado
+    const [filteredIncidencias, setFilteredIncidencias] = useState([]);
 
     // Observa los cambios en los selects
-    const watchedDepartamentoId = watch("departamentoId");
-    const watchedIncidenciaId = watch("incidenciaId");
+    const watcheddepartamento = watch("departamento");
+    const watchedincidencia = watch("incidencia");
 
     // --- Carga Inicial de Datos ---
     const loadInitialData = useCallback(async () => {
         setLoadingDeps(true);
         setLoadingIncs(true);
         try {
-            const [depRes, incRes] = await Promise.all([
+            const [depRes, incRes, prioRes, userRes] = await Promise.all([
                 listDepartamentos(),
-                listAllIncidencias() // Llama a la nueva función del servicio
+                listAllIncidencias(), // Llama a la nueva función del servicio
+                listAllPrioridades(),
+                listUsers() // Asume que lista todos los usuarios relevantes
+                
             ]);
 
             // Asume que depRes.data es [{ id, nombre }]
             setDepartamentos(depRes.data || []);
-
+            setPrioridades(prioRes.data || []);
             // Asume que incRes.data es [{ id, nombre, departamento: { id, nombre } }]
             // Mapeamos para tener una estructura plana si es necesario, o usamos la anidada
             setAllIncidencias(incRes.data || []);
+            setUsuarios(userRes.data || []);
 
         } catch (error) {
             console.error("Error al cargar datos iniciales:", error);
-            toast.error("Error al cargar departamentos o incidencias.");
+            toast.error("Error al cargar datos. Contacte a sistemas.");
             // Opcional: cerrar modal si falla la carga esencial
             // closeDialog();
         } finally {
             setLoadingDeps(false);
             setLoadingIncs(false);
+            
         }
     }, []); // Sin dependencias, se llama una vez
 
@@ -91,33 +101,37 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
 
     // --- Lógica de Selects Dependientes y Auto-asignación ---
 
-    // Efecto para filtrar incidencias cuando cambia el departamento seleccionado
+    // Efecto para filtrar incidencias y usuarios cuando cambia el departamento seleccionado
     useEffect(() => {
-        if (watchedDepartamentoId) {
-            const deptId = parseInt(watchedDepartamentoId, 10);
-            const filtered = allIncidencias.filter(inc => inc.departamento?.id === deptId);
-            setFilteredIncidencias(filtered);
-            
-            // No reseteamos incidencia aquí para permitir la auto-asignación desde incidencia
+        if (watcheddepartamento) {
+            const deptId = parseInt(watcheddepartamento, 10);
+            // Filtra incidencias que pertenecen al departamento seleccionado
+            const filteredInc = allIncidencias.filter(inc => inc.departamento?.id === deptId);
+            // Filtra usuarios que pertenecen al departamento seleccionado (si aplica esa lógica)
+            const filteredUsers = usuarios.filter(user => user.departamento?.id === deptId);
+            setFilteredIncidencias(filteredInc);
+            setFilteredUsuarios(filteredUsers);
+            // Podríamos resetear incidencia si el departamento cambia y la incidencia actual no pertenece al nuevo
+            // setValue("incidencia", "", { shouldValidate: false }); // Descomentar si se desea este comportamiento
         } else {
             setFilteredIncidencias([]); // Limpia si no hay departamento seleccionado
         }
-    }, [watchedDepartamentoId, allIncidencias]);
+    }, [watcheddepartamento, allIncidencias, usuarios]);
 
     // Efecto para auto-asignar departamento cuando cambia la incidencia seleccionada
     useEffect(() => {
-        if (watchedIncidenciaId) {
-            const incId = parseInt(watchedIncidenciaId, 10);
+        if (watchedincidencia) {
+            const incId = parseInt(watchedincidencia, 10);
             const selectedIncidencia = allIncidencias.find(inc => inc.id === incId);
 
             if (selectedIncidencia?.departamento) {
-                const targetDepartamentoId = selectedIncidencia.departamento.id.toString(); // Asegura que sea string para el select
-                const currentDepartamentoId = watchedDepartamentoId;
+                const targetdepartamento = selectedIncidencia.departamento.id.toString(); // Asegura que sea string para el <select>
+                const currentdepartamento = watcheddepartamento;
 
-                // Solo actualiza si el departamento es diferente para evitar bucles
-                if (currentDepartamentoId !== targetDepartamentoId) {
-                    setValue("departamentoId", targetDepartamentoId, { shouldValidate: true });
-                    // El efecto anterior (watchedDepartamentoId) se encargará de re-filtrar las incidencias
+                // Solo actualiza si el departamento asociado a la incidencia es diferente al seleccionado actualmente
+                if (currentdepartamento !== targetdepartamento) {
+                    setValue("departamento", targetdepartamento, { shouldValidate: true });
+                    // El efecto anterior (watcheddepartamento) se encargará de re-filtrar las incidencias
                 }
 
                 // Lógica específica para asignar automáticamente "Sistemas" (si es necesario)
@@ -129,15 +143,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
         }
         // No añadir setValue a las dependencias para evitar bucles infinitos
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [watchedIncidenciaId, allIncidencias]); // Solo depende de la incidencia y la lista completa
-
-    useEffect(() => {
-        const fetchUsers = async () => {
-          await getAllUsers();
-        };
-    
-        if (isAuth) fetchUsers();
-      }, [isAuth]);
+    }, [watchedincidencia, allIncidencias]); // Solo depende de la incidencia y la lista completa
 
     const closeDialog = () => {
         reset(); // Limpia react-hook-form
@@ -145,17 +151,20 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
         setOpen(false);
     };
 
-    const handleFormSubmit = async (data) => {
+    const handleFormSubmit = async (data) => {        
         setLoading(true);
         try {
             const ticketData = {
                 tema: data.tema,
                 descripcion: data.descripcion,
-                prioridad: data.prioridad,
-                // Asegúrate de que el backend espera los IDs directamente o como objetos
-                // Opción 1: IDs directos (más simple si el backend los acepta)
-                departamentoId: parseInt(data.departamentoId),
-                incidenciaId: parseInt(data.incidenciaId),
+                usuarioCreador: parseInt(data.usuarioCreador),
+                usuarioAsignado: parseInt(data.usuarioAsignado),
+                departamento: parseInt(data.departamento),
+                fuente: parseInt(data.fuente),
+                incidencia: parseInt(data.incidencia),
+                motivo: parseInt(data.motivo),
+                estado: parseInt(data.estado),
+                prioridad: parseInt(data.prioridad),
             };
             console.log("Enviando datos del Ticket:", ticketData);
 
@@ -172,135 +181,177 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
         } finally {
             setLoading(false);
         }
-    };
-
+    };    
     const isLoadingData = loadingDeps || loadingIncs;
 
     return (
-        <>
-            <ModalWrapper open={open} setOpen={closeDialog}>
-                <form onSubmit={handleSubmit(handleFormSubmit)} className="w-full">
-                    <Dialog.Title
-                        as="h2"
-                        className="text-lg font-semibold leading-6 text-gray-900 mb-4 text-center"
-                    >
-                        Crear Nuevo Ticket
-                    </Dialog.Title>
-
-                    <div className="mt-2 flex flex-col gap-4 px-4">
-                        {/* Campo Título */}
-                        <div className="w-full">
-                            <label htmlFor="tema" className="block text-sm font-medium text-gray-700 mb-1">Título</label>
-                            <input
-                                type="text" id="tema"
-                                {...register("tema", { required: "El título es obligatorio" })}
-                                placeholder="Título del ticket"
-                                className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.tema && "border-red-500")}
-                            />
-                            {errors.tema && <p className="text-red-500 text-xs mt-1">{errors.tema.message}</p>}
-                        </div>
-
-                        {/* Campo Descripción */}
-                        <div className="w-full">
-                            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                            <textarea id="descripcion" rows={3}
-                                {...register("descripcion", { required: "La descripción es obligatoria" })}
-                                placeholder="Describe el problema o solicitud"
-                                className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.descripcion && "border-red-500")}
-                            />
-                            {errors.descripcion && <p className="text-red-500 text-xs mt-1">{errors.descripcion.message}</p>}
-                        </div>
-
-                        {/* Campo Usuario */}
-                        <div className="w-full">
-                            <label htmlFor="usuarioAsignado" className="block text-sm font-medium text-gray-700 mb-1">Agente:</label>
-                            {/* Usamos Controller para integrar mejor con setValue */}
-                            <Controller
-                                name="usuarioAsignado"
-                                control={control}
-                                rules={{ required: "El usuario es obligatorio" }}
-                                render={({ field }) => (
-                                    <select id="usuarioAsignado"
-                                        {...field} // Pasa props de react-hook-form (value, onChange, onBlur)
-                                        disabled={loadingDeps || loading}
-                                        className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.usuarioAsignado && "border-red-500")}
-                                    >
-                                        <option value="" disabled>{loadingDeps ? "Cargando..." : "Selecciona un agente"}</option>
-                                        {departamentos.map((dep) => (<option key={dep.id} value={dep.id}>{dep.nombre}</option>))}
-                                    </select>
-                                )}
-                            />
-                            {errors.departamentoId && <p className="text-red-500 text-xs mt-1">{errors.departamentoId.message}</p>}
-                        </div>
-                        {/* Campo Departamento */}
-                        <div className="w-full">
-                            <label htmlFor="departamentoId" className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
-                            <Controller
-                                name="departamentoId"
-                                control={control}
-                                rules={{ required: "El departamento es obligatorio" }}
-                                render={({ field }) => (
-                                    <select id="departamentoId"
-                                        {...field} // Pasa props de react-hook-form (value, onChange, onBlur)
-                                        disabled={loadingDeps || loading}
-                                        className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.departamentoId && "border-red-500")}
-                                    >
-                                        <option value="" disabled>{loadingDeps ? "Cargando..." : "Selecciona un departamento"}</option>
-                                        {departamentos.map((dep) => (<option key={dep.id} value={dep.id}>{dep.nombre}</option>))}
-                                    </select>
-                                )}
-                            />
-                            {errors.departamentoId && <p className="text-red-500 text-xs mt-1">{errors.departamentoId.message}</p>}
-                        </div>
-
-                        {/* Campo Incidencia */}
-                        <div className="w-full">
-                            <label htmlFor="incidenciaId" className="block text-sm font-medium text-gray-700 mb-1">Incidencia</label>
-                            <Controller
-                                name="incidenciaId"
-                                control={control}
-                                rules={{ required: "La incidencia es obligatoria" }}
-                                render={({ field }) => (
-                                    <select id="incidenciaId"
-                                        {...field}
-                                        // Deshabilitado si no hay departamento seleccionado o si se están cargando datos
-                                        disabled={!watchedDepartamentoId || loadingIncs || loadingDeps || loading}
-                                        className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.incidenciaId && "border-red-500", (!watchedDepartamentoId || loadingIncs) && "bg-gray-100")}
-                                    >
-                                        <option value="" disabled>
-                                            {!watchedDepartamentoId
-                                                ? "Selecciona un departamento primero"
-                                                : loadingIncs
-                                                    ? "Cargando incidencias..."
-                                                    : filteredIncidencias.length === 0
-                                                        ? "No hay incidencias para este depto."
-                                                        : "Selecciona una incidencia"}
-                                        </option>
-                                        {filteredIncidencias.map((inc) => (<option key={inc.id} value={inc.id}>{inc.nombre}</option>))}
-
-                                    </select>
-                                )}
-                            />
-                            {errors.incidenciaId && <p className="text-red-500 text-xs mt-1">{errors.incidenciaId.message}</p>}
-                        </div>
-
-                        {/* Campo Prioridad */}
-                        <div className="w-full">
-                            <label htmlFor="prioridad" className="block text-sm font-medium text-gray-700 mb-1">Prioridad</label>
-                            <select id="prioridad"
-                                {...register("prioridad", { required: "La prioridad es obligatoria" })}
-                                className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.prioridad && "border-red-500")}
-                                defaultValue="" // Asegura que el placeholder se muestre
-                            >
-                                <option value="" disabled>Selecciona una prioridad</option>
-                                {PRIORITIES.map((p) => (<option key={p} value={p}>{p}</option>))}
-                            </select>
-                            {errors.prioridad && <p className="text-red-500 text-xs mt-1">{errors.prioridad.message}</p>}
-                        </div>
+        // Usa el ModalWrapper refactorizado, pasando title y footer como props
+        <ModalWrapper
+            open={open}
+            setOpen={closeDialog}
+            title={
+                // El título se pasa como un elemento React
+                <DialogTitle
+                    as="h2"
+                    // El ID debe coincidir con el aria-labelledby en ModalWrapper si se genera allí
+                    // Si ModalWrapper genera el ID, no es necesario ponerlo aquí.
+                    // id={titleId} // Asegúrate que titleId esté definido si lo pones aquí
+                    className="text-lg font-semibold leading-6 text-gray-900 text-center"
+                >
+                    Crear Nuevo Ticket
+                </DialogTitle>
+            }
+            footer={
+                // Los botones se pasan como un elemento React en el footer
+                <div className="sm:flex sm:flex-row-reverse gap-4">
+                    <Button
+                        type="submit" // Sigue siendo submit
+                        form="create-ticket-form" // Vincula este botón al formulario por su ID
+                        className={clsx("px-8 text-sm font-semibold text-white sm:w-auto", "bg-blue-600 hover:bg-blue-700", (loading || isLoadingData) && "opacity-50 cursor-not-allowed")}
+                        label={loading ? "Creando..." : "Crear Ticket"}
+                        onClick={handleSubmit(handleFormSubmit)}
+                        disabled={loading || isLoadingData}
+                    />
+                    <Button
+                        type="button"
+                        className="bg-white px-8 text-sm font-semibold text-gray-900 sm:w-auto border hover:bg-gray-50"
+                        onClick={() => closeDialog()}
+                        label="Cancelar"
+                        disabled={loading} // Deshabilitar si el formulario está enviando
+                    />
+                </div>
+            }
+        >
+            {/* El formulario ahora solo envuelve los campos (children del ModalWrapper) */}
+            {/* Se le da un ID para vincularlo con el botón de submit externo */}
+            <form id="create-ticket-form" className="w-full">
+                <div className="flex flex-col gap-4"> {/* Contenedor para los campos con espaciado */}
+                    {/* Campo Título */}
+                    <div className="w-full">
+                        <label htmlFor="tema" className="block text-sm font-medium text-gray-700 mb-1">Título</label>
+                        <input
+                            type="text" id="tema"
+                            {...register("tema", { required: "El título es obligatorio" })}
+                            placeholder="Título del ticket"
+                            className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.tema && "border-red-500")}
+                        />
+                        {errors.tema && <p className="text-red-500 text-xs mt-1">{errors.tema.message}</p>}
                     </div>
 
-                    {/* Botones */}
-                    <div className="bg-gray-50 py-3 mt-4 sm:flex sm:flex-row-reverse gap-4 px-4">
+                    {/* Campo Descripción */}
+                    <div className="w-full">
+                        <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                        <textarea id="descripcion" rows={4} maxLength={500}
+                            {...register("descripcion", { required: "La descripción es obligatoria" })}
+                            placeholder="Describe el problema o solicitud"
+                            className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.descripcion && "border-red-500")}
+                        />
+                        {errors.descripcion && <p className="text-red-500 text-xs mt-1">{errors.descripcion.message}</p>}
+                    </div>
+
+                    {/* Campo Usuario (Agente Asignado) */}
+                    <div className="w-full">
+                        <label htmlFor="usuarioAsignado" className="block text-sm font-medium text-gray-700 mb-1">Agente:</label>
+                        <Controller
+                            name="usuarioAsignado"
+                            control={control}
+                            rules={{ required: "El agente es obligatorio" }} // Mensaje de error más específico
+                            render={({ field }) => (
+                                <select id="usuarioAsignado"
+                                    {...field}
+                                    className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.usuarioAsignado && "border-red-500")}
+                                >
+                                    <option value="" disabled>{loadingDeps ? "Cargando..." : "Selecciona un agente"}</option>
+                                    {/* Idealmente, aquí se mostrarían los filteredUsuarios si la lógica aplica */}
+                                    {/* Si no, se muestran todos los usuarios */}
+                                    {(filteredUsuarios.length > 0 ? filteredUsuarios : usuarios).map((usuario) => (
+                                        <option key={usuario.id} value={usuario.id}>{usuario.nombre}</option>
+                                    ))}
+                                </select>
+                            )}
+                        />
+                        {errors.usuarioAsignado && <p className="text-red-500 text-xs mt-1">{errors.usuarioAsignado.message}</p>}
+                    </div>
+
+                    {/* Campo Departamento */}
+                    <div className="w-full">
+                        <label htmlFor="departamento" className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
+                        <Controller
+                            name="departamento"
+                            control={control}
+                            rules={{ required: "El departamento es obligatorio" }}
+                            render={({ field }) => (
+                                <select id="departamento"
+                                    {...field}
+                                    disabled={loadingDeps || loading} // Deshabilitado mientras carga o envía
+                                    className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.departamento && "border-red-500")}
+                                >
+                                    <option value="" disabled>{loadingDeps ? "Cargando..." : "Selecciona un departamento"}</option>
+                                    {departamentos.map((dep) => (<option key={dep.id} value={dep.id}>{dep.nombre}</option>))}
+                                </select>
+                            )}
+                        />
+                        {errors.departamento && <p className="text-red-500 text-xs mt-1">{errors.departamento.message}</p>}
+                    </div>
+
+                    {/* Campo Incidencia */}
+                    <div className="w-full">
+                        <label htmlFor="incidencia" className="block text-sm font-medium text-gray-700 mb-1">Incidencia</label>
+                        <Controller
+                            name="incidencia"
+                            control={control}
+                            rules={{ required: "La incidencia es obligatoria" }}
+                            render={({ field }) => (
+                                <select id="incidencia"
+                                    {...field}
+                                    disabled={!watcheddepartamento || loadingIncs || loadingDeps || loading}
+                                    className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.incidencia && "border-red-500", (!watcheddepartamento || loadingIncs) && "bg-gray-100 cursor-not-allowed")}
+                                >
+                                    <option value="" disabled>
+                                        {!watcheddepartamento
+                                            ? "Selecciona un departamento primero"
+                                            : loadingIncs
+                                                ? "Cargando incidencias..."
+                                                : filteredIncidencias.length === 0
+                                                    ? "No hay incidencias para este depto."
+                                                    : "Selecciona una incidencia"}
+                                    </option>
+                                    {filteredIncidencias.map((inc) => (<option key={inc.id} value={inc.id}>{inc.nombre}</option>))}
+                                </select>
+                            )}
+                        />
+                        {errors.incidencia && <p className="text-red-500 text-xs mt-1">{errors.incidencia.message}</p>}
+                    </div>
+
+                    {/* Campo Prioridad (Corregido) */}
+                    <div className="w-full">
+                        <label htmlFor="prioridad" className="block text-sm font-medium text-gray-700 mb-1">Prioridad:</label> {/* Corregido htmlFor */}
+                        <Controller
+                            name="prioridad" // Corregido name
+                            control={control}
+                            rules={{ required: "La prioridad es obligatoria" }}
+                            render={({ field }) => (
+                                <select id="prioridad" // Corregido id
+                                    {...field}
+                                    className={clsx("w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", errors.prioridad && "border-red-500")} // Corregido error check
+                                >
+                                    <option value="" disabled>{loadingDeps ? "Cargando..." : "Asigne la prioridad"}</option>
+                                    {/* Asume que prioridades es [{id, nombre}] */}
+                                    {prioridades.map((prio) => (<option key={prio.id} value={prio.id}>{prio.nombre}</option>))}
+                                </select>
+                            )}
+                        />
+                        {errors.prioridad && <p className="text-red-500 text-xs mt-1">{errors.prioridad.message}</p>} {/* Corregido error check */}
+                    </div>
+                </div>
+            </form>
+        </ModalWrapper>
+    );
+}
+
+// Código original de los botones (para referencia)
+/*
+<div className="bg-gray-50 py-3 mt-4 sm:flex sm:flex-row-reverse gap-4 px-4">
                         <Button
                             type="submit"
                             className={clsx("px-8 text-sm font-semibold text-white sm:w-auto", "bg-blue-600 hover:bg-blue-700", (loading || isLoadingData) && "opacity-50 cursor-not-allowed")}
@@ -314,9 +365,5 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
                             label="Cancelar"
                             disabled={loading}
                         />
-                    </div>
-                </form>
-            </ModalWrapper>
-        </>
-    );
-}
+</div>
+*/

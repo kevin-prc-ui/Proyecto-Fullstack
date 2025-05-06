@@ -23,8 +23,8 @@ public class Ticket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @Column(nullable = false)
-//    private String descripcion;
+    @Column(nullable = false, length = 500)
+    private String descripcion;
 
     @Column(nullable = false)
     private String tema;
@@ -75,7 +75,7 @@ public class Ticket {
     private Prioridad prioridad;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, optional = false, orphanRemoval = true)
-    @JoinColumn(name = "chat_id", referencedColumnName = "id", unique = true) // Foreign key in Ticket table
+    @JoinColumn(name = "chat_id", referencedColumnName = "id", unique = true) // Foreign key in Ticket table    
     private Chat chat;
 
     @PrePersist

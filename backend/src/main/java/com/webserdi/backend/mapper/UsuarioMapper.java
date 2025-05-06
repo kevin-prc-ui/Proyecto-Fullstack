@@ -1,6 +1,8 @@
 package com.webserdi.backend.mapper;
 
+import com.webserdi.backend.dto.DepartamentoDto;
 import com.webserdi.backend.dto.UsuarioDto;
+import com.webserdi.backend.entity.Departamento;
 import com.webserdi.backend.entity.Permiso;
 import com.webserdi.backend.entity.Rol;
 import com.webserdi.backend.entity.Usuario;
@@ -17,6 +19,15 @@ public class UsuarioMapper {
         usuarioDto.setEnabled(usuario.isEnabled());
         usuarioDto.setNombre(usuario.getNombre());
         usuarioDto.setApellido(usuario.getApellido());
+        // Mapear el departamento asociado
+        Departamento departamentoEntity = usuario.getDepartamento();
+        if (departamentoEntity != null) {
+            DepartamentoDto departamentoDto = new DepartamentoDto();
+            departamentoDto.setId(departamentoEntity.getId());
+            departamentoDto.setNombre(departamentoEntity.getNombre());
+            usuarioDto.setDepartamento(departamentoDto); // <-- Establecer el DTO anidado
+        }
+        // Si departamentoEntity es null, dto.getDepartamento() permanecerá null
         usuarioDto.setRoles(usuario.getRoles().stream()
                 .map(Rol::getNombre)
                 .collect(Collectors.toSet()));
