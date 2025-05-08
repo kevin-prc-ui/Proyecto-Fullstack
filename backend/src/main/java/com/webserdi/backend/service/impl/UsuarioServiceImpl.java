@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-//Esta anotacion le dice al spring container que genere el spring bean para esta clase UsuarioServiceImpl
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
     private final PermisoRepository permisoRepository;
@@ -46,7 +45,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             usuario.setEmail(newEmail);
             usuarioRepository.save(usuario);
         } catch (DataIntegrityViolationException ex) {
-            // Check if the error is due to the email unique constraint
+            // Verifica si el error es debido a la restricción de unicidad del email
             if (ex.getMessage().contains("UK5171l57faosmj8myawaucatdw")) {
                 throw new DuplicateEmailException("Email is already in use");
             }
@@ -81,17 +80,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioDto getUsuarioById(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("No existe el usuario con el id " + usuarioId));
+                .orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con el id " + usuarioId));
         return UsuarioMapper.mapToUsuarioDto(usuario);
-
     }
 
     @Override
     public UsuarioDto updateUsuario(Long usuarioId, UsuarioDto usuarioDto) {
         Usuario savedUsuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Usuario no encontrado con id: " + usuarioId));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + usuarioId));
 
         // Actualizar datos básicos
         savedUsuario.setNombre(usuarioDto.getNombre());
@@ -114,11 +110,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public void deleteUsuario(Long usuarioId) {
-
-        Usuario usuario = usuarioRepository.findById(usuarioId).
-                orElseThrow(() ->
-                        new ResourceNotFoundException("No existe el usuario con el id" + usuarioId));
-        usuarioRepository.deleteAllById(Collections.singleton(usuarioId));
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con el id" + usuarioId));
+        usuarioRepository.deleteById(usuarioId);
     }
 
     @Override
@@ -130,10 +124,9 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Set<String> getRole (String email){
+    public Set<String> getRole(String email) {
         Usuario user = usuarioRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("No existe el usuario con el email" + email));
+                .orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con el email" + email));
         return user.getRoles().stream()
                 .map(Rol::getNombre)
                 .collect(Collectors.toSet());

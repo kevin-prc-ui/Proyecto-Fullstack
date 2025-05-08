@@ -78,10 +78,10 @@ const Task = () => {
     }
     
     saveActivities(updatedActivities);
-    setShowTaskForm(false);
-    setEditingTask(null);
+    setShowTaskForm(false);  // Cierra el formulario después de guardar
+    setEditingTask(null);     // Limpia el estado de la tarea en edición
   };
-
+  
   // Filtra las actividades según el estado seleccionado (todas, pendientes o completadas)
   const filteredActivities = activities.filter(activity => {
     if (filter === 'completed') return activity.status === 'Completado';

@@ -36,25 +36,22 @@ function Layout() {
       enter="transition-opacity duration-300"
       enterFrom="opacity-0"
       enterTo="opacity-100"
-      className=""
+      className="min-h-screen flex flex-col"
     >
-      <div className="w-full h-screen flex flex-col md:flex-row">
+      <div className="flex flex-1 flex-col md:flex-row">
         {/* Sidebar condicional */}
         {isAuthenticated!==null && !isDashboard && (
-          <div className="w-1/6 h-screen bg-white min-w-50 sticky top-0 hidden md:block">
+          <div className="hidden md:block sticky top-0 h-[calc(100vh)]">
             <Sidebar />
           </div>
         )}
+        
         {/* Contenido principal */}
-        <div
-          className={`w-full flex flex-col overflow-y-auto ${
-            isDashboard ? "w-1" : ""
-          }`}
-        >
+        <div className="flex-1 flex flex-col">
           <Navbar />
-          <div className="pt-2 pb-0 p-3 2xl:px-10 flex flex-col">
+          <main className="flex-1 overflow-y-auto pt-2 pb-0 p-3 2xl:px-10">
             <Outlet />
-          </div>
+          </main>
           <Footer />
         </div>
       </div>
