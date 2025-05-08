@@ -1,7 +1,6 @@
 package com.webserdi.backend.service;
 
 import com.webserdi.backend.dto.PermisoDto;
-import com.webserdi.backend.dto.RolDto;
 import com.webserdi.backend.dto.UsuarioDto;
 
 import java.util.List;

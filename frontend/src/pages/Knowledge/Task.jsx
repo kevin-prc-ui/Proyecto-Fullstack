@@ -4,6 +4,7 @@ import { MdOutlineWorkOutline, MdTaskAlt } from 'react-icons/md';
 import TaskList from './ComponentsKnow/Task_Components/TaskList';
 import TaskForm from './ComponentsKnow/Task_Components/TaskForm';
 import {listUsers} from '../../services/UsuarioService';
+import { getAllActivities } from '../../services/ActivityService';
 
 const Task = () => {
   // Estados para manejar actividades, formulario, filtros y usuarios
@@ -15,6 +16,20 @@ const Task = () => {
   const [usuarios, setUsuarios] = useState([]); // Lista de usuarios para asignación de tareas
 
   const isAuth = localStorage.getItem("authToken"); // Verifica si hay token de autenticación
+// Efecto para cargar usuarios si el usuario está autenticado
+      useEffect(() => {
+        const fetchActivities = async () => {
+          await listActivities();
+          console.log(activities);
+        };
+    
+        if (isAuth) fetchActivities();
+      }, [isAuth]);
+
+  async function listActivities() {
+        const response = await getAllActivities();
+        setActivities(response.data);
+    }
 
   // Efecto para cargar usuarios si el usuario está autenticado
   useEffect(() => {
@@ -63,10 +78,10 @@ const Task = () => {
     }
     
     saveActivities(updatedActivities);
-    setShowTaskForm(false);
-    setEditingTask(null);
+    setShowTaskForm(false);  // Cierra el formulario después de guardar
+    setEditingTask(null);     // Limpia el estado de la tarea en edición
   };
-
+  
   // Filtra las actividades según el estado seleccionado (todas, pendientes o completadas)
   const filteredActivities = activities.filter(activity => {
     if (filter === 'completed') return activity.status === 'Completado';
