@@ -220,8 +220,6 @@ const ChatComponent = ({
           </div>
         ) : (
           messages.map((msg) => {
-            console.log("Rendering message:", msg);
-
             const isSender = msg.sender?.id === currentUserId;
             return (
               <div

@@ -57,4 +57,8 @@ export const getUserRoles = (email) => {
   });
 };
 
+export const getUserId = () => axios.get(`${REST_API_BASE_URL}/users/getuseremail`, getHeaders());
+
+
+
 

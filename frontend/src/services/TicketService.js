@@ -143,6 +143,11 @@ export const listAllPrioridades = () => {
       headers: { Authorization: `Bearer ${getAuthToken()}` }
   });
 };
+export const listAllMotivos = () => {
+  return axios.get(`${REST_API_BASE_URL}/motivos`, { // Endpoint a crear en el backend
+      headers: { Authorization: `Bearer ${getAuthToken()}` }
+  });
+};
 
 
 // Add other necessary functions like createTicket, updateTicket if needed...

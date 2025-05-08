@@ -25,7 +25,6 @@ const Card = ({ ticket, status}) => {
 
   return (
     <>
-   
       <div className="w-full h-fit bg-white shadow-md p-2 rounded ">
         <div className="w-full flex justify-evenly items-center ">
           <div
@@ -86,30 +85,14 @@ const Card = ({ ticket, status}) => {
         </div>
 
         {/* sub tickets */}
-        {ticket?.subTickets?.length > 0 ? (
+        
           <div className="py-4 border-t border-gray-200">
-            <h5 className="text-base line-clamp-1 text-black">
-              {ticket?.subTickets[0].tema}
-            </h5>
-
-            <div className="p-4 space-x-8">
-            <span className="text-sm text-gray-600">
-                {formatDate(new Date(ticket?.subTickets[0]?.fechaCreacion))}
-              </span><span className="text-sm text-gray-600">
-                {formatDate(new Date(ticket?.subTickets[0]?.fechaVencimiento))}
-              </span>
-              <span className="bg-blue-600/10 px-3 py-1 rounded0full text-blue-700 font-medium">
-                {ticket?.subTickets[0].tag}
-              </span>
+            <div className="text-base line-clamp-1 text-black">
+              <div className="textLimited">
+              {ticket?.descripcion}
+              </div>
             </div>
           </div>
-        ) : (
-          <>
-            <div className="py-4 border-t border-gray-200">
-              <span className="text-gray-500">No Sub Ticket</span>
-            </div>
-          </>
-        )}
 
         <div className="w-full pb-2">
           <button

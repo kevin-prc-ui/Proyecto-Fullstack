@@ -138,4 +138,13 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .map(Rol::getNombre)
                 .collect(Collectors.toSet());
     }
+
+    @Override
+    public Long getIdByEmail(String email) {
+        Usuario user = usuarioRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("No existe el usuario con el email" + email));;
+        long id=user.getId();
+        return id;
+    }
 }

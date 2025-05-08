@@ -8,10 +8,11 @@ import {
   createTicket,
   listDepartamentos,
   listAllIncidencias,
-  listAllPrioridades, // Necesitamos una nueva función en el servicio
+  listAllPrioridades,
+  listAllMotivos, // Necesitamos una nueva función en el servicio
   // listIncidenciasBydepartamento // Opcional: si prefieres cargar bajo demanda
 } from "../../services/TicketService"; // Asume que crearás listAllIncidencias
-import { listUsers } from "../../services/UsuarioService";
+import { getUserId, listUsers } from "../../services/UsuarioService";
 import { toast } from "sonner";
 // const PRIORITIES = ["Baja", "Media", "Alta"];
 
@@ -21,7 +22,9 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
   const [loadingIncs, setLoadingIncs] = useState(false);
   const [departamentos, setDepartamentos] = useState([]);
   const [prioridades, setPrioridades] = useState([]);
+  const [motivos, setMotivos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
+  const [usuarioCreador, setUsuarioCreador] = useState();
   const [filteredUsuarios, setFilteredUsuarios] = useState([]);
   const [allIncidencias, setAllIncidencias] = useState([]); // Guarda todas las incidencias
   // const { isAuth, getAllUsers } = useAuth();
@@ -38,6 +41,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
     defaultValues: {
       // Establece valores iniciales
       tema: "",
+      fechaVencimiento:"",
       descripcion: "",
       usuarioCreador: "",
       usuarioAsignado: "",
@@ -61,11 +65,13 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
     setLoadingDeps(true);
     setLoadingIncs(true);
     try {
-      const [depRes, incRes, prioRes, userRes] = await Promise.all([
+      const [depRes, incRes, prioRes, motRes, userRes,userCRes] = await Promise.all([
         listDepartamentos(),
         listAllIncidencias(), // Llama a la nueva función del servicio
         listAllPrioridades(),
+        listAllMotivos(),
         listUsers(), // Asume que lista todos los usuarios relevantes
+        getUserId(),
       ]);
 
       // Asume que depRes.data es [{ id, nombre }]
@@ -74,7 +80,9 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
       // Asume que incRes.data es [{ id, nombre, departamento: { id, nombre } }]
       // Mapeamos para tener una estructura plana si es necesario, o usamos la anidada
       setAllIncidencias(incRes.data || []);
+      setMotivos(motRes.data || []);
       setUsuarios(userRes.data || []);
+      setUsuarioCreador(userCRes.data || [])
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error);
       toast.error("Error al cargar datos. Contacte a sistemas.");
@@ -155,19 +163,20 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
     setOpen(false);
   };
 
-  const handleFormSubmit = async (data) => {
+  const handleFormSubmit = async (data) => {    
     setLoading(true);
     try {
       const ticketData = {
         tema: data.tema,
+        fechaVencimiento: data.fechaVencimiento,
         descripcion: data.descripcion,
-        usuarioCreador: parseInt(data.usuarioCreador),
+        usuarioCreador: parseInt(usuarioCreador),//
         usuarioAsignado: parseInt(data.usuarioAsignado),
         departamento: parseInt(data.departamento),
-        fuente: parseInt(data.fuente),
+        fuente: 1,//  
         incidencia: parseInt(data.incidencia),
-        motivo: parseInt(data.motivo),
-        estado: parseInt(data.estado),
+        motivo: parseInt(data.motivo),//
+        estado: 3,//
         prioridad: parseInt(data.prioridad),
       };
       console.log("Enviando datos del Ticket:", ticketData);
@@ -286,6 +295,30 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
               </p>
             )}
           </div>
+         {/* Campo Motivo*/}
+         <div className="w-full">
+            <label
+              htmlFor="fechaVencimiento"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Fecha de vencimiento:
+            </label>{" "}
+            <Controller
+              name="fechaVencimiento" // Corregido name
+              control={control}
+              rules={{ required: "La fecha es obligatoria" }}
+              render={({ field }) => (
+                <input type="date" id="fechaVencimiento" {...field}/>
+              )}
+            />
+            {errors.motivo && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.motivo.message}
+              </p>
+            )}{" "}
+            {/* Corregido error check */}
+          </div>
+          
           {/* Campo Usuario (Agente Asignado) */}
           <div className="w-full">
             <label
@@ -420,7 +453,48 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
               </p>
             )}
           </div>
-          {/* Campo Prioridad (Corregido) */}
+
+          {/* Campo Motivo*/}
+          <div className="w-full">
+            <label
+              htmlFor="motivo"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Motivo:
+            </label>{" "}
+            <Controller
+              name="motivo" // Corregido name
+              control={control}
+              rules={{ required: "El motivo es obligatorio" }}
+              render={({ field }) => (
+                <select
+                  id="motivo" // Corregido id
+                  {...field}
+                  className={clsx(
+                    "w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                    errors.motivo && "border-red-500"
+                  )} // Corregido error check
+                >
+                  <option value="" disabled>
+                    {loadingDeps ? "Cargando..." : "Asigne el motivo"}
+                  </option>
+                  {/* Asume que motivo es [{id, nombre}] */}
+                  {motivos.map((mot) => (
+                    <option key={mot.id} value={mot.id}>
+                      {mot.nombre}
+                    </option>
+                  ))}
+                </select>
+              )}
+            />
+            {errors.motivo && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.motivo.message}
+              </p>
+            )}{" "}
+            {/* Corregido error check */}
+          </div>
+          {/* Campo Prioridad*/}
           <div className="w-full">
             <label
               htmlFor="prioridad"
@@ -428,7 +502,6 @@ export default function CreateTicket({ open, setOpen, refreshTickets }) {
             >
               Prioridad:
             </label>{" "}
-            {/* Corregido htmlFor */}
             <Controller
               name="prioridad" // Corregido name
               control={control}

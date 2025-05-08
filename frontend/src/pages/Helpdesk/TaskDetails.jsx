@@ -15,14 +15,14 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import ChatComponent from "../../components/Chat"; // Renamed import for clarity
+import { getUserId } from "../../services/UsuarioService";
 
 // --- Configuration ---
-const WEBSOCKET_URL = 'http://localhost:8080/ws'; // Cambiado a HTTP para SockJS
+const WEBSOCKET_URL = 'http:/localhost:8080/ws'; // Cambiado a HTTP para SockJS
 const CHAT_SUB_TOPIC = '/topic/ticket/chat/'; // Asegúrate que coincida con tu backend
 const CHAT_SEND_ENDPOINT = '/app/topic/'; // Endpoint para enviar mensajes
 
 // --- Mock Current User ID (Replace with your actual auth logic) ---
-const MOCK_CURRENT_USER_ID = 2; // Example: Get this from context or auth state
 
 /**
  * @component TaskDetails
@@ -43,19 +43,22 @@ const TaskDetails = () => {
   const [stompClient, setStompClient] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [chatError, setChatError] = useState(null); // WebSocket/STOMP specific errors
+  const [usuario, setUsuario] = useState();
   const subscriptionRef = useRef(null); // To hold the subscription object
+  
 
   // --- Fetch Ticket Details ---
   useEffect(() => {
     if (id) {
       setLoadingTicket(true);
       setTicketError(null);
+      getUserId().then((response)=>{
+        setUsuario(response.data)
+      })
       getTicketById(id)
         .then((response) => {
           if (response.data) {
             // *** CRUCIAL: Check for chatId ***
-            console.log(response.data.chatId);
-
             setTicket(response.data);
             // Fetch initial messages AFTER getting ticket details (and chatId)
             fetchInitialMessages(response.data.chatId); // Use chatId
@@ -246,8 +249,8 @@ const TaskDetails = () => {
       const chatMessage = {
         // Structure matching backend's ChatMessageCreateDto (or similar)
         content: messageContent,
-        // messageType: 'TEXT', // Backend might infer this if content is present
-        // senderId: MOCK_CURRENT_USER_ID // Backend should get sender from authenticated principal
+        messageType: 'TEXT', // Backend might infer this if content is present
+        senderId: MOCK_CURRENT_USER_ID // Backend should get sender from authenticated principal
       };
 
       try {
@@ -396,7 +399,7 @@ const TaskDetails = () => {
             onSendMessage={handleSendMessage}
             isConnected={isConnected}
             isLoadingMessages={isLoadingMessages}
-            currentUserId={MOCK_CURRENT_USER_ID} // *** Replace with actual user ID ***
+            currentUserId={usuario} 
             connectionError={chatError}
           />
         </div>
@@ -474,9 +477,9 @@ const getBadgeColor = (statusName) => {
   switch (lowerStatus) {
     case "pendiente":
       return "bg-yellow-100 text-yellow-800";
-    case "en proceso":
+    case "en-proceso":
       return "bg-blue-100 text-blue-800";
-    case "resuelto":
+    case "completado":
       return "bg-green-100 text-green-800";
     case "cerrado":
       return "bg-gray-200 text-gray-700";

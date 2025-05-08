@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
@@ -65,5 +66,11 @@ public class UsuarioController{
     public ResponseEntity<Set<String>> getRole(@RequestParam String email) {
         Set<String> role = usuarioService.getRole(email);
         return ResponseEntity.ok(role);
+    }
+    @GetMapping("/getuseremail")
+    public ResponseEntity<String> getIdByEmail(Authentication auth) {
+        String email = auth.getName();
+        Long id = usuarioService.getIdByEmail(email);
+        return ResponseEntity.ok(id.toString());
     }
 }

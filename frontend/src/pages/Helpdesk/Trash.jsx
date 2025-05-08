@@ -69,7 +69,7 @@ const Trash = ( ) => {
   const restoreHandler = () => {
     restoreTicket(selected);
     setOpenDialog(false);
-    // window.location.reload();
+    window.location.reload();
     toast.success("Ticket restored successfully");
   };
 
