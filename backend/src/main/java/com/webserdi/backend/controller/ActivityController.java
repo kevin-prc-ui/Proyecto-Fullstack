@@ -35,7 +35,7 @@ public class ActivityController {
     }
 
     // 👉 Obtiene todas las actividades registradas
-    @GetMapping("/")
+    @GetMapping("/")    
     public ResponseEntity<?> getAllActivities() {
         List<Activity> activities = activityService.getAllActivities();
 

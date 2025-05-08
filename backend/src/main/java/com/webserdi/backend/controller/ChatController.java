@@ -9,11 +9,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/tickets/{ticketId}/chat") // Nested under tickets
@@ -45,5 +50,16 @@ public class ChatController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return chatService.postMessage(ticketId, messageDto, file, authentication);
+    }
+
+    @MessageMapping("/topic/{chatId}/sendMessage")
+    @SendTo("/topic/ticket/chat/{chatId}")
+    public ChatMessageDto handleChatMessage(
+            @DestinationVariable String chatId,
+            ChatMessageCreateDto message,
+            Principal principal) {
+
+        // Lógica para procesar el mensaje
+        return chatService.processMessage(chatId, message, principal);
     }
 }

@@ -11,6 +11,7 @@ public class TicketMapper {
         TicketDto ticketDto = new TicketDto();
         ticketDto.setId(ticket.getId());
         ticketDto.setTema(ticket.getTema());
+        ticketDto.setChatId(ticket.getChat().getId());
         ticketDto.setCodigo(ticket.getCodigo());
         ticketDto.setIsTrashed(ticket.getIsTrashed());
         ticketDto.setDescripcion(ticket.getDescripcion());
