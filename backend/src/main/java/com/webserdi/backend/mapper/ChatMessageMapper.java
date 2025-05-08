@@ -2,36 +2,39 @@ package com.webserdi.backend.mapper;
 
 import com.webserdi.backend.dto.ChatMessageDto;
 import com.webserdi.backend.dto.UsuarioSimpleDto;
+import com.webserdi.backend.entity.Chat;
 import com.webserdi.backend.entity.ChatMessage;
 import com.webserdi.backend.entity.Usuario;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class ChatMessageMapper {
-
     public ChatMessageDto toDto(ChatMessage message) {
         if (message == null) {
             return null;
         }
 
-        ChatMessageDto dto = new ChatMessageDto();
-        dto.setId(message.getId());
-        dto.setChatId(message.getChat() != null ? message.getChat().getId() : null);
-        dto.setContent(message.getContent());
-        dto.setMessageType(message.getMessageType());
-        dto.setAttachmentUrl(message.getAttachmentUrl()); // You might transform this URL if needed
-        dto.setAttachmentFilename(message.getAttachmentFilename());
-        dto.setAttachmentMimeType(message.getAttachmentMimeType());
-        dto.setTimestamp(message.getTimestamp());
-
-        Usuario sender = message.getSender();
-        if (sender != null) {
-            String senderNombreCompleto = sender.getNombre() + " " + sender.getApellido();
-            dto.setSender(new UsuarioSimpleDto(sender.getId(), senderNombreCompleto));
-        }
-
-        return dto;
+        return ChatMessageDto.builder()
+            .id(message.getId())
+            .chatId(Optional.ofNullable(message.getChat())
+                .map(Chat::getId)
+                .orElse(null))
+            .content(message.getContent())
+            .messageType(message.getMessageType())
+            .attachmentUrl(message.getAttachmentUrl())
+            .attachmentFilename(message.getAttachmentFilename())
+            .attachmentMimeType(message.getAttachmentMimeType())
+            .timestamp(message.getTimestamp())
+            .sender(Optional.ofNullable(message.getSender())
+                .map(sender -> new UsuarioSimpleDto(
+                    sender.getId(),
+                    String.format("%s %s",
+                        Optional.ofNullable(sender.getNombre()).orElse(""),
+                        Optional.ofNullable(sender.getApellido()).orElse("")).trim()
+                ))
+                .orElse(null))
+            .build();
     }
-
-    // No toEntity needed typically, as creation happens in the service
 }

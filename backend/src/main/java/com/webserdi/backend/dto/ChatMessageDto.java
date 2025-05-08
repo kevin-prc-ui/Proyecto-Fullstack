@@ -1,10 +1,12 @@
 package com.webserdi.backend.dto;
 
 import com.webserdi.backend.entity.ChatMessage; // Import enum
+import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class ChatMessageDto {
     private Long id;
     private Long chatId; // ID of the chat it belongs to

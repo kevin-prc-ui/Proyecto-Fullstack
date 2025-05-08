@@ -2,6 +2,7 @@ package com.webserdi.backend.service.impl;
 
 import com.webserdi.backend.dto.ChatMessageCreateDto;
 import com.webserdi.backend.dto.ChatMessageDto;
+import com.webserdi.backend.dto.UsuarioSimpleDto;
 import com.webserdi.backend.entity.*;
 import com.webserdi.backend.exception.GlobalExceptionHandler;
 import com.webserdi.backend.exception.ResourceNotFoundException;
@@ -24,6 +25,7 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -131,5 +133,38 @@ public class ChatServiceImpl implements ChatService {
         }
 
         String contentType = file.getContentType();
+    }
+
+    @Transactional
+    public ChatMessageDto processMessage(String chatId, ChatMessageCreateDto messageDto, Authentication authentication) {
+        // Obtener el usuario actual
+        String username = authentication.getName();
+        Usuario sender = usuarioRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Convertir chatId a Long (asumiendo que es el ID del ticket)
+        Long ticketId = Long.parseLong(chatId);
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new RuntimeException("Ticket no encontrado"));
+
+        // Crear y guardar el mensaje
+        ChatMessage message = ChatMessage.builder()
+                .content(messageDto.getContent())
+                .sender(sender)
+                .chat(ticket.getChat())
+                .timestamp(LocalDateTime.now())
+                .messageType(ChatMessage.MessageType.TEXT)
+                .build();
+
+        ChatMessage savedMessage = chatMessageRepository.save(message);
+
+        // Convertir a DTO para enviar a través de WebSocket
+        return ChatMessageDto.builder()
+                .id(savedMessage.getId())
+                .chatId(savedMessage.getChat().getId())
+                .content(savedMessage.getContent())
+                .sender(new UsuarioSimpleDto(savedMessage.getSender().getId(), savedMessage.getSender().getNombre()))
+                .timestamp(savedMessage.getTimestamp())
+                .build();
     }
 }

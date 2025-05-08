@@ -57,9 +57,7 @@ public class ChatController {
     public ChatMessageDto handleChatMessage(
             @DestinationVariable String chatId,
             ChatMessageCreateDto message,
-            Principal principal) {
-
-        // Lógica para procesar el mensaje
-        return chatService.processMessage(chatId, message, principal);
+            Authentication authentication) {
+        return chatService.processMessage(chatId, message, authentication);
     }
 }

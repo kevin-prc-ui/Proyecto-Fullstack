@@ -26,4 +26,5 @@ public interface ChatService {
      * @return The created ChatMessageDto.
      */
     ChatMessageDto postMessage(Long ticketId, ChatMessageCreateDto messageDto, MultipartFile file, Authentication authentication);
+    ChatMessageDto processMessage(String chatId, ChatMessageCreateDto message, Authentication authentication);
 }
