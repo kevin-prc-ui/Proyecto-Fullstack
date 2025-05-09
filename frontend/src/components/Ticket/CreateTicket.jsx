@@ -16,7 +16,7 @@ import { getUserId, listUsers } from "../../services/UsuarioService";
 import { toast } from "sonner";
 // const PRIORITIES = ["Baja", "Media", "Alta"];
 
-export default function CreateTicket({ open, setOpen, refreshTickets }) {
+export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
   const [loading, setLoading] = useState(false);
   const [loadingDeps, setLoadingDeps] = useState(false);
   const [loadingIncs, setLoadingIncs] = useState(false);

@@ -14,6 +14,7 @@ import {
   FaExclamationTriangle,
   FaSpinner,
   FaArrowLeft, // <--- Importar el nuevo ícono
+  FaPencilAlt, // <--- Importar ícono de edición
 } from "react-icons/fa";
 import ChatComponent from "../../components/Chat"; // Renamed import for clarity
 import { getUserId } from "../../services/UsuarioService";
@@ -338,11 +339,20 @@ const TaskDetails = () => {
                 </span>
               </h1>
             </div>
-            <div className="p-2 space-y-5">
+            <div className="p-1 space-y-5">
               {/* Sections remain the same as before */}
               <DetailSection
                 title="Información General"
                 icon={<FaInfoCircle className="text-green-600" />}
+                actionButton={
+                  <button
+                    onClick={() => toast.info(`Editar ticket: ${ticket.id} (funcionalidad pendiente)`)} // Placeholder action
+                    className="p-1.5 text-gray-500 hover:text-blue-600 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    title="Editar Ticket"
+                  >
+                    <FaPencilAlt className="h-4 w-4" />
+                  </button>
+                }
               >
                 <DetailItem label="Tema" value={ticket.tema} />
                 <DetailItem
@@ -367,7 +377,6 @@ const TaskDetails = () => {
                 <DetailItem label="Fuente" value={ticket.fuenteNombre} />
                 <DetailItem label="Descripcion" value={ticket.descripcion} />
               </DetailSection>
-
               <DetailSection
                 title="Detalles"
                 icon={<FaCalendarAlt className="text-purple-600" />}
@@ -424,15 +433,19 @@ const TaskDetails = () => {
 };
 
 // --- Componentes Auxiliares (DetailSection, DetailItem - unchanged) ---
-const DetailSection = ({ title, icon, children }) => (
-  <div className="border border-gray-200 rounded-md p-3">
-    <h3 className="text-md font-semibold text-gray-700 mb-3 flex items-center border-b pb-2">
-      {icon &&
-        React.cloneElement(icon, {
-          className: `${icon.props.className} mr-2 w-4 h-4`,
-        })}
-      {title}
-    </h3>
+const DetailSection = ({ title, icon, children, actionButton }) => (
+  <div className="border border-gray-200 rounded-md m-1 p-3">
+    <div className="flex justify-between items-center mb-4 border-b pb-2">
+      <h3 className="text-md font-semibold text-gray-700 flex items-center">
+        {icon &&
+          React.cloneElement(icon, {
+            // Aseguramos que className exista y añadimos mr-2
+            className: `${icon.props.className || ""} mr-2 w-4 h-4`, 
+          })}
+        {title}
+      </h3>
+      {actionButton && <div>{actionButton}</div>}
+    </div>
     <div className="space-y-2 pl-1">{children}</div>
   </div>
 );
