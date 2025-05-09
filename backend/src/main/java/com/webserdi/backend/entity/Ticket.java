@@ -10,33 +10,37 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
+// import java.util.Set; // No se usa Set aquí
 
+/**
+ * Entidad que representa un Ticket de soporte en el sistema.
+ */
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false, length = 1000) // Aumentar longitud si es necesario
     private String descripcion;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String tema;
 
+    /** Código único del ticket, generado automáticamente. Ejemplo: ATN-AA-0001 */
     @Column(nullable = false, unique = true)
     private String codigo;
 
+    /** Indica si el ticket ha sido movido a la papelera (soft delete). */
     @Column(nullable = false)
-    private Boolean isTrashed;
+    private Boolean isTrashed = false; // Valor por defecto
 
     @CreationTimestamp
-    @Column(name="fecha_creacion")
+    @Column(name="fecha_creacion", updatable = false) // updatable = false para que no se modifique en actualizaciones
     private LocalDateTime fechaCreacion;
 
     @UpdateTimestamp
@@ -46,12 +50,13 @@ public class Ticket {
     @Column(name="fecha_vencimiento")
     private LocalDate fechaVencimiento;
 
+    // --- Relaciones ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_creador_id", nullable = false)
     private Usuario usuarioCreador;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_asignado_id")
+    @JoinColumn(name = "usuario_asignado_id") // Nullable, un ticket puede no estar asignado
     private Usuario usuarioAsignado;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -74,19 +79,28 @@ public class Ticket {
     @JoinColumn(name = "prioridad_id", nullable = false)
     private Prioridad prioridad;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, optional = false, orphanRemoval = true)
-    @JoinColumn(name = "chat_id", referencedColumnName = "id", unique = true) // Foreign key in Ticket table    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "estado_id", nullable = false)
+    private Estado estado;
+
+    /**
+     * Relación uno a uno con la entidad Chat.
+     * Cada ticket tiene un chat asociado. La cascada asegura que el chat se gestione
+     * junto con el ticket (creación, eliminación).
+     */
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, optional = false, orphanRemoval = true)
+    @JoinColumn(name = "chat_id", referencedColumnName = "id", unique = true)
     private Chat chat;
 
+    /**
+     * Método de ciclo de vida JPA que asegura la existencia de una entidad Chat
+     * antes de persistir un nuevo Ticket.
+     */
     @PrePersist
     private void ensureChatExists() {
         if (this.chat == null) {
             this.chat = new Chat();
-            // No need to set ticket here, JPA handles it via @JoinColumn
+            // this.chat.setTicket(this); // No es necesario si Chat no tiene referencia bidireccional o si es manejado por JPA
         }
     }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "estado_id", nullable = false)
-    private Estado estado;
 }

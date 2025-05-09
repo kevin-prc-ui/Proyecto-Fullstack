@@ -46,7 +46,7 @@ export const checkOrCreateUser = (userData) =>
 export const login = (loginData) => axios.post(`${REST_API_BASE_URL}/auth/login`, loginData);
 export const logout = () => axios.post(`${REST_API_BASE_URL}/auth/logout`,getHeaders());
 export const getUserRoles = (email) => {
-  return axios.get(`${REST_API_BASE_URL}/users/email?email=${email}`, getHeaders())
+  return axios.get(`${REST_API_BASE_URL}/users/email/roles?email=${email}`, getHeaders())
   .then(response => response)
   .catch(error => {
     if (!error.response) {
@@ -57,7 +57,7 @@ export const getUserRoles = (email) => {
   });
 };
 
-export const getUserId = () => axios.get(`${REST_API_BASE_URL}/users/getuseremail`, getHeaders());
+export const getUserId = () => axios.get(`${REST_API_BASE_URL}/users/me/id`, getHeaders());
 
 
 

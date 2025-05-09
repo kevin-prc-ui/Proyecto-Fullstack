@@ -3,6 +3,7 @@ package com.webserdi.backend.controller;
 import com.webserdi.backend.dto.IncidenciaDto;
 import com.webserdi.backend.service.IncidenciaService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus; // Importar para ResponseEntity.status
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +18,10 @@ public class IncidenciaController {
 
     @PostMapping
     public ResponseEntity<IncidenciaDto> createIncidencia(@RequestBody IncidenciaDto incidenciaDto) {
+        // La validación del DTO y la lógica de asociación se manejan en el servicio
         IncidenciaDto createdIncidencia = incidenciaService.createIncidencia(incidenciaDto);
-        return ResponseEntity.ok(createdIncidencia);
+        // Devolver 201 Created con el objeto creado
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdIncidencia);
     }
 
     @GetMapping("/{incidenciaId}")
