@@ -46,7 +46,8 @@ export const formatUserRole = (rolId) => {
   };
 
   export const getVencimiento = (expirationDate) => {
-    if (!expirationDate) {
+    
+    if (expirationDate) {      
       // 1. Validate Input: Ensure it's a valid Date object
       if (!(expirationDate instanceof Date) || isNaN(expirationDate.getTime())) {
         console.error("getVencimientoStatus received an invalid date:", expirationDate);
@@ -59,8 +60,7 @@ export const formatUserRole = (rolId) => {
       // 3. Calculate Difference in Milliseconds
       //    Positive value means expirationDate is in the future
       //    Negative value means expirationDate is in the past (overdue)
-      const diffInMs = expirationDate.getTime() - now.getTime();
-    
+      const diffInMs = expirationDate.getTime() - now.getTime();    
       // 4. Define time units in milliseconds
       const minuteInMs = 60 * 1000;
       const hourInMs = 60 * minuteInMs;

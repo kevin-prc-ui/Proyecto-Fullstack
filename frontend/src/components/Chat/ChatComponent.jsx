@@ -7,6 +7,8 @@ import {
   FaSpinner,
   FaExclamationCircle,
 } from "react-icons/fa";
+import { postChatMessage } from "../../services/ChatService";
+import { toast } from "sonner";
 
 // --- Helper Function to format timestamp ---
 const formatChatTimestamp = (timestamp) => {
@@ -30,7 +32,8 @@ const ChatComponent = ({
   isConnected, // Boolean indicating WebSocket connection status
   isLoadingMessages, // Boolean indicating if initial messages are loading
   currentUserId, // ID of the currently logged-in user
-  connectionError, // Optional error message for connection issues
+  connectionError,
+  ticketId, // Optional error message for connection issues
 }) => {
   const [message, setMessage] = useState("");
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -142,22 +145,23 @@ const ChatComponent = ({
   };
 
   // --- Message Submission ---
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!onSendMessage || (!message.trim() && selectedFiles.length === 0)) {
-      return; // Don't send empty messages unless files are attached
-    }
-    // Call the parent's send message function
-    // NOTE: Sending actual files via WebSocket is complex.
-    // This example primarily sends the text message.
-    // You'll need additional logic here and in the parent to handle file uploads (likely via HTTP).
-    onSendMessage(message, selectedFiles);
+    
+    if (!message.trim() && selectedFiles.length === 0) return;
 
-    // Clear input after sending
-    setMessage("");
-    setSelectedFiles([]);
-    setFileError("");
-  };
+    try {
+        await postChatMessage(ticketId, message);
+        // Limpiar estados
+        setMessage("");
+        setSelectedFiles([]);
+        setFileError("");
+        
+    } catch (error) {
+        console.error("Error sending message:", error);
+        toast.error("Error al enviar el mensaje");
+    }
+};
   
 
   // --- Render Logic ---

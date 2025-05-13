@@ -23,7 +23,6 @@ public class ChatWebSocketController {
                                         ChatMessageCreateDto message,
                                         Authentication authentication) {
         ChatMessageDto savedMessage = chatService.processMessage(ticketId.toString(), message, authentication);
-
         // Notificar a los usuarios suscritos al chat específico
         messagingTemplate.convertAndSend("/topic/chat/" + ticketId, savedMessage);
 

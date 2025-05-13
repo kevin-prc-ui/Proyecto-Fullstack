@@ -170,6 +170,6 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void notifyUsersNewMessage(Long ticketId, ChatMessageDto message) {
-
+        
     }
 }

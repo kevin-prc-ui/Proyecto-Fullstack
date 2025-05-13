@@ -6,7 +6,7 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
-import { BGS, PRIOTITYSTYELS,PRIORITYNAMES, TICKET_TYPE, formatDate } from "../../utils/utils";//CREATE
+import { BGS, PRIOTITYSTYELS,PRIORITYNAMES, TICKET_TYPE, formatDate, getVencimiento } from "../../utils/utils";//CREATE
 import ConfirmationDialog from "./ConfirmationDialog";//CREATE
 import { BiMessageAltDetail } from "react-icons/bi";
 import { FaList } from "react-icons/fa";
@@ -47,9 +47,14 @@ const Card = ({ ticket, status}) => {
           </a>
           <span className="text-sm text-black-600">
             {formatDate(new Date(ticket?.fechaCreacion))}<br></br>
-          </span><span className="text-sm text-red-600">
+          </span>
+          <span className="text-sm text-red-600">
             {formatDate(new Date(ticket?.fechaVencimiento))}
           </span>
+          <span className="text-sm text-red-600">
+            , {" "} {getVencimiento(new Date(ticket?.fechaVencimiento))}
+          </span>
+
         </>
 
         <div className="w-full border-t border-gray-200 my-2" />

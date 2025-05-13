@@ -51,12 +51,12 @@ public class ChatController {
         return chatService.postMessage(ticketId, messageDto, file, authentication);
     }
 
-    @MessageMapping("/topic/{chatId}/sendMessage")
-    @SendTo("/topic/ticket/chat/{chatId}")
-    public ChatMessageDto handleChatMessage(
-            @DestinationVariable String chatId,
-            ChatMessageCreateDto message,
-            Authentication authentication) {
-        return chatService.processMessage(chatId, message, authentication);
-    }
+//    @MessageMapping("/topic/{chatId}/sendMessage")
+//    @SendTo("/topic/ticket/chat/{chatId}")
+//    public ChatMessageDto handleChatMessage(
+//            @DestinationVariable String chatId,
+//            ChatMessageCreateDto message,
+//            Authentication authentication) {
+//        return chatService.processMessage(chatId, message, authentication);
+//    }
 }

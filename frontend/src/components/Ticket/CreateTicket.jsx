@@ -311,9 +311,9 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
                 <input type="date" id="fechaVencimiento" {...field}/>
               )}
             />
-            {errors.motivo && (
+            {errors.fechaVencimiento && (
               <p className="text-red-500 text-xs mt-1">
-                {errors.motivo.message}
+                {errors.fechaVencimiento.message}
               </p>
             )}{" "}
             {/* Corregido error check */}

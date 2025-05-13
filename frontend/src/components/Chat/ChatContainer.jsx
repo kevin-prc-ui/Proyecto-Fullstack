@@ -3,7 +3,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import ChatComponent from "../Chat/ChatComponent";
-import { listMessages } from "../../services/ChatService";
+import { listMessages, postChatMessage } from "../../services/ChatService";
+import { getUserId } from "../../services/UsuarioService";
 
 const ChatContainer = ({ ticketId }) => {
   const [messages, setMessages] = useState([]);
@@ -11,7 +12,7 @@ const ChatContainer = ({ ticketId }) => {
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
   const [connectionError, setConnectionError] = useState("");
   const [stompClient, setStompClient] = useState(null);
-  const currentUserId = 2; // TODO: Obtener el ID del usuario actual de tu sistema de autenticación
+  const [usuario, setUsuario] = useState(null); // TODO: Obtener el ID del usuario actual de tu sistema de autenticación
   const token = () => localStorage.getItem("authToken");
   const getAuthToken = () => JSON.parse(token()).accessToken;
 
@@ -22,6 +23,7 @@ const ChatContainer = ({ ticketId }) => {
       Authorization: `Bearer ${getAuthToken()}`,
     },
   });
+  
 
   // Cargar mensajes históricos
   const loadChatHistory = useCallback(async () => {
@@ -37,7 +39,7 @@ const ChatContainer = ({ ticketId }) => {
     }
   }, [ticketId]);
 
-  // Configurar WebSocket
+  // Configurar WebSocket y encontrar usuario actual
   useEffect(() => {
     console.log("Intentando Conexion...");
 
@@ -79,11 +81,15 @@ const ChatContainer = ({ ticketId }) => {
     setStompClient(client);
     client.activate();
 
+    getUserId().then((response) => {
+        setUsuario(response.data);
+      });
     return () => {
       if (client.active) {
         client.deactivate();
       }
     };
+    
   }, [ticketId, loadChatHistory]);
 
   // Función para enviar mensajes
@@ -95,42 +101,22 @@ const ChatContainer = ({ ticketId }) => {
       return;
 
     try {
-      const formData = new FormData();
+      // const formData = new FormData();
       const messageDto = {
         content: messageContent,
         ticketId: ticketId,
       };
 
-      formData.append(
-        "message",
-        new Blob([JSON.stringify(messageDto)], {
-          type: "application/json",
-        })
-      );
-
-      // Agregar archivos si existen
-      if (files && files.length > 0) {
-        files.forEach((file) => {
-          formData.append("file", file);
-        });
-      }
+      // formData.append(
+      //   "message",
+      //   new Blob([JSON.stringify(messageDto)], {
+      //     type: "application/json",
+      //   })
+      // );
 
       // Enviar mensaje a través de HTTP para manejar archivos
-      const response = await fetch(
-        `http://localhost:8080/api/tickets/${ticketId}/chat/messages`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${getHeaders()}`,
-          },
-          body: formData,
-        }
-      );
-
+      const response = await postChatMessage(ticketId, messageDto);
       if (!response.ok) throw new Error("Error al enviar mensaje");
-
-      const savedMessage = await response.json();
-
       // Enviar notificación a través de WebSocket
       stompClient.publish({
         destination: `/app/chat/${ticketId}`,
@@ -152,8 +138,9 @@ const ChatContainer = ({ ticketId }) => {
       onSendMessage={handleSendMessage}
       isConnected={isConnected}
       isLoadingMessages={isLoadingMessages}
-      currentUserId={currentUserId}
+      currentUserId={usuario}
       connectionError={connectionError}
+      ticketId={ticketId}
     />
   );
 };
