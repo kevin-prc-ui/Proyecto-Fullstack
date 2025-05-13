@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import ChatComponent from "../Chat/ChatComponent";
+import { listMessages } from "../../services/ChatService";
 
 const ChatContainer = ({ ticketId }) => {
   const [messages, setMessages] = useState([]);
@@ -25,19 +26,9 @@ const ChatContainer = ({ ticketId }) => {
   // Cargar mensajes históricos
   const loadChatHistory = useCallback(async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/tickets/${ticketId}/chat/messages`,
-        {
-          headers: {
-            Authorization: `Bearer ${getHeaders()}`, // Asume que guardas el token en localStorage
-          },
-        }
-      );
+      const response = await listMessages(ticketId);
 
-      if (!response.ok) throw new Error("Error al cargar mensajes");
-
-      const data = await response.json();
-      setMessages(data.content);
+      setMessages(response.data.content);
     } catch (error) {
       console.error("Error cargando mensajes:", error);
       setConnectionError("Error al cargar el historial de mensajes");

@@ -339,7 +339,7 @@ const ChatComponent = ({
             }
             className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none overflow-y-auto max-h-24 text-sm" // Added max-height and auto overflow
             aria-label="Escribir mensaje"
-            disabled={isConnected || connectionError}
+            disabled={!isConnected || connectionError}
             onKeyDown={(e) => {
               // Send on Enter, new line on Shift+Enter
               if (e.key === "Enter" && !e.shiftKey) {
