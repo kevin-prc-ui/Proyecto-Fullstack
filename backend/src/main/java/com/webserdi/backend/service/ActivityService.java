@@ -1,10 +1,11 @@
 package com.webserdi.backend.service;
 
 import com.webserdi.backend.entity.Activity;
-import com.webserdi.backend.entity.User;
+import com.webserdi.backend.entity.Usuario;
 import com.webserdi.backend.entity.Item;
 import com.webserdi.backend.repository.ActivityRepository;
-import com.webserdi.backend.repository.UserRepository;
+import com.webserdi.backend.repository.UsuarioRepository;
+import com.webserdi.backend.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,19 +20,17 @@ public class ActivityService {
     private ActivityRepository activityRepo;
 
     @Autowired
-    private UserRepository userRepo;
+    private UsuarioRepository UsuarioRepo;
 
     // 👉 Guarda o actualiza una actividad junto con items, assignees y reviewers
-    public Activity saveActivity(Activity activity, List<String> itemNames, List<Integer> assigneeIds, List<Integer> reviewerIds) {
+    public Activity saveActivity(Activity activity, List<String> itemNames, Long assigneeIds, Long reviewerIds) {
         // 👉 Asegura que las listas estén inicializadas para evitar NullPointer
         if (activity.getItems() == null) activity.setItems(new ArrayList<>());
-        if (activity.getAssignees() == null) activity.setAssignees(new ArrayList<>());
-        if (activity.getReviewers() == null) activity.setReviewers(new ArrayList<>());
 
         // 👉 Limpia listas antes de agregar (importante para updates)
         activity.getItems().clear();
-        activity.getAssignees().clear();
-        activity.getReviewers().clear();
+        activity.setUsuarioCreador(null);
+        activity.setUsuarioAsignado(null);
 
         // 👉 Agrega Items a la actividad
         for (String itemName : itemNames) {
@@ -42,13 +41,13 @@ public class ActivityService {
         }
 
         // 👉 Agrega Assignees a la actividad
-        List<User> assignees = userRepo.findAllById(assigneeIds);
-        activity.getAssignees().addAll(assignees);
+        Usuario assignees = UsuarioRepo.findById(assigneeIds)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // 👉 Solo si es tipo "workflow", agrega reviewers
         if ("workflow".equals(activity.getType())) {
-            List<User> reviewers = userRepo.findAllById(reviewerIds);
-            activity.getReviewers().addAll(reviewers);
+            Usuario reviewers = UsuarioRepo.findById(reviewerIds)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         }
 
         // 👉 Guarda la actividad (con cascade se guardan también los items)

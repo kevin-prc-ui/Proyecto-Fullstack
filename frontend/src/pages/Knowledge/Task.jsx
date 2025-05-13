@@ -20,7 +20,7 @@ const Task = () => {
       useEffect(() => {
         const fetchActivities = async () => {
           await listActivities();
-          console.log(activities);
+          
         };
     
         if (isAuth) fetchActivities();
@@ -29,6 +29,7 @@ const Task = () => {
   async function listActivities() {
         const response = await getAllActivities();
         setActivities(response.data);
+        console.log(response.data);
     }
 
   // Efecto para cargar usuarios si el usuario está autenticado
@@ -57,6 +58,7 @@ const Task = () => {
     setActivities(updatedActivities);
     localStorage.setItem('activities', JSON.stringify(updatedActivities));
   };
+  
 
   // Maneja la creación o edición de una actividad
   const handleSaveActivity = (activityData) => {
@@ -75,12 +77,13 @@ const Task = () => {
         createdAt: new Date().toISOString(),
         status: 'Pendiente'
       }];
-    }
-    
+    } 
     saveActivities(updatedActivities);
     setShowTaskForm(false);  // Cierra el formulario después de guardar
     setEditingTask(null);     // Limpia el estado de la tarea en edición
   };
+
+
   
   // Filtra las actividades según el estado seleccionado (todas, pendientes o completadas)
   const filteredActivities = activities.filter(activity => {

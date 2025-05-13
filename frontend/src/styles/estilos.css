@@ -41,7 +41,6 @@
   transition: background-color 0.3s ease;
 }
 
-
 /* Botón pequeño */
 .btn-sm {
   padding: 5px 10px;
@@ -161,5 +160,40 @@
     padding: 12px 15px;
     font-size: 15px;
   }
+}
+
+/* Lista de tareas - ESTILOS INTEGRADOS */
+.home-container .task-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+.home-container .task-item {
+  background-color: #f4f4f8;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  transition: background-color 0.2s;
+}
+
+.home-container .task-item:hover {
+  background-color: #e0e0f0;
+}
+
+.home-container .task-item.empty {
+  color: #888;
+  font-style: italic;
+}
+
+/* Animaciones en hover para las tareas (similar a tarjetas) */
+.task-list .card {
+  transition: all 0.2s ease;
+}
+
+.task-list .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 

@@ -11,7 +11,7 @@ import java.util.List;
 public class ActivityRequest {
 
     // 👉 Campos que representan los datos que se envían desde el cliente
-    private Integer id;
+    private Long id;
     private String name;
     private String type;
     private LocalDate dueDate;
@@ -20,8 +20,8 @@ public class ActivityRequest {
     private Boolean sendNotifications;
     private Integer approvalPercentage;
     private List<String> items;
-    private List<Integer> assignees;
-    private List<Integer> reviewers;
+    private Long assignees;
+    private Long reviewers;
 
     // 👉 Convierte este DTO en una entidad Activity (para guardar en la base de datos)
     public Activity toEntity() {

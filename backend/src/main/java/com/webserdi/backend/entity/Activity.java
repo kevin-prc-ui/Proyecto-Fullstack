@@ -15,8 +15,7 @@ public class Activity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
+    private Long id;
     private String name;
     private String type;
     private LocalDate dueDate;
@@ -30,19 +29,13 @@ public class Activity {
     @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "activity_assignees",
-            joinColumns = @JoinColumn(name = "activity_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> assignees = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "activity_reviewers",
-            joinColumns = @JoinColumn(name = "activity_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> reviewers = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_creador_id", nullable = false)
+    private Usuario usuarioCreador;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_asignado_id", nullable = false)
+    private Usuario usuarioAsignado;
+
 }
