@@ -27,4 +27,6 @@ public interface ChatService {
      */
     ChatMessageDto postMessage(Long ticketId, ChatMessageCreateDto messageDto, MultipartFile file, Authentication authentication);
     ChatMessageDto processMessage(String chatId, ChatMessageCreateDto message, Authentication authentication);
+    void notifyUsersNewMessage(Long ticketId, ChatMessageDto message);
+
 }

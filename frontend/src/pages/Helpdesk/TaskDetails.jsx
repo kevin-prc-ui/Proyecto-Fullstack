@@ -16,13 +16,13 @@ import {
   FaArrowLeft, // <--- Importar el nuevo ícono
   FaPencilAlt, // <--- Importar ícono de edición
 } from "react-icons/fa";
-import ChatComponent from "../../components/Chat"; // Renamed import for clarity
+import ChatContainer from "../../components/Chat/ChatContainer";
 import { getUserId } from "../../services/UsuarioService";
 
-// --- Configuration ---
-const WEBSOCKET_URL = "http:/localhost:8080/ws"; // Cambiado a HTTP para SockJS
-const CHAT_SUB_TOPIC = "/topic/ticket/chat/"; // Asegúrate que coincida con tu backend
-const CHAT_SEND_ENDPOINT = "/app/topic/"; // Endpoint para enviar mensajes
+// // --- Configuration ---
+// const WEBSOCKET_URL = "http:/localhost:8080/ws"; // Cambiado a HTTP para SockJS
+// const CHAT_SUB_TOPIC = "/topic/ticket/chat/"; // Asegúrate que coincida con tu backend
+// const CHAT_SEND_ENDPOINT = "/app/topic/"; // Endpoint para enviar mensajes
 
 // --- Mock Current User ID (Replace with your actual auth logic) ---
 
@@ -40,14 +40,6 @@ const TaskDetails = () => {
   const [ticketError, setTicketError] = useState(null);
 
   // --- Chat State ---
-  const [chatMessages, setChatMessages] = useState([]);
-  const [isLoadingMessages, setIsLoadingMessages] = useState(false); // Separate loading for messages
-  const [stompClient, setStompClient] = useState(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [chatError, setChatError] = useState(null); // WebSocket/STOMP specific errors
-  const [usuario, setUsuario] = useState();
-  const subscriptionRef = useRef(null); // To hold the subscription object
-
   // --- Fetch Ticket Details ---
   useEffect(() => {
     if (id) {
@@ -62,7 +54,6 @@ const TaskDetails = () => {
             // *** CRUCIAL: Check for chatId ***
             setTicket(response.data);
             // Fetch initial messages AFTER getting ticket details (and chatId)
-            fetchInitialMessages(response.data.chatId); // Use chatId
           } //else if (response.data && !response.data.chatId) {
           //    setTicketError("Error: No se encontró el ID del chat asociado a este ticket. Contacte al administrador.");
           //    setTicket(null);
@@ -89,186 +80,180 @@ const TaskDetails = () => {
       toast.error("ID de ticket inválido.");
     }
     // Cleanup function for component unmount or ID change
-    return () => {
-      // Disconnect WebSocket when leaving the page or ID changes
-      stompClient?.deactivate();
-      setIsConnected(false);
-      setStompClient(null);
-      console.log("WebSocket client deactivated on cleanup.");
-    };
+    
   }, [id]); // Re-run if ticket ID changes
 
   // --- Fetch Initial Chat Messages ---
-  const fetchInitialMessages = useCallback(
-    (chatId) => {
-      // Note: Using listMessages which might expect ticketId.
-      // Ideally, backend provides an endpoint like /api/chats/{chatId}/messages
-      // Adjust this call based on your actual ChatService implementation.
-      // For now, assuming listMessages(ticketId) works or you adapt it.
-      setIsLoadingMessages(true);
-      setChatMessages([]); // Clear previous messages
-      listMessages(id) // Using ticket ID 'id' as per original code
-        .then((response) => {
-          if (response.data?.content) {
-            // Assuming response.data.content is the array of ChatMessageDto
-            setChatMessages(response.data.content);
-          } else {
-            console.warn(
-              "No initial messages found or unexpected response format:",
-              response.data
-            );
-            setChatMessages([]); // Ensure it's an empty array
-          }
-        })
-        .catch((err) => {
-          console.error("Error al cargar mensajes iniciales:", err);
-          toast.error("No se pudieron cargar los mensajes anteriores.");
-          setChatMessages([]); // Ensure it's an empty array on error
-        })
-        .finally(() => setIsLoadingMessages(false));
-    },
-    [id]
-  ); // Depend on ticket ID for the current listMessages service
+  // const fetchInitialMessages = useCallback(
+  //   (chatId) => {
+  //     // Note: Using listMessages which might expect ticketId.
+  //     // Ideally, backend provides an endpoint like /api/chats/{chatId}/messages
+  //     // Adjust this call based on your actual ChatService implementation.
+  //     // For now, assuming listMessages(ticketId) works or you adapt it.
+  //     setIsLoadingMessages(true);
+  //     setChatMessages([]); // Clear previous messages
+  //     listMessages(id) // Using ticket ID 'id' as per original code
+  //       .then((response) => {
+  //         if (response.data?.content) {
+  //           // Assuming response.data.content is the array of ChatMessageDto
+  //           setChatMessages(response.data.content);
+  //         } else {
+  //           console.warn(
+  //             "No initial messages found or unexpected response format:",
+  //             response.data
+  //           );
+  //           setChatMessages([]); // Ensure it's an empty array
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.error("Error al cargar mensajes iniciales:", err);
+  //         toast.error("No se pudieron cargar los mensajes anteriores.");
+  //         setChatMessages([]); // Ensure it's an empty array on error
+  //       })
+  //       .finally(() => setIsLoadingMessages(false));
+  //   },
+  //   [id]
+  // ); // Depend on ticket ID for the current listMessages service
 
   // --- WebSocket Connection Effect ---
-  useEffect(() => {
-    // Only connect if we have a ticket with a chatId and no active client
-    if (ticket?.chatId && !stompClient) {
-      console.log(
-        `Attempting to connect WebSocket for chat ID: ${ticket.chatId}`
-      );
-      setChatError(null); // Reset error on new connection attempt
+  // useEffect(() => {
+  //   // Only connect if we have a ticket with a chatId and no active client
+  //   if (ticket?.chatId && !stompClient) {
+  //     console.log(
+  //       `Attempting to connect WebSocket for chat ID: ${ticket.chatId}`
+  //     );
+  //     setChatError(null); // Reset error on new connection attempt
 
-      const client = new Client({
-        brokerURL: WEBSOCKET_URL,
-        reconnectDelay: 10000, // Attempt reconnect every 10 seconds
-        heartbeatIncoming: 4000,
-        heartbeatOutgoing: 4000,
-        debug: (str) => {
-          // Optional logging
-          console.log("STOMP Debug:", str);
-        },
-        onConnect: (frame) => {
-          console.log("WebSocket Connected:", frame);
-          setIsConnected(true);
-          setChatError(null); // Clear error on successful connect
+  //     const client = new Client({
+  //       brokerURL: WEBSOCKET_URL,
+  //       reconnectDelay: 10000, // Attempt reconnect every 10 seconds
+  //       heartbeatIncoming: 4000,
+  //       heartbeatOutgoing: 4000,
+  //       debug: (str) => {
+  //         // Optional logging
+  //         console.log("STOMP Debug:", str);
+  //       },
+  //       onConnect: (frame) => {
+  //         console.log("WebSocket Connected:", frame);
+  //         setIsConnected(true);
+  //         setChatError(null); // Clear error on successful connect
 
-          // Subscribe to the specific chat topic
-          const topic = `${CHAT_SUB_TOPIC}${ticket.chatId}`;
-          console.log(`Subscribing to ${topic}`);
-          subscriptionRef.current = client.subscribe(
-            topic,
-            (message) => {
-              try {
-                const receivedMessage = JSON.parse(message.body);
-                console.log("Message received:", receivedMessage);
-                // Update message list state
-                setChatMessages((prevMessages) => [
-                  ...prevMessages,
-                  receivedMessage,
-                ]);
-              } catch (e) {
-                console.error(
-                  "Error parsing received message:",
-                  e,
-                  message.body
-                );
-                toast.error("Error al procesar mensaje recibido.");
-              }
-            },
-            { id: `sub-${ticket.chatId}` }
-          ); // Optional: give subscription an ID
-          toast.success("Chat conectado.");
-        },
-        onStompError: (frame) => {
-          console.error("Broker reported error: " + frame.headers["message"]);
-          console.error("Additional details: " + frame.body);
-          setIsConnected(false);
-          setChatError(
-            `Error del Broker: ${
-              frame.headers["message"] || "Error desconocido"
-            }`
-          );
-          toast.error("Error de conexión con el chat (STOMP).");
-        },
-        onWebSocketError: (event) => {
-          console.error("WebSocket error:", event);
-          setIsConnected(false);
-          setChatError("Error de conexión WebSocket. Intentando reconectar...");
-          // No toast here, reconnectDelay handles retries silently unless it fails permanently
-        },
-        onDisconnect: (frame) => {
-          console.log("WebSocket Disconnected:", frame);
-          setIsConnected(false);
-          // Don't set error on manual disconnect/cleanup
-          if (stompClient) {
-            // Avoid error message if it was manually deactivated
-            setChatError("Chat desconectado.");
-            toast.info("Chat desconectado.");
-          }
-          subscriptionRef.current = null; // Clear subscription ref
-        },
-      });
+  //         // Subscribe to the specific chat topic
+  //         const topic = `${CHAT_SUB_TOPIC}${ticket.chatId}`;
+  //         console.log(`Subscribing to ${topic}`);
+  //         subscriptionRef.current = client.subscribe(
+  //           topic,
+  //           (message) => {
+  //             try {
+  //               const receivedMessage = JSON.parse(message.body);
+  //               console.log("Message received:", receivedMessage);
+  //               // Update message list state
+  //               setChatMessages((prevMessages) => [
+  //                 ...prevMessages,
+  //                 receivedMessage,
+  //               ]);
+  //             } catch (e) {
+  //               console.error(
+  //                 "Error parsing received message:",
+  //                 e,
+  //                 message.body
+  //               );
+  //               toast.error("Error al procesar mensaje recibido.");
+  //             }
+  //           },
+  //           { id: `sub-${ticket.chatId}` }
+  //         ); // Optional: give subscription an ID
+  //         toast.success("Chat conectado.");
+  //       },
+  //       onStompError: (frame) => {
+  //         console.error("Broker reported error: " + frame.headers["message"]);
+  //         console.error("Additional details: " + frame.body);
+  //         setIsConnected(false);
+  //         setChatError(
+  //           `Error del Broker: ${
+  //             frame.headers["message"] || "Error desconocido"
+  //           }`
+  //         );
+  //         toast.error("Error de conexión con el chat (STOMP).");
+  //       },
+  //       onWebSocketError: (event) => {
+  //         console.error("WebSocket error:", event);
+  //         setIsConnected(false);
+  //         setChatError("Error de conexión WebSocket. Intentando reconectar...");
+  //         // No toast here, reconnectDelay handles retries silently unless it fails permanently
+  //       },
+  //       onDisconnect: (frame) => {
+  //         console.log("WebSocket Disconnected:", frame);
+  //         setIsConnected(false);
+  //         // Don't set error on manual disconnect/cleanup
+  //         if (stompClient) {
+  //           // Avoid error message if it was manually deactivated
+  //           setChatError("Chat desconectado.");
+  //           toast.info("Chat desconectado.");
+  //         }
+  //         subscriptionRef.current = null; // Clear subscription ref
+  //       },
+  //     });
 
-      client.activate();
-      setStompClient(client);
-    }
+  //     client.activate();
+  //     setStompClient(client);
+  //   }
 
-    // No return cleanup here, handled in the main useEffect [id]
-  }, [ticket, stompClient]); // Depend on ticket (for chatId) and stompClient instance
+  //   // No return cleanup here, handled in the main useEffect [id]
+  // }, [ticket, stompClient]); // Depend on ticket (for chatId) and stompClient instance
 
   // --- Send Message Handler ---
-  const handleSendMessage = useCallback(
-    (messageContent, files) => {
-      if (!stompClient || !isConnected || !ticket?.chatId) {
-        toast.error("No se puede enviar mensaje. Chat no conectado.");
-        return;
-      }
+  // const handleSendMessage = useCallback(
+  //   (messageContent, files) => {
+  //     if (!stompClient || !isConnected || !ticket?.chatId) {
+  //       toast.error("No se puede enviar mensaje. Chat no conectado.");
+  //       return;
+  //     }
 
-      if (!messageContent.trim() && files.length === 0) {
-        return; // Don't send empty messages
-      }
+  //     if (!messageContent.trim() && files.length === 0) {
+  //       return; // Don't send empty messages
+  //     }
 
-      // --- File Handling Placeholder ---
-      if (files.length > 0) {
-        // TODO: Implement file upload logic
-        // 1. Show a loading indicator for the file(s)
-        // 2. Upload each file via a separate HTTP POST request to a dedicated endpoint
-        //    (e.g., /api/files/upload?chatId=...).
-        // 3. On successful upload, the backend should return file details (URL, filename, type).
-        // 4. Send a STOMP message of type 'FILE' including the file details received in step 3.
-        console.warn(
-          "File sending not implemented yet. Sending text message only."
-        );
-        toast.info("La subida de archivos aún no está implementada.");
-        // For now, we just proceed to send the text message if any.
-        if (!messageContent.trim()) return; // Don't send if only files were selected and no text
-      }
+  //     // --- File Handling Placeholder ---
+  //     if (files.length > 0) {
+  //       // TODO: Implement file upload logic
+  //       // 1. Show a loading indicator for the file(s)
+  //       // 2. Upload each file via a separate HTTP POST request to a dedicated endpoint
+  //       //    (e.g., /api/files/upload?chatId=...).
+  //       // 3. On successful upload, the backend should return file details (URL, filename, type).
+  //       // 4. Send a STOMP message of type 'FILE' including the file details received in step 3.
+  //       console.warn(
+  //         "File sending not implemented yet. Sending text message only."
+  //       );
+  //       toast.info("La subida de archivos aún no está implementada.");
+  //       // For now, we just proceed to send the text message if any.
+  //       if (!messageContent.trim()) return; // Don't send if only files were selected and no text
+  //     }
 
-      // --- Send Text Message ---
-      const destination = `${CHAT_SEND_ENDPOINT}${ticket.chatId}/sendMessage`;
-      const chatMessage = {
-        // Structure matching backend's ChatMessageCreateDto (or similar)
-        content: messageContent,
-        messageType: "TEXT", // Backend might infer this if content is present
-        senderId: usuario, // Backend should get sender from authenticated principal
-      };
+  //     // --- Send Text Message ---
+  //     const destination = `${CHAT_SEND_ENDPOINT}${ticket.chatId}/sendMessage`;
+  //     const chatMessage = {
+  //       // Structure matching backend's ChatMessageCreateDto (or similar)
+  //       content: messageContent,
+  //       messageType: "TEXT", // Backend might infer this if content is present
+  //       senderId: usuario, // Backend should get sender from authenticated principal
+  //     };
 
-      try {
-        console.log(`Sending message to ${destination}:`, chatMessage);
-        stompClient.publish({
-          destination: destination,
-          body: JSON.stringify(chatMessage),
-        });
-        // Optimistic UI update could be added here if desired
-      } catch (error) {
-        console.error("Error sending message:", error);
-        toast.error("Error al enviar el mensaje.");
-        setChatError("Error al enviar mensaje.");
-      }
-    },
-    [stompClient, isConnected, ticket?.chatId]
-  );
+  //     try {
+  //       console.log(`Sending message to ${destination}:`, chatMessage);
+  //       stompClient.publish({
+  //         destination: destination,
+  //         body: JSON.stringify(chatMessage),
+  //       });
+  //       // Optimistic UI update could be added here if desired
+  //     } catch (error) {
+  //       console.error("Error sending message:", error);
+  //       toast.error("Error al enviar el mensaje.");
+  //       setChatError("Error al enviar mensaje.");
+  //     }
+  //   },
+  //   [stompClient, isConnected, ticket?.chatId]
+  // );
 
   // --- Render Loading State ---
   if (loadingTicket) {
@@ -416,14 +401,8 @@ const TaskDetails = () => {
           {/* Columna Derecha: Chat */}
           <div className="flex-1 lg:w-1/2 xl:w-3/5 min-h-[600px] lg:min-h-0">
             {/* Pass necessary props to ChatComponent */}
-            <ChatComponent
-              chatId={ticket.chatId}
-              messages={chatMessages}
-              onSendMessage={handleSendMessage}
-              isConnected={isConnected}
-              isLoadingMessages={isLoadingMessages}
-              currentUserId={usuario}
-              connectionError={chatError}
+            <ChatContainer
+              ticketId={id}
             />
           </div>
         </div>

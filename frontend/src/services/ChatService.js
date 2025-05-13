@@ -12,7 +12,6 @@ const getHeaders = () => ({
   headers: {
     Authorization: `Bearer ${getAuthToken()}`,
   },
-  
 });
 
 

@@ -47,7 +47,6 @@ public class ChatController {
             @RequestPart(value = "message")
             @Validated ChatMessageCreateDto messageDto,
             @RequestPart(value = "file", required = false) MultipartFile file) {
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return chatService.postMessage(ticketId, messageDto, file, authentication);
     }

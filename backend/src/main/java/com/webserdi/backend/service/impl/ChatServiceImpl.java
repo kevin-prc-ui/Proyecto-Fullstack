@@ -167,4 +167,9 @@ public class ChatServiceImpl implements ChatService {
                 .timestamp(savedMessage.getTimestamp())
                 .build();
     }
+
+    @Override
+    public void notifyUsersNewMessage(Long ticketId, ChatMessageDto message) {
+
+    }
 }
