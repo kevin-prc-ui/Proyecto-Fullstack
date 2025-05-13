@@ -83,6 +83,7 @@ const ChatContainer = ({ ticketId }) => {
 
     getUserId().then((response) => {
         setUsuario(response.data);
+        
       });
     return () => {
       if (client.active) {

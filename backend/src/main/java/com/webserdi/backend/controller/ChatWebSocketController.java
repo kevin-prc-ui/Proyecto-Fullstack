@@ -14,18 +14,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 @RequiredArgsConstructor
 public class ChatWebSocketController {
-    private final ChatService chatService;
-    private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/chat/{ticketId}")
-    @SendTo("/topic/chat/{ticketId}")
-    public ChatMessageDto handleMessage(@DestinationVariable Long ticketId,
-                                        ChatMessageCreateDto message,
-                                        Authentication authentication) {
-        ChatMessageDto savedMessage = chatService.processMessage(ticketId.toString(), message, authentication);
-        // Notificar a los usuarios suscritos al chat específico
-        messagingTemplate.convertAndSend("/topic/chat/" + ticketId, savedMessage);
 
-        return savedMessage;
-    }
+
 }

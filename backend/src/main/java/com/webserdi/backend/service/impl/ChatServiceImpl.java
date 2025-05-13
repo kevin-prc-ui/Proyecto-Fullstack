@@ -69,8 +69,7 @@ public class ChatServiceImpl implements ChatService {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new GlobalExceptionHandler();
         }
-//        String userEmail = authentication.getName();
-        String userEmail = "practicante.sistemas2@serdi.com.mx";
+        String userEmail = authentication.getName();
         Usuario sender = usuarioRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + userEmail));
 

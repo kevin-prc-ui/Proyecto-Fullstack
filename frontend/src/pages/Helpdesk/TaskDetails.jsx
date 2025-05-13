@@ -129,7 +129,7 @@ const TaskDetails = () => {
           {" "}
           {/* flex-grow para que ocupe el espacio restante. El gap original se mantiene para la disposición interna. */}
           {/* Columna Izquierda: Detalles del Ticket */}
-          <div className="lg:w-1/2 xl:w-2/5 flex-shrink-0 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+          <div className="lg:w-1/2 xl:w-3/5 flex-shrink-0 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
             <div className="p-2 border-b border-gray-200 bg-gray-50">
               <h1 className="text-xl font-semibold text-gray-800 flex items-center">
                 <FaTicketAlt className="mr-3 text-blue-600" />

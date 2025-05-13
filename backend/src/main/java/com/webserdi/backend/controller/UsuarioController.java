@@ -140,8 +140,7 @@ public class UsuarioController {
         if (auth == null || !auth.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado.");
         }
-        String email = auth.getName();
-        Long id = usuarioService.getIdByEmail(email);
+        Long id = usuarioService.getIdByEmail(auth.getName());
         return ResponseEntity.ok(id.toString());
     }
 }

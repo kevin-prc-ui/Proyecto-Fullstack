@@ -7,7 +7,6 @@ import lombok.Data;
 public class ChatMessageCreateDto {
     // Content is optional if a file is provided
     private String content;
-    private Long ticketId;
 
     // File will be handled separately as MultipartFile in the controller
 }
