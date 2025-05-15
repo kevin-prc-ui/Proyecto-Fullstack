@@ -20,7 +20,6 @@ const Task = () => {
       useEffect(() => {
         const fetchActivities = async () => {
           await listActivities();
-          
         };
     
         if (isAuth) fetchActivities();

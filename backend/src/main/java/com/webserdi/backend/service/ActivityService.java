@@ -5,7 +5,6 @@ import com.webserdi.backend.entity.Usuario;
 import com.webserdi.backend.entity.Item;
 import com.webserdi.backend.repository.ActivityRepository;
 import com.webserdi.backend.repository.UsuarioRepository;
-import com.webserdi.backend.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
