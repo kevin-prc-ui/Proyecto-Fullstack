@@ -6,7 +6,9 @@ import ChatComponent from "../Chat/ChatComponent";
 import { listMessages, postChatMessage } from "../../services/ChatService";
 import { getUserId } from "../../services/UsuarioService";
 
-const ChatContainer = ({ ticketId }) => {
+const ChatContainer = ({ ticketId, chatId }) => {
+  console.log(ticketId, chatId);
+  
   const [messages, setMessages] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(true);
@@ -60,7 +62,7 @@ const ChatContainer = ({ ticketId }) => {
         setConnectionError("");
 
         // Suscribirse al canal del chat
-        client.subscribe(`/topic/chat/${ticketId}`, (message) => {
+        client.subscribe(`/topic/chat/${chatId}`, (message) => {
           const receivedMessage = JSON.parse(message.body);
           setMessages((prev) => [...prev, receivedMessage]);
         });
@@ -134,7 +136,7 @@ const ChatContainer = ({ ticketId }) => {
 
   return (
     <ChatComponent
-      chatId={ticketId}
+      chatId={ticket.chatId}
       messages={messages}
       onSendMessage={handleSendMessage}
       isConnected={isConnected}

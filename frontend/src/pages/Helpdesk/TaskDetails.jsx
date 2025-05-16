@@ -219,6 +219,7 @@ const TaskDetails = () => {
             {/* Pass necessary props to ChatComponent */}
             <ChatContainer
               ticketId={id}
+              chatId={ticket.chatId}
             />
           </div>
         </div>
