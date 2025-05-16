@@ -86,7 +86,7 @@ const ChatContainer = ({ ticketId }) => {
         
       });
     return () => {
-      if (client.active) {
+      if (!client.active) {
         client.deactivate();
       }
     };
