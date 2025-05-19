@@ -198,14 +198,12 @@ public class TicketServiceImpl implements TicketService {
             throw new ResourceNotFoundException("La descripción del ticket es obligatoria para la actualización.");
         }
         // No permitir cambiar isTrashed directamente aquí, usar métodos específicos deleteTicket/restoreTicket
-        // if (dto.getIsTrashed() != null) ticket.setIsTrashed(dto.getIsTrashed());
-
 
         // Actualizar campos directos del ticket
         ticket.setTema(dto.getTema());
         ticket.setDescripcion(dto.getDescripcion());
         ticket.setFechaVencimiento(dto.getFechaVencimiento());
-        // ticket.setFechaActualizacion(LocalDateTime.now()); // Se actualiza automáticamente por @UpdateTimestamp
+        ticket.setFechaActualizacion(LocalDateTime.now()); // Se actualiza automáticamente por @UpdateTimestamp
 
         // Actualizar relaciones (similar a la creación, pero con validaciones adicionales si es necesario)
         // No se permite cambiar el usuario creador.
@@ -217,8 +215,6 @@ public class TicketServiceImpl implements TicketService {
                 ticket.setUsuarioAsignado(usuarioRepository.findById(dto.getUsuarioAsignado())
                         .orElseThrow(() -> new ResourceNotFoundException("Usuario asignado no encontrado con ID: " + dto.getUsuarioAsignado())));
             }
-        } else {
-            ticket.setUsuarioAsignado(null);
         }
 
         // Departamento

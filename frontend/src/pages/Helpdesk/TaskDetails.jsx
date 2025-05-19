@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import ChatContainer from "../../components/Chat/ChatContainer";
 import { getVencimiento } from "../../utils/utils";
+import CreateTicket from "../../components/Ticket/CreateTicket";
 
 //  * @component TaskDetails
 //  * @description Muestra los detalles completos de un ticket y su chat asociado.
@@ -23,6 +24,7 @@ import { getVencimiento } from "../../utils/utils";
 const TaskDetails = () => {
   const params = useParams();
   const id = params?.id || ""; // Ticket ID
+  const [openDialog, setOpenDialog] = useState(false);
 
   // --- Ticket State ---
   const [loadingTicket, setLoadingTicket] = useState(true);
@@ -66,9 +68,11 @@ const TaskDetails = () => {
       toast.error("ID de ticket inválido.");
     }
     // Cleanup function for component unmount or ID change
-    
   }, [id]); // Re-run if ticket ID changes
 
+  const editarTicket = () => {
+    setOpenDialog(true);
+  };
 
   // --- Render Loading State ---
   if (loadingTicket) {
@@ -138,7 +142,9 @@ const TaskDetails = () => {
                   {ticket.codigo || ticket.id}
                 </span>
               </h1>
-              <span className="text-red-600 italic">{getVencimiento(new Date(ticket.fechaVencimiento))}</span>
+              <span className="text-red-600 italic">
+                {getVencimiento(new Date(ticket.fechaVencimiento))}
+              </span>
             </div>
             <div className="p-1 space-y-5">
               {/* Sections remain the same as before */}
@@ -147,7 +153,7 @@ const TaskDetails = () => {
                 icon={<FaInfoCircle className="text-green-600" />}
                 actionButton={
                   <button
-                    onClick={() => toast.info(`Editar ticket: ${ticket.id} (funcionalidad pendiente)`)} // Placeholder action
+                    onClick={() => editarTicket()} // Placeholder action
                     className="p-1.5 text-gray-500 hover:text-blue-600 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                     title="Editar Ticket"
                   >
@@ -217,13 +223,11 @@ const TaskDetails = () => {
           {/* Columna Derecha: Chat */}
           <div className="flex-1 lg:w-1/2 xl:w-3/5 min-h-[600px] lg:min-h-0">
             {/* Pass necessary props to ChatComponent */}
-            <ChatContainer
-              ticketId={id}
-              chatId={ticket.chatId}
-            />
+            <ChatContainer ticketId={id} chatId={ticket.chatId} />
           </div>
         </div>
       </div>
+      <CreateTicket open={openDialog} setOpen={setOpenDialog} ticket={ticket} />
     </div>
   );
 };
@@ -236,7 +240,7 @@ const DetailSection = ({ title, icon, children, actionButton }) => (
         {icon &&
           React.cloneElement(icon, {
             // Aseguramos que className exista y añadimos mr-2
-            className: `${icon.props.className || ""} mr-2 w-4 h-4`, 
+            className: `${icon.props.className || ""} mr-2 w-4 h-4`,
           })}
         {title}
       </h3>

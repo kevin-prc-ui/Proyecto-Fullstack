@@ -9,18 +9,20 @@ import {
   listDepartamentos,
   listAllIncidencias,
   listAllPrioridades,
-  listAllMotivos, // Necesitamos una nueva función en el servicio
+  listAllMotivos,
+  updateTicket, // Necesitamos una nueva función en el servicio
   // listIncidenciasBydepartamento // Opcional: si prefieres cargar bajo demanda
-} from "../../services/TicketService"; // Asume que crearás listAllIncidencias
+} from "../../services/TicketService";
 import { getUserId, listUsers } from "../../services/UsuarioService";
 import { toast } from "sonner";
+import { data } from "react-router-dom";
 // const PRIORITIES = ["Baja", "Media", "Alta"];
 
-export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
+export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
   const [loading, setLoading] = useState(false);
   const [loadingDeps, setLoadingDeps] = useState(false);
   const [loadingIncs, setLoadingIncs] = useState(false);
-  const [departamentos, setDepartamentos] = useState([]);
+  const [departamentos, setDepartamentos] = useState([]);  
   const [prioridades, setPrioridades] = useState([]);
   const [motivos, setMotivos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
@@ -35,7 +37,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
     reset,
     control, // Necesario para Controller
     watch, // Para observar cambios en los campos
-    setValue, // Para establecer valores programáticamente
+    setValue, // Para establecer valores programáticamente    
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -77,7 +79,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
       // Asume que depRes.data es [{ id, nombre }]
       setDepartamentos(depRes.data || []);
       setPrioridades(prioRes.data || []);
-      // Asume que incRes.data es [{ id, nombre, departamento: { id, nombre } }]
+      // Asume que incRes.data es [{ id, nombre, departamento: { id, nombre } }]      
       // Mapeamos para tener una estructura plana si es necesario, o usamos la anidada
       setAllIncidencias(incRes.data || []);
       setMotivos(motRes.data || []);
@@ -93,7 +95,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
       setLoadingIncs(false);
     }
   }, []); // Sin dependencias, se llama una vez
-
+  
   useEffect(() => {
     if (open) {
       loadInitialData();
@@ -104,7 +106,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
       setFilteredIncidencias([]);
     }
   }, [open, loadInitialData]);
-
+  
   // --- Lógica de Selects Dependientes y Auto-asignación ---
 
   // Efecto para filtrar incidencias y usuarios cuando cambia el departamento seleccionado
@@ -127,7 +129,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
       setFilteredIncidencias([]); // Limpia si no hay departamento seleccionado
     }
   }, [watcheddepartamento, allIncidencias, usuarios]);
-
+  
   // Efecto para auto-asignar departamento cuando cambia la incidencia seleccionada
   useEffect(() => {
     if (watchedincidencia) {
@@ -156,7 +158,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
     // No añadir setValue a las dependencias para evitar bucles infinitos
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedincidencia, allIncidencias]); // Solo depende de la incidencia y la lista completa
-
+  
   const closeDialog = () => {
     reset(); // Limpia react-hook-form
     setFilteredIncidencias([]); // Limpia estado local
@@ -180,8 +182,13 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
         prioridad: parseInt(data.prioridad),
       };
       console.log("Enviando datos del Ticket:", ticketData);
-
-      await createTicket(ticketData);
+      if (ticket?.id) {
+        await updateTicket(ticket.id, ticketData);
+        toast.success("Ticket actualizado exitosamente.");        
+      }else{
+        await createTicket(ticketData);
+        toast.success("Ticket creado exitosamente.");
+      }
       toast.success("Ticket creado exitosamente.");
       if (refreshTickets) {
         refreshTickets();
@@ -195,15 +202,22 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
     } finally {
       setLoading(false);
     }
-  };
+  };  
   const isLoadingData = loadingDeps || loadingIncs;
+  function pageTitle() {
+    if (ticket?.id){
+      return <h2 className="text-center">Editar Ticket</h2>;
+    }else {
+      return <h2 className="text-center">Crear Ticket</h2>;
+    }
+  }
 
   return (
     <ModalWrapper
       open={open}
       setOpen={closeDialog}
       title={
-        // El título se pasa como un elemento React
+        // El título se pasa como un elemento React en el header
         <DialogTitle
           as="h2"
           // El ID debe coincidir con el aria-labelledby en ModalWrapper si se genera allí
@@ -211,7 +225,8 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
           // id={titleId} // Asegúrate que titleId esté definido si lo pones aquí
           className="text-lg font-semibold leading-6 text-gray-900 text-center"
         >
-          Crear Nuevo Ticket
+
+          {pageTitle()}
         </DialogTitle>
       }
       footer={
@@ -294,7 +309,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
               </p>
             )}
           </div>
-         {/* Campo Motivo*/}
+         {/* Campo Fecha de Vencimiento */}
          <div className="w-full">
             <label
               htmlFor="fechaVencimiento"
@@ -307,7 +322,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
               control={control}
               rules={{ required: "La fecha es obligatoria" }}
               render={({ field }) => (
-                <input type="date" id="fechaVencimiento" {...field}/>
+                <input  type="date" id="fechaVencimiento" {...field}/>
               )}
             />
             {errors.fechaVencimiento && (
@@ -316,7 +331,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
               </p>
             )}{" "}
             {/* Corregido error check */}
-          </div>
+          </div>          
           
           {/* Campo Usuario (Agente Asignado) */}
           <div className="w-full">
@@ -538,4 +553,3 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
     </ModalWrapper>
   );
 }
-
