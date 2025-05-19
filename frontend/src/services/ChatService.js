@@ -18,7 +18,7 @@ const getHeaders = () => ({
 // Function to get messages (assuming it exists and works with ticketId)
 export const listMessages = (ticketId) => {
     // Ensure backend endpoint matches: /api/tickets/{ticketId}/chat/messages (GET)
-    return axios.get(`${REST_API_BASE_URL}/tickets/${ticketId}/chat/messages?page=0`, getHeaders());
+    return axios.get(`${REST_API_BASE_URL}/tickets/${ticketId}/chat/messages?page=0&size=1000`, getHeaders());
 };
 
 // --- NEW FUNCTION ---

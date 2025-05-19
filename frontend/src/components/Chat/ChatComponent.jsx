@@ -64,7 +64,7 @@ const ChatComponent = ({
     const ta = textareaRef.current;
     if (ta) {
       ta.style.height = "auto"; // Reset height
-      ta.style.height = `${Math.min(ta.scrollHeight, 96)}px`; // Set new height, max 96px (aprox 4 filas)
+      ta.style.height = `${Math.min(ta.scrollHeight, 96)}px`; // Nueva height, max 96px (aprox 4 filas)
     }
   }, [message]); // Depende del contenido del mensaje
 
@@ -235,7 +235,7 @@ const ChatComponent = ({
                 className={`flex ${isSender ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[75%] p-2 px-3 rounded-lg shadow-sm ${ // Padding ajustado
+                  className={`max-w-[75%] m-1 p-2 px-3 rounded-lg shadow-sm ${ // Padding ajustado
                     isSender
                       ? "bg-indigo-500 text-white"
                       : "bg-white text-gray-800 border border-gray-200"
