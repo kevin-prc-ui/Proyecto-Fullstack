@@ -20,7 +20,6 @@ import org.springframework.stereotype.Controller;
  */
 @Controller
 @RequiredArgsConstructor
-// @CrossOrigin("http://localhost:5173") // Configurar CORS en WebSocketConfig
 public class ChatWebSocketController {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatWebSocketController.class);
@@ -37,14 +36,14 @@ public class ChatWebSocketController {
      * @return El {@link ChatMessageDto} del mensaje guardado y procesado.
      * @throws Exception Si ocurre un error durante el procesamiento.
      */
-    @MessageMapping("/chat/{chatId}/sendMessage") // Endpoint al que los clientes envían mensajes
+    @MessageMapping("/api/chat/{chatId}/sendmessage") // Endpoint al que los clientes envían mensajes
     @SendTo("/ticket/chat/{chatId}")             // Topic al que se suscribe el cliente para recibir mensajes
     public ChatMessageDto sendMessage(
             @DestinationVariable String chatId, // El ID del Chat (NO el ID del Ticket directamente)
             @Payload ChatMessageCreateDto messageCreateDto,
-            Authentication headerAccessor) throws Exception { // SimpMessageHeaderAccessor para obtener el principal
+            SimpMessageHeaderAccessor headerAccessor) throws Exception { // SimpMessageHeaderAccessor para obtener el principal
 
-        Authentication authentication = headerAccessor;
+        Authentication authentication = (Authentication) headerAccessor.getUser();
         String email = authentication.getName();
 
         if (!authentication.isAuthenticated()) {

@@ -1,4 +1,4 @@
-// c:\react\Proyecto\frontend\src\components\Chat\index.jsx
+// C:/react/Proyecto/frontend/src/components/Chat/ChatComponent.jsx
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   FaComments,
@@ -6,167 +6,173 @@ import {
   FaFileUpload,
   FaSpinner,
   FaExclamationCircle,
+  FaTimes, // Icono para eliminar archivo
+  FaDownload // Icono para descargar archivo
 } from "react-icons/fa";
-import { postChatMessage } from "../../services/ChatService";
-import { toast } from "sonner";
+// Ya no necesitamos postChatMessage ni toast aquí, el padre maneja el envío y errores
+// import { postChatMessage } from "../../services/ChatService";
+// import { toast } from "sonner";
 
 // --- Helper Function to format timestamp ---
 const formatChatTimestamp = (timestamp) => {
   if (!timestamp) return "";
   try {
+    // Asegurarse de que el timestamp sea un formato válido para el constructor de Date
     const date = new Date(timestamp);
+    // Validar si la fecha es válida
+    if (isNaN(date.getTime())) {
+        console.warn("Timestamp inválido recibido:", timestamp);
+        return "Fecha inválida";
+    }
     return date.toLocaleTimeString("es-ES", {
       hour: "2-digit",
       minute: "2-digit",
     });
   } catch (e) {
-    return "Invalid Date";
+    console.error("Error formatting timestamp:", timestamp, e);
+    return "Error fecha";
   }
 };
 
 // --- Main Chat Component ---
 const ChatComponent = ({
-  chatId, // ID of the chat (needed for context, though sending is handled by parent)
-  messages = [], // Array of message objects { id, sender: { id, nombres }, content, timestamp, messageType, ... }
-  onSendMessage, // Function to call when sending a message: (messageContent: string, files: File[]) => void
-  isConnected, // Boolean indicating WebSocket connection status
-  isLoadingMessages, // Boolean indicating if initial messages are loading
-  currentUserId, // ID of the currently logged-in user
-  connectionError,
-  ticketId, // Optional error message for connection issues
+  // chatId, // No se usa directamente en este componente refactorizado
+  messages = [], // Array de objetos mensaje { id, sender: { id, nombres }, content, timestamp, messageType, attachmentUrl, attachmentFilename, ... }
+  onSendMessage, // Función para llamar al enviar: (messageContent: string, files: File[]) => Promise<void>
+  isConnected, // Boolean indicando estado de conexión WebSocket
+  isConnecting, // Boolean indicando si está intentando conectar
+  isLoadingMessages, // Boolean indicando si se están cargando mensajes iniciales
+  currentUserId, // ID del usuario logueado (para identificar mensajes propios)
+  connectionError, // Mensaje de error de conexión
 }) => {
   const [message, setMessage] = useState("");
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  // Cambiado para manejar un solo archivo seleccionado
+  const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [fileError, setFileError] = useState("");
   const fileInputRef = useRef(null);
-  const messagesEndRef = useRef(null); // Ref to scroll to bottom
+  const messagesEndRef = useRef(null); // Ref para scroll al final
+  const textareaRef = useRef(null); // Ref para auto-resize del textarea
 
-  // Scroll to bottom when messages change
+  // Scroll al final cuando los mensajes cambian
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // --- File Handling Logic (UI only for now) ---
+  // Auto-resize del textarea
+  useEffect(() => {
+    const ta = textareaRef.current;
+    if (ta) {
+      ta.style.height = "auto"; // Reset height
+      ta.style.height = `${Math.min(ta.scrollHeight, 96)}px`; // Set new height, max 96px (aprox 4 filas)
+    }
+  }, [message]); // Depende del contenido del mensaje
+
+  // --- Lógica de Manejo de Archivos ---
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "application/pdf"];
+
+  const validateFile = (file) => {
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return `Archivo no soportado: ${file.name} (Tipo: ${file.type || "desconocido"}). Permitidos: PNG, JPG, PDF.`;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      return `Archivo demasiado grande: ${file.name} (Max: 5MB).`;
+    }
+    return null; // No hay error
+  };
+
+  const handleFileSelect = useCallback((files) => {
+    if (!files || files.length === 0) {
+        setSelectedFile(null);
+        setFileError("");
+        return;
+    }
+    // Solo procesar el primer archivo si se seleccionan varios
+    const file = files[0];
+    const error = validateFile(file);
+
+    if (error) {
+      setFileError(error);
+      setSelectedFile(null); // Limpiar selección en caso de error
+    } else {
+      setFileError(""); // Limpiar errores previos si el archivo es válido
+      setSelectedFile(file); // Establecer el archivo válido
+    }
+  });
+
   const handleDrag = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setIsDragging(true);
-    } else if (e.type === "dragleave") {
-      setIsDragging(false);
-    }
+    if (e.type === "dragenter" || e.type === "dragover") setIsDragging(true);
+    else if (e.type === "dragleave") setIsDragging(false);
   }, []);
 
   const handleDrop = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-    setFileError(""); // Clear previous errors
-
-    const files = Array.from(e.dataTransfer.files);
-    // Basic validation (can be expanded)
-    const allowedTypes = [
-      "image/png",
-      "image/jpeg",
-      "image/jpg",
-      "application/pdf",
-    ];
-    const maxSize = 5 * 1024 * 1024; // 5MB
-
-    const validFiles = files.filter((file) => {
-      if (!allowedTypes.includes(file.type)) {
-        setFileError(
-          `Archivo no soportado: ${file.name} (Tipo: ${
-            file.type || "desconocido"
-          })`
-        );
-        return false;
-      }
-      if (file.size > maxSize) {
-        setFileError(`Archivo demasiado grande: ${file.name} (Max: 5MB)`);
-        return false;
-      }
-      return true;
-    });
-
-    if (validFiles.length !== files.length) {
-      // Only add valid files if some were invalid
-      setSelectedFiles((prev) => [...prev, ...validFiles]);
-    } else {
-      // Add all if all are valid
-      setSelectedFiles((prev) => [...prev, ...files]);
-    }
-  }, []);
+    handleFileSelect(e.dataTransfer.files);
+  }, [handleFileSelect]); // Depende de handleFileSelect
 
   const handleFileChange = (e) => {
-    const files = e.target.files;
-    if (files) {
-      const newFiles = Array.from(files);
-      // Apply same validation as drop
-      const allowedTypes = [
-        "image/png",
-        "image/jpeg",
-        "image/jpg",
-        "application/pdf",
-      ];
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      setFileError(""); // Clear previous errors
-
-      const validFiles = newFiles.filter((file) => {
-        if (!allowedTypes.includes(file.type)) {
-          setFileError(
-            `Archivo no soportado: ${file.name} (Tipo: ${
-              file.type || "desconocido"
-            })`
-          );
-          return false;
-        }
-        if (file.size > maxSize) {
-          setFileError(`Archivo demasiado grande: ${file.name} (Max: 5MB)`);
-          return false;
-        }
-        return true;
-      });
-
-      if (validFiles.length !== newFiles.length) {
-        setSelectedFiles((prev) => [...prev, ...validFiles]);
-      } else {
-        setSelectedFiles((prev) => [...prev, ...newFiles]);
-      }
-      // Clear the input value so the same file can be selected again
-      e.target.value = null;
-    }
+    handleFileSelect(e.target.files);
+    // Limpiar el valor del input para permitir seleccionar el mismo archivo de nuevo
+    e.target.value = null;
   };
 
-  const removeFile = (index) => {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-    if (selectedFiles.length === 1) setFileError(""); // Clear error if last file removed
+  const removeFile = () => {
+    setSelectedFile(null);
+    setFileError(""); // Limpiar error asociado al archivo
   };
 
-  // --- Message Submission ---
- const handleSubmit = async (e) => {
+  // --- Envío de Mensaje ---
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!message.trim() && selectedFiles.length === 0) return;
 
-    try {
-        await postChatMessage(ticketId, message);
-        // Limpiar estados
-        setMessage("");
-        setSelectedFiles([]);
-        setFileError("");
-        
-    } catch (error) {
-        console.error("Error sending message:", error);
-        toast.error("Error al enviar el mensaje");
+    const trimmedMessage = message.trim();
+    // Validar si hay contenido de texto O un archivo seleccionado
+    if (!trimmedMessage && !selectedFile) {
+      console.warn("Intento de enviar mensaje vacío sin archivo.");
+      return; // No enviar si está vacío
     }
-};
-  
+
+    // Llamar a la función onSendMessage proporcionada por el padre
+    // Pasar el contenido del mensaje y el archivo seleccionado (en un array para consistencia con la firma original)
+    try {
+        // onSendMessage es una función async, esperar a que termine
+        await onSendMessage(trimmedMessage, selectedFile ? [selectedFile] : []);
+
+        // Limpiar el input y los archivos seleccionados SOLO si el envío fue exitoso
+        setMessage("");
+        setSelectedFile(null);
+        setFileError("");
+        // Resetear altura del textarea
+        if (textareaRef.current) {
+            textareaRef.current.style.height = "auto";
+        }
+    } catch (error) {
+        // El error ya se maneja y notifica en el componente padre (ChatContainer)
+        console.error("Error handled in parent:", error);
+    }
+  };
+
+  // Determinar el texto del placeholder basado en el estado de conexión
+  const getPlaceholderText = () => {
+      if (connectionError) return "Error de conexión...";
+      if (isConnecting) return "Conectando al chat...";
+      if (!isConnected) return "Chat desconectado. Intentando reconectar...";
+      return "Escribe tu mensaje...";
+  };
+
+  // Determinar si el input y el botón de envío deben estar deshabilitados
+  const isInputDisabled = !isConnected || !!connectionError || isConnecting;
+  const isSendButtonDisabled = isInputDisabled || (!message.trim() && !selectedFile);
+
 
   // --- Render Logic ---
   return (
-    <div className="flex-1 flex flex-col h-180 w-120 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+    <div className="flex-1 flex flex-col h-[600px] lg:h-full max-h-[80vh] bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200"> {/* Altura ajustada */}
       {/* Header */}
       <div className="flex items-center justify-between p-3 bg-gray-50 border-b border-gray-200">
         <div className="flex items-center">
@@ -175,44 +181,31 @@ const ChatComponent = ({
             Mensajes del Ticket
           </h2>
         </div>
-        {/* Connection Status Indicator */}
+        {/* Indicador de Estado de Conexión */}
         <div className="flex items-center text-xs">
           {connectionError ? (
-            <FaExclamationCircle
-              className="text-red-500 mr-1"
-              title={connectionError}
-            />
+            <FaExclamationCircle className="text-red-500 mr-1" title={`Error: ${connectionError}`} />
+          ) : isConnecting ? (
+            <FaSpinner className="animate-spin text-yellow-500 mr-1" title="Conectando..." />
           ) : isConnected ? (
-            <span
-              className="w-3 h-3 bg-green-500 rounded-full mr-1"
-              title="Conectado"
-            ></span>
+            <span className="w-3 h-3 bg-green-500 rounded-full mr-1" title="Conectado"></span>
           ) : (
-            <FaSpinner
-              className="animate-spin text-yellow-500 mr-1"
-              title="Conectando..."
-            />
+            <span className="w-3 h-3 bg-gray-400 rounded-full mr-1" title="Desconectado"></span>
           )}
           <span
             className={`font-medium ${
-              connectionError
-                ? "text-red-600"
-                : isConnected
-                ? "text-green-600"
-                : "text-yellow-600"
+              connectionError ? "text-red-600" :
+              isConnecting ? "text-yellow-600" :
+              isConnected ? "text-green-600" : "text-gray-500"
             }`}
           >
-            {connectionError
-              ? "Error"
-              : isConnected
-              ? "Conectado"
-              : "Conectando"}
+            {connectionError ? "Error" : isConnecting ? "Conectando" : isConnected ? "Conectado" : "Desconectado"}
           </span>
         </div>
       </div>
 
-      {/* Message Area */}
-      <div className="flex-1 p-2 overflow-y-auto bg-gray-100 space-y-4">
+      {/* Área de Mensajes */}
+      <div className="flex-1 p-3 overflow-y-auto bg-gray-100 space-y-3"> {/* Padding/espaciado ajustado */}
         {isLoadingMessages ? (
           <div className="text-center text-gray-500 py-10">
             <FaSpinner className="animate-spin h-6 w-6 mx-auto mb-2 text-indigo-500" />
@@ -224,35 +217,66 @@ const ChatComponent = ({
           </div>
         ) : (
           messages.map((msg) => {
-            const isSender = msg.sender?.id === currentUserId;
+            // console.log("Rendering message:", msg); // Log para depuración
+            // Asegurarse de que msg y msg.sender existan antes de acceder a propiedades
+            const senderId = msg.sender?.id;
+            const senderName = msg.sender?.nombre || msg.sender?.nombres || "Usuario Desconocido"; // Verificar 'nombre' y 'nombres'
+            const isSender = senderId === currentUserId;
+
+            // Validación básica para mensajes con estructura mínima
+            if (msg.id === undefined || msg.id === null || msg.timestamp === undefined || msg.timestamp === null) {
+                console.warn("Saltando renderizado de mensaje con ID o timestamp faltante:", msg);
+                return null; // No renderizar mensajes inválidos
+            }
+
             return (
               <div
-                key={msg.id || `temp-${Math.random()}`} // Use ID if available, fallback for optimistic updates
+                key={msg.id} // Usar ID garantizado
                 className={`flex ${isSender ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[75%] p-3 rounded-lg shadow-sm ${
+                  className={`max-w-[75%] p-2 px-3 rounded-lg shadow-sm ${ // Padding ajustado
                     isSender
-                      ? "bg-indigo-500 text-white m-1"
-                      : "bg-white text-gray-800 border m-1 border-gray-200"
+                      ? "bg-indigo-500 text-white"
+                      : "bg-white text-gray-800 border border-gray-200"
                   }`}
                 >
-                  {!isSender && ( // Show sender name only for messages from others
+                  {!isSender && ( // Mostrar nombre del remitente solo para mensajes de otros
                     <p className="text-xs font-semibold mb-1 text-indigo-700">
-                      {msg.sender?.nombre || "Usuario Desconocido"}
+                      {senderName}
                     </p>
                   )}
-                  <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                  {/* Display attachment info if present */}
-                  {msg.messageType != "TEXT" && msg.attachmentFilename && (
-                    <div className="mt-2 p-2 bg-opacity-20 bg-gray-300 rounded text-xs flex items-center">
-                      <FaFileUpload className="mr-1 flex-shrink-0" />
-                      <span className="truncate">{msg.attachmentFilename}</span>
-                      {/* Add download link if msg.attachmentUrl exists */}
+
+                  {/* Renderizar contenido basado en el tipo de mensaje */}
+                  {/* Mostrar contenido de texto si existe, incluso si hay adjunto */}
+                  {msg.content && (
+                     <p className={`text-sm whitespace-pre-wrap break-words ${msg.messageType !== "TEXT" ? 'italic text-gray-200' : ''}`}>{msg.content}</p>
+                  )}
+
+                  {/* Mostrar información del adjunto si no es solo texto */}
+                  {msg.messageType !== "TEXT" && msg.attachmentFilename && (
+                    <div className="mt-1 p-2 bg-black bg-opacity-10 rounded text-xs flex items-center gap-2">
+                      <FaFileUpload className="flex-shrink-0 text-base" />
+                      <span className="truncate flex-1">{msg.attachmentFilename}</span>
+                      {/* Añadir enlace de descarga si la URL existe */}
+                      {msg.attachmentUrl && (
+                        <a
+                          href={`http://localhost:8080${msg.attachmentUrl}`} // Asumiendo que el backend sirve archivos en esta ruta
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 hover:underline"
+                          title={`Descargar ${msg.attachmentFilename}`}
+                          onClick={(e) => e.stopPropagation()} // Evitar que el clic en el enlace cierre algo si estuviera en un modal, etc.
+                        >
+                          <FaDownload />
+                        </a>
+                      )}
                     </div>
                   )}
+
+
                   <p
-                    className={`text-xs mt-1 ${
+                    className={`text-[10px] mt-1 ${ // Timestamp más pequeño
                       isSender ? "text-indigo-100" : "text-gray-400"
                     } text-right`}
                   >
@@ -263,110 +287,94 @@ const ChatComponent = ({
             );
           })
         )}
-        {/* Empty div to ensure scrolling to the bottom works */}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} /> {/* Ancla para el scroll */}
       </div>
 
-      {/* Input Area */}
+      {/* Área de Entrada */}
       <form
         onSubmit={handleSubmit}
         className="p-3 border-t border-gray-200 bg-gray-50"
       >
-        {/* Selected Files Preview */}
-        {selectedFiles.length > 0 && (
-          <div className="mb-2 flex flex-wrap gap-2 border-b pb-2 border-gray-200">
-            {selectedFiles.map((file, index) => (
-              <div
-                key={`${file.name}-${index}-${file.lastModified}`}
-                className="flex items-center bg-indigo-100 rounded-md px-2 py-1 text-xs text-indigo-800"
-              >
-                <span className="max-w-[100px] truncate mr-1.5">
-                  {file.name}
+        {/* Previsualización de Archivo Seleccionado (Un solo archivo) */}
+        {selectedFile && (
+          <div className="mb-2 flex items-center justify-between border rounded p-1.5 bg-indigo-50 border-indigo-200">
+             <div className="flex items-center gap-2 text-xs text-indigo-800 flex-1 min-w-0">
+                <FaFileUpload className="flex-shrink-0 text-indigo-600"/>
+                <span className="truncate">
+                  {selectedFile.name}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => removeFile(index)}
-                  className="text-red-500 hover:text-red-700 font-bold text-sm leading-none"
-                  aria-label="Eliminar archivo"
-                >
-                  &times;
-                </button>
-              </div>
-            ))}
+             </div>
+            <button
+              type="button"
+              onClick={removeFile}
+              className="text-red-500 hover:text-red-700 font-bold text-lg leading-none p-1 flex-shrink-0"
+              aria-label="Eliminar archivo"
+            >
+              <FaTimes size={12}/>
+            </button>
           </div>
         )}
 
-        {/* Input Row */}
+        {/* Fila de Input */}
         <div className="flex items-end gap-2">
-          {/* File Upload Button/Dropzone */}
+          {/* Botón de Subida de Archivo / Dropzone */}
           <div
             className={`relative flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-lg border-2 border-dashed cursor-pointer transition-colors
-              ${
-                isDragging
-                  ? "border-indigo-500 bg-indigo-100"
-                  : "border-gray-300 hover:border-indigo-400"
-              }
-              ${fileError ? "border-red-500 bg-red-100" : ""}`}
+              ${ isDragging ? "border-indigo-500 bg-indigo-100" : "border-gray-300 hover:border-indigo-400" }
+              ${ fileError ? "border-red-500 bg-red-50" : "" }
+              ${ isInputDisabled ? "opacity-50 cursor-not-allowed" : "" }`} // Deshabilitar visualmente
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
             onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
+            // Deshabilitar el clic si el input está deshabilitado
+            onClick={() => !isInputDisabled && fileInputRef.current?.click()}
             role="button"
-            tabIndex={0}
+            tabIndex={ isInputDisabled ? -1 : 0} // Remover del orden de tabulación si está deshabilitado
             aria-label="Adjuntar archivo"
-            title="Adjuntar archivo (PNG, JPG, PDF - Max 5MB)"
+            title={ fileError ? fileError : "Adjuntar archivo (PNG, JPG, PDF - Max 5MB)"}
           >
             <FaFileUpload
-              className={`text-lg ${
-                isDragging ? "text-indigo-600" : "text-gray-500"
-              }`}
+              className={`text-lg ${ isDragging ? "text-indigo-600" : fileError ? "text-red-500" : "text-gray-500" }`}
             />
             <input
               ref={fileInputRef}
               type="file"
-              multiple
+              // Eliminado 'multiple' para manejar un solo archivo
               onChange={handleFileChange}
               className="hidden"
-              accept=".png,.jpg,.jpeg,.pdf" // Match validation
-              aria-hidden="true" // Hide from accessibility tree as the div handles interaction
+              accept={ALLOWED_TYPES.join(",")} // Usar tipos definidos
+              aria-hidden="true"
+              disabled={isInputDisabled} // Deshabilitar input
             />
           </div>
 
-          {/* Text Input */}
+          {/* Input de Texto */}
           <textarea
-            rows={1} // Start with one row
+            ref={textareaRef}
+            rows={1}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder={
-              isConnected ? "Escribe tu mensaje..." : "Esperando conexión..."
-            }
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none overflow-y-auto max-h-24 text-sm" // Added max-height and auto overflow
+            placeholder={getPlaceholderText()}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none overflow-y-auto text-sm" // Eliminado max-h, usando JS resize
             aria-label="Escribir mensaje"
-            disabled={!isConnected || connectionError}
+            disabled={isInputDisabled} // Deshabilitar basado en conexión
             onKeyDown={(e) => {
-              // Send on Enter, new line on Shift+Enter
+              // Enviar al presionar Enter (sin Shift), nueva línea con Shift+Enter
               if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault(); // Prevent default newline
-                handleSubmit(e); // Trigger form submission
+                e.preventDefault(); // Prevenir salto de línea por defecto
+                if (!isSendButtonDisabled) { // Solo enviar si el botón no está deshabilitado
+                    handleSubmit(e); // Disparar el envío del formulario
+                }
               }
             }}
-            style={{ height: "auto", minHeight: "40px" }} // Adjust height dynamically (basic)
-            onInput={(e) => {
-              // Auto-resize textarea
-              e.target.style.height = "auto";
-              e.target.style.height = `${e.target.scrollHeight}px`;
-            }}
+            style={{ minHeight: "40px", height: "40px" }} // Altura inicial
           />
 
-          {/* Send Button */}
+          {/* Botón de Enviar */}
           <button
             type="submit"
-            disabled={
-              (!message.trim() && selectedFiles.length === 0) ||
-              !isConnected ||
-              connectionError
-            }
+            disabled={isSendButtonDisabled}
             className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
             aria-label="Enviar mensaje"
           >
@@ -374,22 +382,23 @@ const ChatComponent = ({
           </button>
         </div>
 
-        {/* Error Messages */}
-        {fileError && <p className="mt-1 text-xs text-red-600">{fileError}</p>}
+        {/* Mensajes de Error */}
+        {fileError && !connectionError && <p className="mt-1 text-xs text-red-600">{fileError}</p>}
         {connectionError && (
           <p className="mt-1 text-xs text-red-600">
             Error de conexión: {connectionError}
           </p>
         )}
 
-        {/* Helper Text (Optional) */}
+        {/* Texto de Ayuda (Opcional) */}
         {!fileError && !connectionError && (
           <p className="mt-1 text-xs text-gray-500">
-            Shift+Enter para nueva línea. Archivos: PNG, JPG, PDF (Max 5MB).
+            Shift+Enter para nueva línea. Archivo: PNG, JPG, PDF (Max 5MB).
           </p>
         )}
       </form>
     </div>
   );
 };
+
 export default ChatComponent;

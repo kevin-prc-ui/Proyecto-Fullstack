@@ -40,6 +40,7 @@ export const postChatMessage = (ticketId, messageContent, file) => {
         formData.append('file', file);
     }
 
+    
     return axios.post(
         `${REST_API_BASE_URL}/tickets/${ticketId}/chat/messages`, formData, getHeaders());
 };

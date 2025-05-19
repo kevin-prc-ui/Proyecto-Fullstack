@@ -108,7 +108,7 @@ const TaskDetails = () => {
 
   // --- Render Main Content (Ticket Details + Chat) ---
   return (
-    <div className="min-h-fit min-w-250 p-4 md:p-6">
+    <div className="min-h-fit w-fit p-4 md:p-6">
       {/* Contenedor principal que alinea el botón (izquierda) y el contenido principal (derecha) */}
       {/* 'items-center' centrará verticalmente el botón respecto al bloque de contenido de la derecha */}
       <div className="max-w-7x2 mx-auto flex flex-row items-center gap-x-4 md:gap-x-6">

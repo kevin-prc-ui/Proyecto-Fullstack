@@ -199,7 +199,6 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
   const isLoadingData = loadingDeps || loadingIncs;
 
   return (
-    // Usa el ModalWrapper refactorizado, pasando title y footer como props
     <ModalWrapper
       open={open}
       setOpen={closeDialog}
@@ -540,21 +539,3 @@ export default function CreateTicket({ open, setOpen, refreshTickets, id}) {
   );
 }
 
-// Código original de los botones (para referencia)
-/*
-<div className="bg-gray-50 py-3 mt-4 sm:flex sm:flex-row-reverse gap-4 px-4">
-                        <Button
-                            type="submit"
-                            className={clsx("px-8 text-sm font-semibold text-white sm:w-auto", "bg-blue-600 hover:bg-blue-700", (loading || isLoadingData) && "opacity-50 cursor-not-allowed")}
-                            label={loading ? "Creando..." : "Crear Ticket"}
-                            disabled={loading || isLoadingData}
-                        />
-                        <Button
-                            type="button"
-                            className="bg-white px-8 text-sm font-semibold text-gray-900 sm:w-auto border hover:bg-gray-50"
-                            onClick={() => closeDialog()}
-                            label="Cancelar"
-                            disabled={loading}
-                        />
-</div>
-*/
