@@ -24,7 +24,7 @@ export const CreateSitesComponent = ({ addSite }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+      console.log("handleSubmit ejecutado");
     addSite(siteData);
 
     handleClose();
