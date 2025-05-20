@@ -3,6 +3,7 @@ import { FiX, FiSave, FiPlus, FiTrash2, FiUser, FiFileText, FiChevronDown, FiChe
 import { MdTaskAlt } from 'react-icons/md';
 import { RiFlowChart } from 'react-icons/ri';
 import { createActivity, getAllActivities } from '../../../../services/ActivityService';
+import { getUserId } from '../../../../services/UsuarioService';
 
 const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     
@@ -14,8 +15,8 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     dueDate: '',
     priority: 'Medium',
     description: '',
-    assignees: [],
-    reviewers: [],
+    usuariosCreadores: '',
+    usuariosAsignados: '',
     approvalPercentage: 70,
     items: [],
     sendNotifications: true
@@ -103,6 +104,8 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     };
 
     // Llamamos al servicio para crear o actualizar la actividad
+    console.log('Datos enviados al backend:', preparedData);
+    
     createActivity(preparedData);
   };
 
@@ -220,10 +223,10 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                       <label className="form-label">Asignados *</label>
                       <select
                         className="form-select"
-                        multiple
+        
                         size="4"
-                        value={formData.assignees}
-                        onChange={(e) => handleMultiSelect(e, 'assignees')}
+                        value={formData.usuariosAsignados}
+                        onChange={handleChange}
                         required
                       >
                         {users.map(user => (
@@ -244,7 +247,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                             className="form-select"
                             multiple
                             size="4"
-                            value={formData.reviewers}
+                            value={formData.usuarioCreadores}
                             onChange={(e) => handleMultiSelect(e, 'reviewers')}
                             required
                           >

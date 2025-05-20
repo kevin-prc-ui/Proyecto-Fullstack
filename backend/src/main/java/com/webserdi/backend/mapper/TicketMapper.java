@@ -51,7 +51,6 @@ public class TicketMapper {
             ticketDto.setUsuarioAsignadoNombres("No asignado"); // Opcional: valor por defecto
         }
 
-
         if (ticket.getDepartamento() != null) {
             ticketDto.setDepartamento(ticket.getDepartamento().getId());
             ticketDto.setDepartamentoNombre(ticket.getDepartamento().getNombre());

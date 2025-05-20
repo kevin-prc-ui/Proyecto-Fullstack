@@ -1,7 +1,10 @@
 package com.webserdi.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,6 +13,9 @@ import java.util.List;
 
 @Data
 @Entity
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "activities")
 public class Activity {
 
@@ -28,7 +34,6 @@ public class Activity {
 
     @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items = new ArrayList<>();
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_creador_id", nullable = false)

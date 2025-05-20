@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data // 👉 Genera automáticamente getters, setters, toString, equals y hashCode
-public class ActivityRequest {
+public class ActivityDto {
 
     // 👉 Campos que representan los datos que se envían desde el cliente
     private Long id;
@@ -20,8 +20,10 @@ public class ActivityRequest {
     private Boolean sendNotifications;
     private Integer approvalPercentage;
     private List<String> items;
-    private Long assignees;
-    private Long reviewers;
+    private Long usuariosCreadores;
+    private List<Long> usuariosAsignados;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     // 👉 Convierte este DTO en una entidad Activity (para guardar en la base de datos)
     public Activity toEntity() {

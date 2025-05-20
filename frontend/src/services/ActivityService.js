@@ -28,6 +28,7 @@ const getHeaders = () => {
     // or return empty headers, which will likely cause the API call to fail (401/403)
     return {};
   }
+  
   return {
     headers: {
       Authorization: `Bearer ${accessToken}`,

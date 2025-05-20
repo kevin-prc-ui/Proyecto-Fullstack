@@ -1,8 +1,8 @@
 package com.webserdi.backend.controller;
 
-import com.webserdi.backend.dto.ActivityRequest;
+import com.webserdi.backend.dto.ActivityDto;
 import com.webserdi.backend.entity.Activity;
-import com.webserdi.backend.service.ActivityService;
+import com.webserdi.backend.service.impl.ActivityServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,21 +14,16 @@ import java.util.List;
 public class ActivityController {
 
     @Autowired
-    private ActivityService activityService;
+    private ActivityServiceImpl activityServiceImpl;
+
 
     // 👉 Guarda una nueva actividad (junto con items, asignados y revisores)
     @PostMapping("/save")
-    public ResponseEntity<?> saveActivity(@RequestBody ActivityRequest request) {
-        // Convierte el DTO recibido (ActivityRequest) en una entidad Activity
-        Activity activity = request.toEntity();
+    public ResponseEntity<?> saveActivity(@RequestBody ActivityDto request) {
+        // Convierte el DTO recibido (ActivityDto) en una entidad Activity
 
         // Llama al servicio para guardar la actividad con todos los detalles relacionados
-        Activity saved = activityService.saveActivity(
-                activity,
-                request.getItems(),
-                request.getAssignees(),
-                request.getReviewers()
-        );
+        ActivityDto saved = activityServiceImpl.saveActivity(request);
 
         // Retorna la actividad guardada
         return ResponseEntity.ok(saved);
@@ -37,7 +32,7 @@ public class ActivityController {
     // 👉 Obtiene todas las actividades registradas
     @GetMapping("/")    
     public ResponseEntity<?> getAllActivities() {
-        List<Activity> activities = activityService.getAllActivities();
+        List<Activity> activities = activityServiceImpl.getAllActivities();
 
         // Retorna la lista completa de actividades
         return ResponseEntity.ok(activities);
@@ -45,8 +40,8 @@ public class ActivityController {
 
     // 👉 Obtiene una actividad específica por su ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> getActivityById(@PathVariable Integer id) {
-        Activity activity = activityService.getActivityById(id);
+    public ResponseEntity<?> getActivityById(@PathVariable Long id) {
+        Activity activity = activityServiceImpl.getActivityById(id);
 
         // Si existe la actividad, la retorna; si no, devuelve 404 Not Found
         if (activity != null) {
@@ -63,7 +58,7 @@ public class ActivityController {
             @RequestParam(required = false) String priority) {
 
         // Obtiene las actividades filtradas según los criterios enviados
-        List<Activity> activities = activityService.getFilteredActivities(type, priority);
+        List<Activity> activities = activityServiceImpl.getFilteredActivities(type, priority);
 
         // Retorna las actividades que cumplen los filtros
         return ResponseEntity.ok(activities);

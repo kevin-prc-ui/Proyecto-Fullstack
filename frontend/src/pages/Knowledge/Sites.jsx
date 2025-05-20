@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
 import "../../styles/estilos.css";
 import MySitesComponent from './ComponentsKnow/Sites_Components/MySitesComponent.jsx';
 import SitesFinderComponent from './ComponentsKnow/Sites_Components/SitesFinderComponent.jsx';
