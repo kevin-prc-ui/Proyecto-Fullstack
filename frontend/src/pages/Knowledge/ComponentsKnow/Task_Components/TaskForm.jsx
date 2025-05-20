@@ -15,8 +15,8 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     dueDate: '',
     priority: 'Medium',
     description: '',
-    usuariosCreadores: '',
-    usuariosAsignados: '',
+    usuariosCreadores:  [],
+    usuariosAsignados: [],
     approvalPercentage: 70,
     items: [],
     sendNotifications: true
@@ -219,25 +219,43 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                 {expandedSections.assignment && (
                   <div className="row g-3">
                     {/* Asignados */}
-                    <div className="col-md-6">
-                      <label className="form-label">Asignados *</label>
-                      <select
-                        className="form-select"
-        
-                        size="4"
-                        value={formData.usuariosAsignados}
-                        onChange={handleChange}
-                        required
-                      >
-                        {users.map(user => (
-                          <option key={user.id} value={user.id}>
-                            {user.nombre}
-                          </option>
-                        ))}
-                      </select>
-                      <small className="text-muted">Mantén Ctrl/Cmd para seleccionar múltiples</small>
-                    </div>
+                        {/* Select para usuariosAsignados */}
+                        <div className="col-md-6">
+                          <label className="form-label">Asignados *</label>
+                          <select
+                            className="form-select"
+                            multiple
+                            size="4"
+                            value={formData.usuariosAsignados}
+                            onChange={(e) => handleMultiSelect(e, 'usuariosAsignados')}
+                            required
+                          >
+                            {users.map(user => (
+                              <option key={user.id} value={user.id}>
+                                {user.nombre}
+                              </option>
+                            ))}
+                          </select>
+                          <small className="text-muted">Mantén Ctrl/Cmd para seleccionar múltiples</small>
+                        </div>
 
+                        {/* Select para usuariosCreadores (si es necesario) */}
+                        <div className="col-md-6">
+                          <label className="form-label">Creadores</label>
+                          <select
+                            className="form-select"
+                            multiple
+                            size="4"
+                            value={formData.usuariosCreadores}
+                            onChange={(e) => handleMultiSelect(e, 'usuariosCreadores')}
+                          >
+                            {users.map(user => (
+                              <option key={user.id} value={user.id}>
+                                {user.nombre}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                     {/* Revisores y porcentaje de aprobación (solo si es workflow) */}
                     {formData.type === 'workflow' && (
                       <>
