@@ -178,7 +178,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
         fuente: 1,//  
         incidencia: parseInt(data.incidencia),
         motivo: parseInt(data.motivo),//
-        estado: 3,//
+        estado: 1,//
         prioridad: parseInt(data.prioridad),
       };
       console.log("Enviando datos del Ticket:", ticketData);
@@ -206,9 +206,9 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
   const isLoadingData = loadingDeps || loadingIncs;
   function pageTitle() {
     if (ticket?.id){
-      return <h2 className="text-center">Editar Ticket</h2>;
+      return <div className="text-center">Editar Ticket</div>;
     }else {
-      return <h2 className="text-center">Crear Ticket</h2>;
+      return <div className="text-center">Crear Ticket</div>;
     }
   }
 

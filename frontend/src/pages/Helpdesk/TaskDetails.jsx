@@ -221,7 +221,7 @@ const TaskDetails = () => {
             </div>
           </div>
           {/* Columna Derecha: Chat */}
-          <div className="flex-1 lg:w-1/2 xl:w-3/5 min-h-[600px] lg:min-h-0">
+          <div className="flex-1 lg:w-1/2 xl:w-200 min-h-[600px] lg:min-h-0">
             {/* Pass necessary props to ChatComponent */}
             <ChatContainer ticketId={id} chatId={ticket.chatId} />
           </div>

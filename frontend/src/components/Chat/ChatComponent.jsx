@@ -169,6 +169,53 @@ const ChatComponent = ({
   const isInputDisabled = !isConnected || !!connectionError || isConnecting;
   const isSendButtonDisabled = isInputDisabled || (!message.trim() && !selectedFile);
 
+    // --- Función para Manejar la Descarga de Adjuntos con Autenticación ---
+  const handleDownloadAttachment = useCallback(
+    async (attachmentUrl, attachmentFilename) => {
+      const token = JSON.parse(localStorage.getItem("authToken"));
+
+      if (!token) {
+        console.error(
+          "Token de autenticación no encontrado. No se puede descargar el archivo."
+        );
+        return;
+      }
+
+      // Idealmente, la URL base del backend debería venir de una variable de entorno
+      const baseUrl = "http://localhost:8080"; // Ajusta si es necesario
+
+      try {
+        const response = await fetch(`${baseUrl}${attachmentUrl}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token.accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Error al descargar el archivo:", response.status, errorText);
+          // toast.error(`Error al descargar: ${response.statusText}`);
+          throw new Error(`Error del servidor: ${response.status} ${response.statusText}`);
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = attachmentFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a); // Limpiar el elemento <a>
+        window.URL.revokeObjectURL(url); // Liberar el objeto URL
+      } catch (error) {
+        console.error("Fallo en la descarga del adjunto:", error);
+        // toast.error("No se pudo descargar el archivo. Inténtelo de nuevo.");
+      }
+    },
+    []
+  );
 
   // --- Render Logic ---
   return (
@@ -260,16 +307,17 @@ const ChatComponent = ({
                       <span className="truncate flex-1">{msg.attachmentFilename}</span>
                       {/* Añadir enlace de descarga si la URL existe */}
                       {msg.attachmentUrl && (
-                        <a
-                          href={`http://localhost:8080${msg.attachmentUrl}`} // Asumiendo que el backend sirve archivos en esta ruta
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 hover:underline"
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Evitar que el clic se propague
+                            handleDownloadAttachment(msg.attachmentUrl, msg.attachmentFilename);
+                          }}
+                          className="p-1 text-blue-500 hover:text-blue-700 focus:outline-none"
                           title={`Descargar ${msg.attachmentFilename}`}
-                          onClick={(e) => e.stopPropagation()} // Evitar que el clic en el enlace cierre algo si estuviera en un modal, etc.
                         >
-                          <FaDownload />
-                        </a>
+                        <FaDownload className="text-sm" />
+                        </button>
                       )}
                     </div>
                   )}
