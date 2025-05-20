@@ -133,6 +133,9 @@ export const restoreTicket = (ticketId) =>
 export const createTicket = (ticketData) =>
   axios.post(`${REST_API_BASE_URL}/tickets`, ticketData, getHeaders());
 
+export const updateTicket = (id, ticketData) =>
+  axios.put(`${REST_API_BASE_URL}/tickets/${id}`, ticketData,null, getHeaders());
+
 export const listAllIncidencias = () => {
   return axios.get(`${REST_API_BASE_URL}/incidencias`, { // Endpoint a crear en el backend
       headers: { Authorization: `Bearer ${getAuthToken()}` }
@@ -148,7 +151,4 @@ export const listAllMotivos = () => {
       headers: { Authorization: `Bearer ${getAuthToken()}` }
   });
 };
-
-
-// Add other necessary functions like createTicket, updateTicket if needed...
 
