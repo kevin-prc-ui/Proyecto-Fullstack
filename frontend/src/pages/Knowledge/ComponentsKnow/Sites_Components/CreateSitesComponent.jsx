@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
 
-
-export const CreateSitesComponent = () => {
+export const CreateSitesComponent = ({ addSite }) => {
   const [showModal, setShowModal] = useState(false);
   const [siteData, setSiteData] = useState({
     type: 'Collaboration Site',
@@ -25,13 +24,24 @@ export const CreateSitesComponent = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí iría la lógica para enviar los datos
-    console.log('Datos del sitio:', siteData);
+
+    addSite(siteData);
+
     handleClose();
+
+    setSiteData({
+      type: 'Collaboration Site',
+      name: '',
+      siteId: '',
+      visibility: 'Public',
+      description: ''
+    });
   };
 
   return (
     <>
+      {/* No necesitamos botón aquí si abres modal desde arriba */}
+      {/* Pero si quieres mantener botón dentro del componente, mantenlo */}
       <button 
         type="button" 
         className="list-group-item list-group-item-action create-site-btn"
@@ -215,7 +225,6 @@ export const CreateSitesComponent = () => {
           </Modal.Footer>
         </Form>
       </Modal>
-
     </>
   );
 };
