@@ -7,7 +7,7 @@ import { listMessages, postChatMessage } from "../../services/ChatService";
 // Importa tu hook de autenticación para obtener el usuario actual
 import { getUserId } from "../../services/UsuarioService"; // Ajusta la ruta a tu AuthContext
 import { toast } from "sonner"; // Para notificaciones
-import { getAuthToken as getTokenFromAuthService } from "../../services/AuthService"; // Importa y renombra
+import { getAuthToken as getTokenFromAuthService } from "../../services/AuthService.js"; // Importa y renombra
 
 // --- Configuración WebSocket ---
 const WEBSOCKET_URL = "http://localhost:8080/ws"; // Tu endpoint WebSocket

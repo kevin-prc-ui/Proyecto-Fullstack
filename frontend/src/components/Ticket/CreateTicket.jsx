@@ -15,18 +15,17 @@ import {
 } from "../../services/TicketService";
 import { getUserId, listUsers } from "../../services/UsuarioService";
 import { toast } from "sonner";
-import { data } from "react-router-dom";
 // const PRIORITIES = ["Baja", "Media", "Alta"];
 
 export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
   const [loading, setLoading] = useState(false);
   const [loadingDeps, setLoadingDeps] = useState(false);
   const [loadingIncs, setLoadingIncs] = useState(false);
+  const [usuarioCreador, setUsuarioCreador] = useState();
   const [departamentos, setDepartamentos] = useState([]);  
   const [prioridades, setPrioridades] = useState([]);
   const [motivos, setMotivos] = useState([]);
   const [usuarios, setUsuarios] = useState([]);
-  const [usuarioCreador, setUsuarioCreador] = useState();
   const [filteredUsuarios, setFilteredUsuarios] = useState([]);
   const [allIncidencias, setAllIncidencias] = useState([]); // Guarda todas las incidencias
   // const { isAuth, getAllUsers } = useAuth();
@@ -40,19 +39,30 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
     setValue, // Para establecer valores programáticamente    
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      // Establece valores iniciales
+    // Inicializa defaultValues con los datos del ticket si existe, de lo contrario usa valores vacíos
+    defaultValues: ticket ? {
+      tema: ticket.tema || "",
+      fechaVencimiento: ticket.fechaVencimiento ? new Date(ticket.fechaVencimiento).toISOString().split('T')[0] : "", // Formato YYYY-MM-DD
+      descripcion: ticket.descripcion || "",
+      usuarioCreador: ticket.usuarioCreador || "", // Asume que usuarioCreador es un objeto con id
+      usuarioAsignado: ticket.usuarioAsignado || "", // Asume que usuarioAsignado es un objeto con id
+      departamento: ticket.departamento || "", // Asume que departamento es un objeto con id
+      fuente: ticket.fuente || "", // Asume que fuente es un objeto con id
+      incidencia: ticket.incidencia || "", // Asume que incidencia es un objeto con id
+      motivo: ticket.motivo|| "", // Asume que motivo es un objeto con id
+      prioridad: ticket.prioridad || "", // Asume que prioridad es un objeto con id
+    } : {
       tema: "",
-      fechaVencimiento:"",
+      fechaVencimiento: "",
       descripcion: "",
-      usuarioCreador: "",
+      usuarioCreador: "", // Este campo no debería ser editable por el usuario
       usuarioAsignado: "",
       departamento: "",
-      fuente: "",
+      fuente: "", // Este campo no debería ser editable por el usuario
       incidencia: "",
       motivo: "",
-      estado: "",
-      prioridad: "", // Estandarizado a prioridad
+      estado: "", // El estado probablemente no se edita en este formulario
+      prioridad: "",
     },
   });
   // Incidencias filtradas basadas en el departamento seleccionado
@@ -67,24 +77,19 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
     setLoadingDeps(true);
     setLoadingIncs(true);
     try {
-      const [depRes, incRes, prioRes, motRes, userRes,userCRes] = await Promise.all([
+      const [depRes, incRes, prioRes, motRes,userCRes] = await Promise.all([
         listDepartamentos(),
         listAllIncidencias(), // Llama a la nueva función del servicio
         listAllPrioridades(),
         listAllMotivos(),
-        listUsers(), // Asume que lista todos los usuarios relevantes
         getUserId(),
       ]);
-
-      // Asume que depRes.data es [{ id, nombre }]
       setDepartamentos(depRes.data || []);
       setPrioridades(prioRes.data || []);
-      // Asume que incRes.data es [{ id, nombre, departamento: { id, nombre } }]      
-      // Mapeamos para tener una estructura plana si es necesario, o usamos la anidada
       setAllIncidencias(incRes.data || []);
       setMotivos(motRes.data || []);
-      setUsuarios(userRes.data || []);
       setUsuarioCreador(userCRes.data || [])
+      
     } catch (error) {
       console.error("Error al cargar datos iniciales:", error);
       toast.error("Error al cargar datos. Contacte a sistemas.");
@@ -96,12 +101,25 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
     }
   }, []); // Sin dependencias, se llama una vez
   
+  // Cargar usuarios solo cuando se abre el modal o cambia el departamento
+  const loadUsers = useCallback(async (departamentoId = null) => {
+    setLoadingDeps(true); // Reutilizamos este loading para usuarios también
+    try {
+      const userRes = await listUsers(departamentoId); // Asume que listUsers puede filtrar por departamento
+      setUsuarios(userRes.data || []);
+    } catch (error) {
+      console.error("Error al cargar usuarios:", error);
+      toast.error("Error al cargar usuarios. Contacte a sistemas.");
+    } finally {
+      setLoadingDeps(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (open) {
       loadInitialData();
     } else {
       // Resetea estados cuando se cierra el modal para evitar datos viejos
-      setDepartamentos([]);
       setAllIncidencias([]);
       setFilteredIncidencias([]);
     }
@@ -113,28 +131,29 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
   useEffect(() => {
     if (watcheddepartamento) {
       const deptId = parseInt(watcheddepartamento, 10);
+      // Carga usuarios filtrados por el departamento seleccionado
+      loadUsers(deptId);
+      
+
       // Filtra incidencias que pertenecen al departamento seleccionado
       const filteredInc = allIncidencias.filter(
-        (inc) => inc.departamento?.id === deptId
-      );
-      // Filtra usuarios que pertenecen al departamento seleccionado (si aplica esa lógica)
-      const filteredUsers = usuarios.filter(
-        (user) => user.departamento?.id === deptId
+        (inc) => inc.departamento.id === deptId
       );
       setFilteredIncidencias(filteredInc);
-      setFilteredUsuarios(filteredUsers);
+      // Ya no necesitamos filteredUsuarios state, usamos el usuarios state cargado por loadUsers
+      // setFilteredUsuarios(filteredUsers);
       // Podríamos resetear incidencia si el departamento cambia y la incidencia actual no pertenece al nuevo
       // setValue("incidencia", "", { shouldValidate: false }); // Descomentar si se desea este comportamiento
     } else {
       setFilteredIncidencias([]); // Limpia si no hay departamento seleccionado
     }
-  }, [watcheddepartamento, allIncidencias, usuarios]);
+  }, [watcheddepartamento, allIncidencias]);
   
   // Efecto para auto-asignar departamento cuando cambia la incidencia seleccionada
   useEffect(() => {
     if (watchedincidencia) {
       const incId = parseInt(watchedincidencia, 10);
-      const selectedIncidencia = allIncidencias.find((inc) => inc.id === incId);
+      const selectedIncidencia = allIncidencias.find((inc) => inc === incId);
 
       if (selectedIncidencia?.departamento) {
         const targetdepartamento =
@@ -158,6 +177,49 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
     // No añadir setValue a las dependencias para evitar bucles infinitos
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchedincidencia, allIncidencias]); // Solo depende de la incidencia y la lista completa
+
+  // Efecto para resetear el formulario cuando el modal se abre con un ticket diferente
+  useEffect(() => {
+    if (open && ticket) {
+      // Resetear el formulario con los valores del ticket
+      reset({
+        tema: ticket.tema || "",
+        fechaVencimiento: ticket.fechaVencimiento ? new Date(ticket.fechaVencimiento).toISOString().split('T')[0] : "",
+        descripcion: ticket.descripcion || "",
+        usuarioAsignado: ticket.usuarioAsignado || "",
+        departamento: ticket.departamento || "",
+        incidencia: ticket.incidencia || "",
+        motivo: ticket.motivo || "",
+        prioridad: ticket.prioridad || "",
+      });
+      // Asegurarse de que las incidencias y usuarios filtrados se carguen si hay un departamento en el ticket
+      if (ticket.departamento) {
+        const deptId = ticket.departamento;
+        // Esto debería ser manejado por el efecto de watcheddepartamento si setValue lo dispara
+        // Pero si el departamento ya estaba seleccionado, el efecto no se dispararía.
+        // Podríamos llamar a loadUsers y filtrar incidencias aquí también si es necesario.
+        const filteredInc = allIncidencias.filter(
+          (inc) => inc.departamento.id === parseInt(deptId, 10)
+        );
+        setFilteredIncidencias(filteredInc);
+        loadUsers(parseInt(deptId, 10));
+      }
+    } else if (!open) {
+       // Resetear el formulario a valores vacíos cuando se cierra
+       reset({
+        tema: "",
+        fechaVencimiento: "",
+        descripcion: "",
+        usuarioAsignado: "",
+        departamento: "",
+        incidencia: "",
+        motivo: "",
+        prioridad: "",
+       });
+       setFilteredIncidencias([]);
+       setUsuarios([]); // Limpiar usuarios también
+    }
+  }, [open, ticket, reset, allIncidencias, loadUsers]); // Depende de open, ticket, reset, allIncidencias, loadUsers
   
   const closeDialog = () => {
     reset(); // Limpia react-hook-form
@@ -172,21 +234,23 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
         tema: data.tema,
         fechaVencimiento: data.fechaVencimiento,
         descripcion: data.descripcion,
-        usuarioCreador: parseInt(usuarioCreador),//
-        usuarioAsignado: parseInt(data.usuarioAsignado),
-        departamento: parseInt(data.departamento),
-        fuente: 1,//  
+        usuarioCreador: usuarioCreador,// Usar el ID del usuario creador obtenido
+        usuarioAsignado: data.usuarioAsignado,
+        departamento: data.departamento,
+        fuente: 1,// Asumimos fuente fija por ahora
         incidencia: parseInt(data.incidencia),
-        motivo: parseInt(data.motivo),//
-        estado: 1,//
+        motivo: parseInt(data.motivo),
+        estado: 3,
         prioridad: parseInt(data.prioridad),
       };
       console.log("Enviando datos del Ticket:", ticketData);
       if (ticket?.id) {
         await updateTicket(ticket.id, ticketData);
+        window.location.reload();
         toast.success("Ticket actualizado exitosamente.");        
       }else{
         await createTicket(ticketData);
+        window.location.reload();
         toast.success("Ticket creado exitosamente.");
       }
       toast.success("Ticket creado exitosamente.");
@@ -204,43 +268,34 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
     }
   };  
   const isLoadingData = loadingDeps || loadingIncs;
-  function pageTitle() {
-    if (ticket?.id){
-      return <div className="text-center">Editar Ticket</div>;
-    }else {
-      return <div className="text-center">Crear Ticket</div>;
-    }
-  }
+    // Actualizar texto del botón de submit
+  const submitButtonText = () => {
+    if (loading) return ticket?.id ? "Actualizando..." : "Creando...";
+    return ticket?.id ? "Actualizar Ticket" : "Crear Ticket";
+  };
+  
 
   return (
+    <>
     <ModalWrapper
       open={open}
       setOpen={closeDialog}
       title={
-        // El título se pasa como un elemento React en el header
-        <DialogTitle
-          as="h2"
-          // El ID debe coincidir con el aria-labelledby en ModalWrapper si se genera allí
-          // Si ModalWrapper genera el ID, no es necesario ponerlo aquí.
-          // id={titleId} // Asegúrate que titleId esté definido si lo pones aquí
-          className="text-lg font-semibold leading-6 text-gray-900 text-center"
-        >
-
-          {pageTitle()}
+        <DialogTitle className="text-lg font-semibold leading-6 text-gray-900 text-center">
+          {ticket?.id ? "Editar Ticket" : "Crear Ticket"}
         </DialogTitle>
       }
       footer={
-        // Los botones se pasan como un elemento React en el footer
         <div className="sm:flex sm:flex-row-reverse gap-4">
           <Button
-            type="submit" // Sigue siendo submit
-            form="create-ticket-form" // Vincula este botón al formulario por su ID
+            type="submit"
+            form="create-ticket-form"
             className={clsx(
               "px-8 text-sm font-semibold text-white sm:w-auto",
               "bg-blue-600 hover:bg-blue-700",
               (loading || isLoadingData) && "opacity-50 cursor-not-allowed"
             )}
-            label={loading ? "Creando..." : "Crear Ticket"}
+            label={submitButtonText()}
             onClick={handleSubmit(handleFormSubmit)}
             disabled={loading || isLoadingData}
           />
@@ -249,7 +304,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
             className="bg-white px-8 text-sm font-semibold text-gray-900 sm:w-auto border hover:bg-gray-50"
             onClick={() => closeDialog()}
             label="Cancelar"
-            disabled={loading} // Deshabilitar si el formulario está enviando
+            disabled={loading}
           />
         </div>
       }
@@ -348,21 +403,16 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
               render={({ field }) => (
                 <select
                   id="usuarioAsignado"
-                  {...field}
                   className={clsx(
                     "w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
                     errors.usuarioAsignado && "border-red-500"
                   )}
+                  {...field}
                 >
                   <option value="" disabled>
                     {loadingDeps ? "Cargando..." : "Selecciona un agente"}
                   </option>
-                  {/* Idealmente, aquí se mostrarían los filteredUsuarios si la lógica aplica */}
-                  {/* Si no, se muestran todos los usuarios */}
-                  {(filteredUsuarios.length > 0
-                    ? filteredUsuarios
-                    : usuarios
-                  ).map((usuario) => (
+                  {usuarios.map((usuario) => (
                     <option key={usuario.id} value={usuario.id}>
                       {usuario.nombre}
                     </option>
@@ -391,12 +441,12 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
               render={({ field }) => (
                 <select
                   id="departamento"
-                  {...field}
                   disabled={loadingDeps || loading} // Deshabilitado mientras carga o envía
                   className={clsx(
                     "w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
                     errors.departamento && "border-red-500"
                   )}
+                {...field}
                 >
                   <option value="" disabled>
                     {loadingDeps ? "Cargando..." : "Selecciona un departamento"}
@@ -430,7 +480,6 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
               render={({ field }) => (
                 <select
                   id="incidencia"
-                  {...field}
                   disabled={
                     !watcheddepartamento ||
                     loadingIncs ||
@@ -443,6 +492,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
                     (!watcheddepartamento || loadingIncs) &&
                       "bg-gray-100 cursor-not-allowed"
                   )}
+                {...field}
                 >
                   <option value="" disabled>
                     {!watcheddepartamento
@@ -483,11 +533,11 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
               render={({ field }) => (
                 <select
                   id="motivo" // Corregido id
-                  {...field}
                   className={clsx(
                     "w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
                     errors.motivo && "border-red-500"
                   )} // Corregido error check
+                  {...field}
                 >
                   <option value="" disabled>
                     {loadingDeps ? "Cargando..." : "Asigne el motivo"}
@@ -523,11 +573,11 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
               render={({ field }) => (
                 <select
                   id="prioridad" // Corregido id
-                  {...field}
                   className={clsx(
                     "w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
                     errors.prioridad && "border-red-500"
                   )} // Corregido error check
+                  {...field}
                 >
                   <option value="" disabled>
                     {loadingDeps ? "Cargando..." : "Asigne la prioridad"}
@@ -551,5 +601,7 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
         </div>
       </form>
     </ModalWrapper>
+    </>
+    
   );
 }

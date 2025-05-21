@@ -9,6 +9,7 @@ import {
   FaTimes, // Icono para eliminar archivo
   FaDownload // Icono para descargar archivo
 } from "react-icons/fa";
+import { getAuthToken } from "../../services/AuthService";
 // Ya no necesitamos postChatMessage ni toast aquí, el padre maneja el envío y errores
 // import { postChatMessage } from "../../services/ChatService";
 // import { toast } from "sonner";
@@ -172,16 +173,8 @@ const ChatComponent = ({
     // --- Función para Manejar la Descarga de Adjuntos con Autenticación ---
   const handleDownloadAttachment = useCallback(
     async (attachmentUrl, attachmentFilename) => {
-      const token = JSON.parse(localStorage.getItem("authToken"));
+      const token = getAuthToken();
 
-      if (!token) {
-        console.error(
-          "Token de autenticación no encontrado. No se puede descargar el archivo."
-        );
-        return;
-      }
-
-      // Idealmente, la URL base del backend debería venir de una variable de entorno
       const baseUrl = "http://localhost:8080"; // Ajusta si es necesario
 
       try {
@@ -215,7 +208,7 @@ const ChatComponent = ({
       }
     },
     []
-  );
+  ); 
 
   // --- Render Logic ---
   return (

@@ -83,7 +83,7 @@ export const formatUserRole = (rolId) => {
       } else if (absDiffInMs >= minuteInMs) {
         const minutes = Math.floor(absDiffInMs / minuteInMs);
         return diffInMs > 0
-          ? `Expires in ${minutes} minuto${minutes > 1 ? 's' : ''}`
+          ? `Expira en ${minutes} minuto${minutes > 1 ? 's' : ''}`
           : `Expiró hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
       } else {
         // Less than a minute difference
@@ -93,9 +93,10 @@ export const formatUserRole = (rolId) => {
   };
 
   export const formatDate = (date) => {
+    
     // Get the month, day, and year
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const month = String(date.getMonth()).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");

@@ -37,7 +37,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // withSockJS() habilita fallbacks SockJS para navegadores que no soportan WebSockets directamente.
         // setAllowedOrigins("*") permite conexiones desde cualquier origen (ajustar para producción).
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:5173", "http://localhost:3000") // Especifica tus orígenes de frontend
+                .setAllowedOrigins("http://localhost:3000") // Especifica tus orígenes de frontend
                 .withSockJS();
     }
 
