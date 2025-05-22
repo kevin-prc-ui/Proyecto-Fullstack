@@ -5,10 +5,12 @@ import MySitesComponent from './ComponentsKnow/Sites_Components/MySitesComponent
 import SitesFinderComponent from './ComponentsKnow/Sites_Components/SitesFinderComponent.jsx';
 import CreateSitesComponent from './ComponentsKnow/Sites_Components/CreateSitesComponent.jsx';
 import FavoritesComponent from './ComponentsKnow/Sites_Components/FavoritesComponent.jsx';
+import SiteView from './ComponentsKnow/Sites_Components/SiteView.jsx';
 
 const Sites = () => {
   const [activeTab, setActiveTab] = useState('misSitios');
   const [sites, setSites] = useState([]);
+  const [currentSite, setCurrentSite] = useState(null); // Nuevo estado para el sitio actual
 
   // Cargar sitios de localStorage al montar
   useEffect(() => {
@@ -21,28 +23,44 @@ const Sites = () => {
     localStorage.setItem('mySites', JSON.stringify(sites));
   }, [sites]);
 
-  // Agregar nuevo sitio (se pasa a CreateSitesComponent)
+  // Agregar nuevo sitio
   const addSite = (newSite) => {
     console.log("Sitio nuevo creado:", newSite);
     setSites([...sites, {...newSite, favorite: false}]);
     setActiveTab('misSitios');
   };
 
+  // Función para abrir un sitio
+  const openSite = (site) => {
+    setCurrentSite(site);
+  };
+
+  // Función para volver a la vista principal
+  const goBack = () => {
+    setCurrentSite(null);
+  };
+
   const renderComponent = () => {
     switch (activeTab) {
       case 'misSitios':
-        return <MySitesComponent sites={sites} setSites={setSites} />;
+        return <MySitesComponent sites={sites} setSites={setSites} onSiteClick={openSite} />;
       case 'buscarSitios':
         return <SitesFinderComponent />;
       case 'crearSitio':
         return <CreateSitesComponent addSite={addSite} />;
       case 'favoritos':
-        return <FavoritesComponent sites={sites} setSites={setSites} />;
+        return <FavoritesComponent sites={sites} setSites={setSites} onSiteClick={openSite} />;
       default:
         return null;
     }
   };
 
+  // Si hay un sitio seleccionado, mostramos la vista detallada
+  if (currentSite) {
+    return <SiteView site={currentSite} onGoBack={goBack} />;
+  }
+
+  // Vista normal de pestañas
   return (
     <div className="container mt-4 sites-tabs">
       {/* Botones de pestaña */}
