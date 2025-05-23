@@ -121,6 +121,7 @@ const UsersComponent = () => {
     e.preventDefault(); // Evita el comportamiento por defecto del formulario
     const userData = {
       nombre,
+      enabled: true,
       apellido,
       email,
       roles: rol ? [rol] : [],

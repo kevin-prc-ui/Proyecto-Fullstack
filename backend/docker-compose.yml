@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    image: backend:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:sqlserver://192.168.254.123:1433/dbsistema
+      - DB_USER=sa
+      - DB_PASSWORD=183729*a
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+          cpus: '1'
+
+networks:
+  backend:
+    driver: bridge
