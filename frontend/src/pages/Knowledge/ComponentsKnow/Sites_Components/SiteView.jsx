@@ -181,7 +181,7 @@ const SiteView = ({ site, onGoBack }) => {
                         className="float-right"
                         onClick={() => markAsCompleted(post.id)}
                       >
-                        <FaCheckCircle /> Completar
+                        <FaCheckCircle /> Revisado
                       </Button>
                     </Card.Body>
                   </Card>
