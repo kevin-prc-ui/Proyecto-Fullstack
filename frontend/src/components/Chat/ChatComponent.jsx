@@ -174,6 +174,8 @@ const ChatComponent = ({
   const handleDownloadAttachment = useCallback(
     async (attachmentUrl, attachmentFilename) => {
       const token = getAuthToken();
+      console.log("Token:", token);
+      
 
       const baseUrl = "http://localhost:8080"; // Ajusta si es necesario
 
@@ -181,7 +183,7 @@ const ChatComponent = ({
         const response = await fetch(`${baseUrl}${attachmentUrl}`, {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token.accessToken}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 

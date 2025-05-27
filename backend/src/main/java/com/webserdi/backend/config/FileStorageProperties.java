@@ -10,6 +10,5 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class FileStorageProperties {
-    // Define the upload directory in application.properties (e.g., file.upload-dir=./uploads)
     private String uploadDir;
 }
