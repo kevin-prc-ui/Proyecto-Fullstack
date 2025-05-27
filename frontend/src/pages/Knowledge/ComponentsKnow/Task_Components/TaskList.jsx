@@ -221,7 +221,7 @@ const getAssignedUsers = (ids) => {
                       {/* Cantidad de revisores */}
                       <small className="text-muted d-flex align-items-center">
                         <FiUser className="me-1" />
-                        {workflow.reviewers.length} revisores
+                        {workflow.usuariosAsignados.length} revisores
                       </small>
 
                       {/* Porcentaje de aprobación */}
