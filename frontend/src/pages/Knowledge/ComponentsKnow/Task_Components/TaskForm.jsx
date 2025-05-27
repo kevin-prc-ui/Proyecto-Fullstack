@@ -15,9 +15,9 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     dueDate: '',
     priority: 'Medium',
     description: '',
-    usuariosCreadores:  [],
-    usuariosAsignados: [],
-    approvalPercentage: 70,
+    usuariosCreadores:  '',
+    usuariosAsignados: '',
+    approvalPercentage: '',
     items: [],
     sendNotifications: true
   });
@@ -102,6 +102,8 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
       ...formData,
       items: formData.items.map(item => item.name)
     };
+
+    preparedData.usuariosCreadores = (await getUserId()).data;
 
     // Llamamos al servicio para crear o actualizar la actividad
     console.log('Datos enviados al backend:', preparedData);
@@ -239,23 +241,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                           <small className="text-muted">Mantén Ctrl/Cmd para seleccionar múltiples</small>
                         </div>
 
-                        {/* Select para usuariosCreadores (si es necesario) */}
-                        <div className="col-md-6">
-                          <label className="form-label">Creadores</label>
-                          <select
-                            className="form-select"
-                            multiple
-                            size="4"
-                            value={formData.usuariosCreadores}
-                            onChange={(e) => handleMultiSelect(e, 'usuariosCreadores')}
-                          >
-                            {users.map(user => (
-                              <option key={user.id} value={user.id}>
-                                {user.nombre}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                        
                     {/* Revisores y porcentaje de aprobación (solo si es workflow) */}
                     {formData.type === 'workflow' && (
                       <>

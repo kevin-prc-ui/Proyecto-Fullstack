@@ -4,10 +4,12 @@ import com.webserdi.backend.dto.ActivityDto;
 import com.webserdi.backend.entity.Activity;
 import com.webserdi.backend.entity.Item; // Assuming Item entity is in this package and has a getName() method
 
+import com.webserdi.backend.entity.Usuario;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,9 +96,15 @@ public class ActivityMapper {
         if (activity.getUsuarioCreador() != null) {
             activityDto.setUsuariosCreadores(activity.getUsuarioCreador().getId());
         }
+
         if (activity.getUsuarioAsignado() != null) {
-            activityDto.setUsuariosAsignados(List.of(activity.getUsuarioAsignado().getId()));
+            List<Long> asignados = activity.getUsuarioAsignado().stream()
+                    .map(Usuario::getId)
+                    .collect(Collectors.toList());
+            activityDto.setUsuariosAsignados(asignados);
         }
+
+
 
         // Map List<Item> to List<String>
         // This assumes your Item entity has a method like getName() or similar

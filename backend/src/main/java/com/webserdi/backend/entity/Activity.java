@@ -39,8 +39,12 @@ public class Activity {
     @JoinColumn(name = "usuario_creador_id", nullable = false)
     private Usuario usuarioCreador;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_asignado_id", nullable = false)
-    private Usuario usuarioAsignado;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "activity_usuario_asignado",
+            joinColumns = @JoinColumn(name = "activity_id"),
+            inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
+    private List<Usuario> usuarioAsignado;
 
 }

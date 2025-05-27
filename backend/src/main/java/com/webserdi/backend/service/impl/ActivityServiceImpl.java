@@ -12,34 +12,37 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional // 👉 Garantiza que las operaciones sobre Activity y sus relaciones se hagan en una sola transacción
+@Transactional
 public class ActivityServiceImpl {
+
     @Autowired
     private ActivityRepository activityRepo;
 
     @Autowired
-    private UsuarioRepository UsuarioRepo;
-    @Autowired
-    private ActivityMapper activityMapper;
-    @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // 👉 Guarda o actualiza una actividad junto con items, assignees y reviewers
+    @Autowired
+    private ActivityMapper activityMapper;
+
     public ActivityDto saveActivity(ActivityDto dto) {
         Activity activity = activityMapper.toEntity(dto);
 
-
-        // 👉 Limpia listas antes de agregar (importante para updates)
+        // Limpia items antes de agregar (importante para updates)
         activity.getItems().clear();
-        activity.setUsuarioCreador(null);
+
+        // Obtiene y asigna el usuario creador (no puede ser null)
+        Usuario creador = usuarioRepository.findById(dto.getUsuariosCreadores())
+                .orElseThrow(() -> new RuntimeException("Usuario creador no encontrado"));
+        activity.setUsuarioCreador(creador);
+
+        // Limpia usuarios asignados antes de asignar nuevos
         activity.setUsuarioAsignado(null);
 
-        // 👉 Agrega Items a la actividad
+        // Agrega Items a la actividad
         for (String itemName : dto.getItems()) {
             Item item = new Item();
             item.setName(itemName);
@@ -47,31 +50,22 @@ public class ActivityServiceImpl {
             activity.getItems().add(item);
         }
 
-        // 👉 Agrega Assignees a la actividad
+        // Agrega usuarios asignados
         List<Usuario> asignados = usuarioRepository.findAllById(dto.getUsuariosAsignados());
+        activity.setUsuarioAsignado(asignados);
 
-
-        // 👉 Solo si es tipo "workflow", agrega reviewers
-        if ("workflow".equals(activity.getType())) {
-            Usuario reviewers = UsuarioRepo.findById(dto.getUsuariosCreadores())
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        }
-
-        // 👉 Guarda la actividad (con cascade se guardan también los items)
+        // Guarda la actividad (con cascade se guardan los items)
         return activityMapper.toDto(activityRepo.save(activity));
     }
 
-    // 👉 Devuelve todas las actividades
     public List<Activity> getAllActivities() {
         return activityRepo.findAll();
     }
 
-    // 👉 Devuelve una actividad por ID (o null si no existe)
     public Activity getActivityById(Long id) {
         return activityRepo.findById(id).orElse(null);
     }
 
-    // 👉 Filtra actividades por type y/o priority
     public List<Activity> getFilteredActivities(String type, String priority) {
         if (type != null && priority != null) {
             return activityRepo.findByTypeAndPriority(type, priority);
@@ -84,4 +78,3 @@ public class ActivityServiceImpl {
         }
     }
 }
-

@@ -11,9 +11,12 @@ import { RiFlowChart } from 'react-icons/ri';
 const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete, onDeleteTask }) => {
   
   // Devuelve la lista de usuarios que están asignados (por id)
-  const getAssignedUsers = (ids) => {
-    return users.filter(user => ids.includes(user.id));
-  };
+const getAssignedUsers = (ids) => {
+  if (!Array.isArray(ids)) return [];
+  return users.filter(user => ids.includes(user.id));
+};
+
+
 
   return (
     <div className="row g-4">
