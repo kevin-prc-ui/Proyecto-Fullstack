@@ -1,105 +1,161 @@
 // c:\react\Proyecto\frontend\src\assets\routes.jsx
-import { FaHome, FaFileAlt, FaFolderOpen, FaGlobe, FaTasks, FaUsers, FaDatabase, FaTrashAlt } from "react-icons/fa";
-import {  MdSupportAgent, MdTaskAlt, MdOutlinePendingActions } from "react-icons/md";
+import {
+  FaHome,
+  FaFileAlt,
+  FaFolderOpen,
+  FaGlobe,
+  FaTasks,
+  FaUsers,
+  FaDatabase,
+  FaTrashAlt,
+} from "react-icons/fa";
+import {
+  MdSupportAgent,
+  MdTaskAlt,
+  MdOutlinePendingActions,
+  MdSettings,
+} from "react-icons/md";
 import { PiFolderSimpleUser } from "react-icons/pi";
 import { MdAdminPanelSettings } from "react-icons/md";
 
 const linkData = [
-    {
-      label: "Helpdesk",
-      icon: <MdSupportAgent />,
-      children: [
-        {
-          label: "Tickets",
-          link: "/helpdesk/tasks",
-          icon: <FaTasks />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "Completados",
-          link: "/helpdesk/completados/completados",
-          icon: <MdTaskAlt />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "En proceso",
-          link: "/helpdesk/en-proceso/en-proceso",
-          icon: <MdOutlinePendingActions />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "Pendientes",
-          link: "/helpdesk/pendientes/pendientes",
-          icon: <MdOutlinePendingActions />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "Eliminados",
-          link: "/helpdesk/trash",
-          icon: <FaTrashAlt />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        }
-      ]
-    },
-    {
-      label: "Knowledge Base",
-      icon: <PiFolderSimpleUser />,
-      children: [
-        {
-          label: "Inicio",
-          link: "/knowledge/home",
-          icon: <FaHome />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "Mis Archivos",
-          link: "/knowledge/myfile",
-          icon: <FaFileAlt />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "Archivo Compartido",
-          link: "/knowledge/sharedfile",
-          icon: <FaFolderOpen />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "Sitios",
-          link: "/knowledge/sites",
-          icon: <FaGlobe />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "Tareas",
-          link: "/knowledge/task",
-          icon: <FaTasks />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "Personas",
-          link: "/knowledge/people",
-          icon: <FaUsers />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-        {
-          label: "Repositorio",
-          link: "/knowledge/repository",
-          icon: <FaDatabase />,
-          roles: ["ROLE_ADMIN", "ROLE_USER"]
-        },
-      ]
-    },
-    {
-      label: "Administración",
-      icon: <MdAdminPanelSettings />,
-      children: [
-        {
-          label: "Usuarios",
-          link: "/admin/users",
-          icon: <FaHome />,
-          roles: ["ROLE_ADMIN"]
-        },
-      ]
-    }
-  ];
+  {
+    label: "Helpdesk",
+    icon: <MdSupportAgent />,
+    children: [
+      {
+        label: "Tickets",
+        link: "/helpdesk/tasks",
+        icon: <FaTasks />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+      {
+        label: "Completados",
+        link: "/helpdesk/completados/completados",
+        icon: <MdTaskAlt />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+      {
+        label: "En proceso",
+        link: "/helpdesk/en-proceso/en-proceso",
+        icon: <MdOutlinePendingActions />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+      {
+        label: "Pendientes",
+        link: "/helpdesk/pendientes/pendientes",
+        icon: <MdOutlinePendingActions />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+      {
+        label: "Eliminados",
+        link: "/helpdesk/trash",
+        icon: <FaTrashAlt />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+    ],
+  },
+  {
+    label: "Knowledge Base",
+    icon: <PiFolderSimpleUser />,
+    children: [
+      {
+        label: "Inicio",
+        link: "/knowledge/home",
+        icon: <FaHome />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+      {
+        label: "Mis Archivos",
+        link: "/knowledge/myfile",
+        icon: <FaFileAlt />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+      {
+        label: "Archivo Compartido",
+        link: "/knowledge/sharedfile",
+        icon: <FaFolderOpen />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+      {
+        label: "Sitios",
+        link: "/knowledge/sites",
+        icon: <FaGlobe />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+      {
+        label: "Tareas",
+        link: "/knowledge/task",
+        icon: <FaTasks />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+      {
+        label: "Personas",
+        link: "/knowledge/people",
+        icon: <FaUsers />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+      {
+        label: "Repositorio",
+        link: "/knowledge/repository",
+        icon: <FaDatabase />,
+        roles: ["ROLE_ADMIN", "ROLE_USER"],
+      },
+    ],
+  },
+  {
+    label: "Administración",
+    icon: <MdAdminPanelSettings />,
+    children: [
+      {
+        label: "Helpdesk",
+        icon: <MdSupportAgent />,  // Nuevo icono para la subsección
+        children: [  // Cambiar de 'helpdesk' a 'children'
+          {
+            label: "Usuarios",
+            link: "/admin/helpdesk/users",
+            icon: <FaUsers />,
+            roles: ["ROLE_ADMIN"]
+          },
+          {
+            label: "Incidencias",
+            link: "/admin/helpdesk/incidencias",
+            icon: <FaFileAlt />,
+            roles: ["ROLE_ADMIN"]
+          },
+          {
+            label: "Prioridades",
+            link: "/admin/helpdesk/prioridades",
+            icon: <MdOutlinePendingActions />,
+            roles: ["ROLE_ADMIN"]
+          },
+          {
+            label: "Departamentos",
+            link: "/admin/helpdesk/departamentos",
+            icon: <FaFolderOpen />,
+            roles: ["ROLE_ADMIN"]
+          },
+          {
+            label: "Sistema",
+            link: "/admin/helpdesk/sistemas",
+            icon: <MdSettings />,
+            roles: ["ROLE_ADMIN"]
+          }
+        ]
+      },
+      {
+        label: "Gestión Documental",
+        icon: <PiFolderSimpleUser />,  // Nuevo icono
+        children: [  // Cambiar de 'helpdesk' a 'children'
+          {
+            label: "Gestión doc",
+            link: "/admin/gestion/gestion",
+            icon: <FaHome />,
+            roles: ["ROLE_ADMIN"]
+          }
+        ]
+      }
+    ],
+  },
+];
 export default linkData;
