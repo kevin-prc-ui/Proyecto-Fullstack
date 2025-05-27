@@ -47,16 +47,17 @@ const Task = () => {
   }
 
   // Efecto para cargar actividades guardadas en localStorage al iniciar
-  useEffect(() => {
-    const savedActivities = JSON.parse(localStorage.getItem('activities')) || [];
-    setActivities(savedActivities);
-  }, []);
+  // useEffect(() => {
+  //   const savedActivities = JSON.parse(localStorage.getItem('activities')) || [];
+  //   setActivities(savedActivities);
+  // }, []);
 
   // Guarda las actividades actualizadas en estado y localStorage
-  const saveActivities = (updatedActivities) => {
-    setActivities(updatedActivities);
-    localStorage.setItem('activities', JSON.stringify(updatedActivities));
-  };
+const saveActivities = (updatedActivities) => {
+  setActivities(updatedActivities);
+  // localStorage.setItem('activities', JSON.stringify(updatedActivities)); // Comenta o elimina
+};
+
   
 
   // Maneja la creación o edición de una actividad

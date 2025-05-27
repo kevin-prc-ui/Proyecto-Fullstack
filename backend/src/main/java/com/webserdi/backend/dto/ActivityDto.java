@@ -25,28 +25,4 @@ public class ActivityDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // 👉 Convierte este DTO en una entidad Activity (para guardar en la base de datos)
-    public Activity toEntity() {
-        Activity activity = new Activity();
-        activity.setId(id);
-        activity.setName(name);
-        activity.setType(type);
-        activity.setDueDate(dueDate);
-        activity.setPriority(priority);
-        activity.setDescription(description);
-        activity.setSendNotifications(sendNotifications);
-
-        // 👉 Solo asigna approvalPercentage si el tipo es "workflow"
-        activity.setApprovalPercentage("workflow".equals(type) ? approvalPercentage : null);
-
-        // 👉 Actualiza siempre la fecha de modificación
-        activity.setUpdatedAt(LocalDateTime.now());
-
-        // 👉 Si es una nueva actividad (sin ID), establece la fecha de creación
-        if (id == null) {
-            activity.setCreatedAt(LocalDateTime.now());
-        }
-
-        return activity;
-    }
 }

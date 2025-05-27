@@ -251,7 +251,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                             className="form-select"
                             multiple
                             size="4"
-                            value={formData.usuarioCreadores}
+                            value={formData.usuariosCreadores}
                             onChange={(e) => handleMultiSelect(e, 'reviewers')}
                             required
                           >
