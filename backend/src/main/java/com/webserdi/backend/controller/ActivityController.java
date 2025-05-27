@@ -32,7 +32,7 @@ public class ActivityController {
     // 👉 Obtiene todas las actividades registradas
     @GetMapping("/")    
     public ResponseEntity<?> getAllActivities() {
-        List<Activity> activities = activityServiceImpl.getAllActivities();
+        List<ActivityDto> activities = activityServiceImpl.getAllActivities();
 
         // Retorna la lista completa de actividades
         return ResponseEntity.ok(activities);

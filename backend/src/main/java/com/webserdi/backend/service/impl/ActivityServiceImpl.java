@@ -59,10 +59,11 @@ public class ActivityServiceImpl {
         return activityMapper.toDto(activityRepo.save(activity));
     }
 
-    public List<Activity> getAllActivities() {
-        return activityRepo.findAll();
+    public List<ActivityDto> getAllActivities() {
+        return activityRepo.findAll().stream()
+                .map(activityMapper::toDto)
+                .collect(Collectors.toList());
     }
-
 
 
     public Activity getActivityById(Long id) {
