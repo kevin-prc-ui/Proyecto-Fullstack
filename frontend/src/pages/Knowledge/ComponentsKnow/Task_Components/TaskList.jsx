@@ -102,8 +102,8 @@ const getAssignedUsers = (ids) => {
                       {/* Usuarios asignados */}
                       <small className="text-muted d-flex align-items-center">
                         <FiUser className="me-1" />
-                        {getAssignedUsers(task.assignees).length > 0 
-                          ? getAssignedUsers(task.assignees).map(u => u.avatar).join(', ') 
+                        {getAssignedUsers(task.usuariosAsignados).length > 0 
+                          ? getAssignedUsers(task.usuariosAsignados).map(u => u.avatar).join(', ') 
                           : 'Sin asignados'}
                       </small>
 
