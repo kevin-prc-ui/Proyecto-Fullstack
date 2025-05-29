@@ -2,8 +2,7 @@ package com.webserdi.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Data; // @Getter, @Setter, @ToString, @EqualsAndHashCode, @RequiredArgsConstructor
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -14,8 +13,10 @@ import java.util.Set;
  * Entidad que representa un Usuario en el sistema.
  */
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
-@Data // Cuidado con @Data y relaciones JPA (puede causar problemas con equals/hashCode/toString en lazy loading)
+@AllArgsConstructor
 // Considerar usar @Getter, @Setter, @ToString individualmente y generar equals/hashCode con cuidado.
 public class Usuario {
     @Id

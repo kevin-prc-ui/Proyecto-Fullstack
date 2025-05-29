@@ -137,7 +137,7 @@ public class UsuarioController {
      */
     @GetMapping("/me/id") // Endpoint más descriptivo para el usuario actual
     public ResponseEntity<String> getCurrentAuthenticatedUserId(Authentication auth) {
-        if (auth == null || !auth.isAuthenticated()) {
+        if (!auth.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no autenticado.");
         }
         Long id = usuarioService.getIdByEmail(auth.getName());
