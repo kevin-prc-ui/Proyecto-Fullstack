@@ -33,7 +33,6 @@ const ChatContainer = ({ ticketId, chatId }) => {
     setIsLoadingMessages(true);
     setConnectionError(null);
     try {
-      // listMessages ya debería usar el token internamente a través de ChatService
       const response = await listMessages(ticketId);
       if (response.data?.content) {
         const sortedMessages = response.data.content.sort((a, b) =>

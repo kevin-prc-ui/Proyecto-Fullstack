@@ -92,12 +92,14 @@ const TaskDetails = () => {
   if (ticketError || !ticket) {
     return (
       <div className="flex justify-center items-center min-h-screen px-4">
-        <div className="text-center rounded-lg shadow-lg p-6 max-w-md">
+        <div className="text-center rounded-lg shadow-lg p-4 max-w-md">
           <FaExclamationTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-semibold text-red-700 mb-2">Error</h2>
           <p className="text-gray-600">
-            {ticketError ||
-              "El ticket solicitado no pudo ser encontrado o está incompleto."}
+            {
+              `El ticket ${id} no pudo ser encontrado o está incompleto.`}
+              <br></br>
+              Contacte a Ivan de sistemas.
           </p>
           <button
             onClick={() => window.history.back()}

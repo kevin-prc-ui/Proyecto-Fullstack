@@ -184,7 +184,7 @@ ChildMenuItem.propTypes = {
   child: PropTypes.shape({
       label: PropTypes.string.isRequired,
       icon: PropTypes.node,
-      link: PropTypes.string.isRequired,
+      link: PropTypes.string,
       roles: PropTypes.arrayOf(PropTypes.string) // Keep roles info if needed elsewhere
   }).isRequired,
   index: PropTypes.number.isRequired,
