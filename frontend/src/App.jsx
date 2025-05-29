@@ -22,6 +22,9 @@ import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
+import { Incidencias } from "./pages/Helpdesk/Incidencias";
+import { Dpm } from "./pages/Helpdesk/Dpm";
+import { Logs } from "./pages/Helpdesk/Logs";
 
 function Layout() {
   const isAuthenticated = localStorage.getItem("authToken");
@@ -117,11 +120,16 @@ function App() {
           {/* Rutas solo para administradores */}
           <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
             <Route element={<Layout />}>
-              <Route path="/admin/users" element={<Users />} />
+              <Route path="/admin/helpdesk/users" element={<Users />} />
               <Route
                 path="/admin/add-user"
                 element={<UsersComponent />}
               />
+              <Route path="/admin/helpdesk/incidencias" element={<Incidencias />} />
+              <Route path="/admin/helpdesk/departamentos" element={< Dpm/>} />
+              <Route path="/admin/helpdesk/prioridades" element={< Dpm/>} />
+              <Route path="/admin/helpdesk/motivos" element={<Dpm />} />
+              <Route path="/admin/helpdesk/logs" element={< Logs/>} />
               <Route
                 path="/admin/edit-user/:id"
                 element={<UsersComponent />}

@@ -23,6 +23,7 @@ import CreateTicket from "../../components/Ticket/CreateTicket";
 //  */
 const TaskDetails = () => {
   const params = useParams();
+    
   const id = params?.id || ""; // Ticket ID
   const [openDialog, setOpenDialog] = useState(false);
 
