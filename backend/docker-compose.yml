@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    image: my-spring-app:latest # Considera si quieres que docker-compose siempre reconstruya o use una imagen pre-construida
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=jdbc:sqlserver://192.168.254.123:1433/dbsistema
+      - DB_USER=sa
+      - DB_PASSWORD=183729*a
+      # Es buena práctica definir la ruta de subida como una variable de entorno
+      # para que la aplicación Spring Boot la pueda leer.
+      - FILE_UPLOAD_DIR=/app/chat-data # Esta es la ruta DENTRO del contenedor
+    ports:
+      - "8080:8080"
+    volumes:
+      # Esta línea define un "bind mount". Mapea la carpeta ./chat-uploads del host
+      # a la carpeta /app/chat-uploads dentro del contenedor.
+      - chat_uploads_data:/app/chat-data
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+          cpus: '1'
+
+networks:
+  backend:
+    driver: bridge
+volumes:
+  chat_uploads_data:
+    driver: local

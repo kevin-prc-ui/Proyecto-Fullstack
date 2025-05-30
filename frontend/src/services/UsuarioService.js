@@ -8,10 +8,11 @@ const token = () => localStorage.getItem("authToken");
 const getAuthToken = () => JSON.parse(token()).accessToken;
 
 // Function to create headers with the Authorization token
-const getHeaders = () => ({
+const getHeaders = () => ({  
   headers: {
     Authorization: `Bearer ${getAuthToken()}`,
   },
+  
 });
 
 export const listUsers = () =>
@@ -43,9 +44,9 @@ export const checkOrCreateUser = (userData) =>
   axios.post(`${REST_API_BASE_URL}/users/check-or-create`, userData, getHeaders());
 
 export const login = (loginData) => axios.post(`${REST_API_BASE_URL}/auth/login`, loginData);
-export const logout = (signoutData) => axios.post(`${REST_API_BASE_URL}/auth/logout`, signoutData);
+export const logout = () => axios.post(`${REST_API_BASE_URL}/auth/logout`,getHeaders());
 export const getUserRoles = (email) => {
-  return axios.get(`${REST_API_BASE_URL}/users/email?email=${email}`, getHeaders())
+  return axios.get(`${REST_API_BASE_URL}/users/email/roles?email=${email}`, getHeaders())
   .then(response => response)
   .catch(error => {
     if (!error.response) {
@@ -55,4 +56,11 @@ export const getUserRoles = (email) => {
     throw error;
   });
 };
+
+export const postIp = (ip) => axios.post(`${REST_API_BASE_URL}/ip`,ip,getHeaders());
+
+export const getUserId = () => axios.get(`${REST_API_BASE_URL}/users/me/id`, getHeaders());
+
+
+
 

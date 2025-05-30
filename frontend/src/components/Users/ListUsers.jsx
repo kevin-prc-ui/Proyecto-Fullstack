@@ -61,7 +61,7 @@ function ListUsuarioComponent() {
    * Navega a la página para agregar un nuevo usuario.
    */
   function addNewUser() {
-    navigator("/admin/helpdesk/add-user");
+    navigator("/admin/add-user");
   }
 
   /**
@@ -69,7 +69,7 @@ function ListUsuarioComponent() {
    * @param {number} id - ID del usuario a editar.
    */
   function updateUser(id) {
-    navigator(`/admin/helpdesk/edit-user/${id}`);
+    navigator(`/admin/edit-user/${id}`);
   }
 
   /**
@@ -162,7 +162,7 @@ function ListUsuarioComponent() {
     <>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Lista de empleados</h2>
-        <Button variant="primary" onClick={addNewUser}>
+        <Button className="disabled" variant="primary" onClick={addNewUser}>
           Agregar usuario
         </Button>
       </div>

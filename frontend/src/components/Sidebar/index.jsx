@@ -1,122 +1,174 @@
 // c:\react\Proyecto\frontend\src\components\Sidebar\index.jsx
-/* eslint-disable react/prop-types */
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { MdSettings } from "react-icons/md";
-import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
-import { Container, Nav, Navbar, Button } from "react-bootstrap";
-import linkData from "../../assets/routes";
-import { jwtDecode } from 'jwt-decode';
+import { Container, Nav, Navbar, Button, Spinner } from "react-bootstrap"; 
 import PropTypes from 'prop-types';
-import { getUserRoles } from "../../services/UsuarioService";
+import linkData from "../../assets/routes"; 
+import { useUserRoles } from "../../hooks/useUserRoles";
 
-/**
- * Componente Sidebar - Barra lateral de navegación con menú colapsable
- * Muestra opciones de navegación filtradas por roles de usuario
- * Incluye animaciones y manejo de estado de elementos activos
- */
 const Sidebar = () => {
-  const isAuthenticated = localStorage.getItem("authToken");
-  const [expandedParent, setExpandedParent] = useState(null);
-  const [userRoles, setUserRoles] = useState([]);
-  const { user } = useSelector((state) => state.auth);
+  const { roles, isLoading, error } = useUserRoles();
+  const [expandedParents, setExpandedParents] = useState({});
   const location = useLocation();
 
-  const [state, setState] = useState({
-      isLoading: true,
-      roles: [],
-      error: null
-    });
-    const accessToken = localStorage.getItem("authToken");
-    const decoded = jwtDecode(accessToken).sub;
-    useEffect(() => {
-      let isMounted = true;
-      const fetchAuthData = async () => {
-        try {
-          if (!isAuthenticated) {
-            return isMounted && setState(s => ({ ...s, isLoading: false }));
-          }
-          const roles = (await getUserRoles(decoded)).data;
-          if (isMounted) {
-            setState({ isLoading: false, roles, error: null });
-          }
-        } catch (error) {
-          if (isMounted) {
-            setState({ isLoading: false, roles: [], error: error.message });
-            console.error("Error fetching user roles:", error);
-          }
-        }
-      };
-      fetchAuthData();
-      return () => { isMounted = false; };
-    }, [isAuthenticated]);
+  const filteredLinkData = useMemo(() => {
+    if (isLoading || error) return [];
 
-    const hasRequiredRole = linkData.map(parent => ({
-      ...parent,
-      children: parent.children?.filter(child => 
-        !child.roles || child.roles.some(role => state.roles.includes(role))
-      )
-      }))
-      .filter(parent => parent.children?.length > 0);
-  
-  // // Efecto para decodificar el token JWT y obtener roles
-  // useEffect(() => {
-  //   const fetchUserRoles = () => {
-  //     try {
-  //       const accessToken = localStorage.getItem("authToken");
-  //       if (!accessToken) return;
-        
-  //       const decoded = jwtDecode(accessToken);
-  //       setUserRoles(decoded.roles || []);
-  //     } catch (error) {
-  //       console.error("Error decodificando token:", error);
-  //       setUserRoles([]);
-  //     }
-  //   };
-    
-  //   fetchUserRoles();
-  // }, []);
+    const filterItems = (items) => {
+      return items
+        .map(item => {
+          const filteredItem = { ...item };
+          
+          if (item.children) {
+            filteredItem.children = filterItems(item.children);
+          }
+          
+          return filteredItem;
+        })
+        .filter(item => {
+          const hasRequiredRoles = !item.roles || item.roles.length === 0 || item.roles.some(role => roles.includes(role));
+          
+          const hasVisibleChildren = item.children && item.children.length > 0;
+          const isLink = !!item.link;
+          
+          return hasRequiredRoles && (hasVisibleChildren || isLink);
+        });
+    };
 
-  // // Memoización de enlaces filtrados por roles
-  // const filteredLinkData = useMemo(() => 
-  //   linkData
-  //     .map(parent => ({
-  //       ...parent,
-  //       children: parent.children?.filter(child => 
-  //         !child.roles || child.roles.some(role => userRoles.includes(role))
-  //       )
-  //       }))
-  //     .filter(parent => parent.children?.length > 0),
-  //   [userRoles]
-  // );
+    return filterItems(linkData);
+  }, [roles, isLoading, error]);
 
-  // Manejo de expansión/colapso de menús padres
-  const toggleParent = (parentLabel) => {
-    setExpandedParent(prev => prev === parentLabel ? null : parentLabel);
+  // Manejar expansión de menús
+  const toggleParent = (label, depth) => {
+    const key = `${depth}-${label}`;
+    setExpandedParents(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
   };
 
-  // Verificación de enlace activo
-  const isActiveLink = (link) => location.pathname.startsWith(link);
+  // Verificar si un menú está expandido
+  const isExpanded = (label, depth) => {
+    return !!expandedParents[`${depth}-${label}`];
+  };
+
+  // Verificar si un ítem o sus hijos están activos
+  const isItemActive = (item) => {
+    if (item.link && location.pathname.startsWith(item.link)) {
+      return true;
+    }
+    
+    if (item.children) {
+      return item.children.some(child => isItemActive(child));
+    }
+    
+    return false;
+  };
+
+  // Componente recursivo para ítems de menú
+  const MenuItem = ({ item, depth = 0 }) => {
+    const hasChildren = item.children && item.children.length > 0;
+    const expanded = isExpanded(item.label, depth);
+    const active = isItemActive(item);
+    const key = `${depth}-${item.label}`;
+
+    return (
+      <div className="w-100 mb-1">
+        {/* Elemento principal - puede ser enlace o botón */}
+        {item.link && !hasChildren ? (
+          <Link
+            to={item.link}
+            className={clsx(
+              "sidebar-parent-button",
+              "w-100 d-flex gap-2 px-3 py-2 rounded align-items-center",
+              "text-decoration-none mb-1 text-start",
+              depth === 0 ? "text-dark fw-medium" : "text-dark",
+              active && "active"
+            )}
+            style={{ paddingLeft: `${1 + depth}rem` }}
+          >
+            {item.icon && <span className="fs-5">{item.icon}</span>}
+            <span className="fs-6">{item.label}</span>
+          </Link>
+        ) : (
+          <Button
+            variant="link"
+            className={clsx(
+              "sidebar-parent-button",
+              "w-100 d-flex gap-2 px-3 py-2 rounded align-items-center",
+              "text-decoration-none mb-1 text-start",
+              depth === 0 ? "text-dark fw-medium" : "text-dark",
+              active && "active"
+            )}
+            onClick={() => toggleParent(item.label, depth)}
+            aria-expanded={expanded}
+            aria-controls={`submenu-${key}`}
+            style={{ paddingLeft: `${1 + depth}rem` }}
+          >
+            {item.icon && <span className="fs-5">{item.icon}</span>}
+            <span className="fs-6">{item.label}</span>
+            {hasChildren && (
+              <span className="ms-auto transition-transform">
+                {expanded ? '⮝' : '⮟'}
+              </span>
+            )}
+          </Button>
+        )}
+
+        {/* Submenús con animación */}
+        {hasChildren && (
+          <div
+            id={`submenu-${key}`}
+            className={clsx(
+              "child-links",
+              expanded ? "child-links-expanded" : "child-links-collapsed"
+            )}
+            style={{
+              paddingLeft: `${depth}rem`
+            }}
+            role="menu"
+            aria-hidden={!expanded}
+          >
+            {item.children.map((child) => (
+              <MenuItem 
+                key={`${depth+1}-${child.label}`} 
+                item={child} 
+                depth={depth + 1} 
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Render loading state
+  if (isLoading) {
+    return (
+      <Container fluid className="h-100 p-3 d-flex justify-content-center align-items-center">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </Spinner>
+      </Container>
+    );
+  }
 
   return (
-    <Container fluid className="h-100 p-3">
-      <Navbar expand="lg" className="flex-column h-100">
-        <Nav className="flex-column flex-grow-1 w-full">
-          {hasRequiredRole.map((parent) => (
-            <ParentMenuItem
-              key={parent.label}
-              parent={parent}
-              expandedParent={expandedParent}
-              toggleParent={toggleParent}
-              isActiveLink={isActiveLink}
-              location={location}
-            />
+    <Container fluid className="h-100 p-3 bg-light border-end sidebar-container">
+      <Navbar expand="lg" className="flex-column h-100 align-items-stretch">
+        <Nav className="flex-column flex-grow-1 w-100">
+          {filteredLinkData.length === 0 && !isLoading && (
+             <p className="text-muted text-center mt-3">No hay opciones de menú disponibles.</p>
+          )}
+
+          {filteredLinkData.map((parent) => (
+            <MenuItem key={`0-${parent.label}`} item={parent} depth={0} />
           ))}
 
-          {/* Sección de Configuración */}
           <div className="w-100 border-top pt-3 mt-auto">
-            <SettingsButton />
+            <SettingsButton isActive={location.pathname.startsWith('/settings')} />
           </div>
         </Nav>
       </Navbar>
@@ -124,84 +176,26 @@ const Sidebar = () => {
   );
 };
 
-// Componente para ítems de menú padre
-const ParentMenuItem = ({ parent, expandedParent, toggleParent, isActiveLink, location }) => (
-  <div className="w-full">
-    <Button
-      variant="link"
-      className={clsx(
-        "w-full d-flex gap-2 px-3 py-2 rounded items-center mb-2",
-        "text-decoration-none text-start",
-        parent.children?.some(child => location.pathname.includes(child.link))
-          ? "bg-primary text-white"
-          : "text-dark hover:bg-[#2564ed2d]"
-      )}
-      onClick={() => toggleParent(parent.label)}
-      aria-expanded={expandedParent === parent.label}
-    >
-      <span className="fs-5">{parent.icon}</span>
-      <span className="fs-6">{parent.label}</span>
-    </Button>
-
-    {expandedParent === parent.label && (
-      <div className="child-links ms-4 ps-2 border-start" role="menu">
-        {parent.children?.map((child, index) => (
-          <ChildMenuItem
-            key={child.label}
-            child={child}
-            index={index}
-            isActiveLink={isActiveLink}
-          />
-        ))}
-      </div>
-    )}
-  </div>
-);
-
-// Componente para ítems de menú hijos
-const ChildMenuItem = ({ child, index, isActiveLink }) => (
-  <Link
-    to={child.link}
-    className={clsx(
-      "child-link",
-      "w-full lg-w-90 d-flex gap-2 px-3 py-2 rounded items-center mb-2",
-      "text-decoration-none hover-bg-[#2564ed2d]",
-      isActiveLink(child.link) ? "bg-primary text-white" : "text-dark"
-    )}
-    style={{ animationDelay: `${index * 0.05}s` }}
-    role="menuitem"
-  >
-    <span className="fs-5">{child.icon}</span>
-    <span className="fs-6">{child.label}</span>
-  </Link>
-);
-
-// Componente para botón de configuración
-const SettingsButton = () => (
+// SettingsButton (sin cambios)
+const SettingsButton = ({ isActive }) => (
   <Button
     variant="link"
-    className="text-dark d-flex align-items-center gap-2 w-100"
+    className={clsx(
+        "settings-button",
+        "text-dark d-flex align-items-center gap-2 w-100 px-3 py-2 rounded",
+        "text-decoration-none",
+        isActive && "active"
+        )}
     as={Link}
-    to="/settings"
+    to="/helpdesk/tasks"
   >
     <MdSettings className="fs-5" />
-    <span className="fs-6">Configuración</span>
+    <span className="fs-6 fw-medium">Configuración</span>
   </Button>
 );
 
-// Propiedades esperadas
-ParentMenuItem.propTypes = {
-  parent: PropTypes.object.isRequired,
-  expandedParent: PropTypes.string,
-  toggleParent: PropTypes.func.isRequired,
-  isActiveLink: PropTypes.func.isRequired,
-  location: PropTypes.object.isRequired
-};
-
-ChildMenuItem.propTypes = {
-  child: PropTypes.object.isRequired,
-  index: PropTypes.number.isRequired,
-  isActiveLink: PropTypes.func.isRequired
+SettingsButton.propTypes = {
+    isActive: PropTypes.bool.isRequired,
 };
 
 export default Sidebar;

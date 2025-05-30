@@ -48,7 +48,6 @@ public class AuthController {
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String authorizationHeader) {
         // Extract the token from the Authorization header
         String token = extractTokenFromHeader(authorizationHeader);
-        System.out.println(token);
         // Invalidate the token (add it to a blacklist or similar)
         if (token != null) {
             // Invalidate the token (add it to a blacklist or similar)

@@ -10,6 +10,9 @@ export default defineConfig({
     tailwindcss(),
 
   ],
+  define: {
+    global: 'window', // Soluciona el problema de 'global is not defined'
+  },
   server:{
     allowedHosts: ['all','localhost'],
     port:3000,

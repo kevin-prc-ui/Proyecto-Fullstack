@@ -1,7 +1,6 @@
 package com.webserdi.backend.service;
 
 import com.webserdi.backend.dto.PermisoDto;
-import com.webserdi.backend.dto.RolDto;
 import com.webserdi.backend.dto.UsuarioDto;
 
 import java.util.List;
@@ -17,4 +16,5 @@ public interface UsuarioService {
     void deleteUsuario(Long usuarioId);
     void updateUsuarioEmail(Long usuarioId, String newEmail);
     Set<String> getRole (String email);
+    Long getIdByEmail(String email);
 }

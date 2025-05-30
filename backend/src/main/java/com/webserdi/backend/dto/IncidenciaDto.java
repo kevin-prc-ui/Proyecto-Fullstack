@@ -6,4 +6,5 @@ import lombok.Data;
 public class IncidenciaDto {
     private Long id;
     private String nombre;
+    private DepartamentoDto departamento;
 }

@@ -1,4 +1,6 @@
 package com.webserdi.backend.entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore; // Asegúrate de importar esto
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +22,6 @@ public class Permiso {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "modulo_id", nullable = false)
+//@JsonIgnore // ← Esta es la línea que resuelve el problema
     private Modulo modulo;
 }
-
-

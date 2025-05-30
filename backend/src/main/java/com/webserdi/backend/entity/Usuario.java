@@ -1,22 +1,23 @@
 package com.webserdi.backend.entity;
 
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+/**
+ * Entidad que representa un Usuario en el sistema.
+ */
 @Entity
+@Getter
+@Setter
 @NoArgsConstructor
-@Data
+@AllArgsConstructor
+// Considerar usar @Getter, @Setter, @ToString individualmente y generar equals/hashCode con cuidado.
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +26,11 @@ public class Usuario {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = true)
+    /**
+     * Contraseña hasheada del usuario. Nullable si se permite creación de usuarios
+     * sin contraseña inicial (ej. vía invitación o SSO).
+     */
+    @Column(nullable = true) // Puede ser true si la contraseña se establece después o es opcional
     private String password;
 
     @Column(nullable = false)
@@ -34,16 +39,25 @@ public class Usuario {
     @Column(nullable = false)
     private String apellido;
 
-    private boolean enabled;
+    /** Indica si la cuenta del usuario está habilitada. */
+    private boolean enabled = true; // Valor por defecto, podría ser false hasta activación
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    /** Departamento al que pertenece el usuario (opcional). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departamento_id", nullable = true) // Nullable si un usuario puede no tener departamento
+    @JsonBackReference("usuario-departamento") // Nombre único para la referencia
+    private Departamento departamento;
+
+    /** Roles asignados al usuario. */
+    @ManyToMany(fetch = FetchType.EAGER) // EAGER para roles es común si se usan en seguridad con frecuencia
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
     private Set<Rol> roles = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    /** Permisos directos asignados al usuario (adicionales a los de los roles). */
+    @ManyToMany(fetch = FetchType.EAGER) // EAGER si se necesitan con frecuencia
     @JoinTable(
             name = "usuario_permisos",
             joinColumns = @JoinColumn(name = "usuario_id"),
@@ -52,6 +66,8 @@ public class Usuario {
     private Set<Permiso> permisos = new HashSet<>();
 
     @CreationTimestamp
-    @Column(name="fecha_creacion")
+    @Column(name="fecha_creacion", updatable = false)
     private LocalDateTime fechaCreacion;
+
+    // Considerar añadir @UpdateTimestamp para fecha_actualizacion si es relevante
 }

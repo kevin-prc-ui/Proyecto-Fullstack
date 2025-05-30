@@ -7,12 +7,12 @@ import {
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
 import { toast } from "sonner";
-import { BGS, PRIOTITYSTYELS, TICKET_TYPE, formatDate } from "../../utils/utils";
+import { BGS, PRIOTITYSTYELS, PRIORITYNAMES, TICKET_TYPE, formatDate, getVencimiento } from "../../utils/utils";
 import clsx from "clsx";
 import { FaList } from "react-icons/fa";
-import UserInfo from "../Users/UserInfo";
+import UserInfo from "../../components/Users/UserInfo";
 import Button from "../Button";
-import ConfirmationDialog from "./Dialog";
+import ConfirmationDialog from "./ConfirmationDialog";
 import { deleteTicket } from "../../services/TicketService";
 
 const ICONS = {
@@ -38,13 +38,13 @@ const Table = ({ tickets }) => {
   };
 
   const TableHeader = () => (
-    <thead className='w-full border-b border-gray-300'>
-      <tr className='w-full text-black  text-left'>
-        <th className='py-2'>Titulo</th>
-        <th className='py-2'>Prioridad</th>
-        <th className='py-2 line-clamp-1'>Creado</th>
-        <th className='py-2'>Vencimiento</th>
-        <th className='py-2'>Assets</th>
+    <thead className='w-full border-gray-300'>
+      <tr className='w-full text-black text-left'>
+        <th className='py-2 p-1'>Titulo</th>
+        <th className='py-2 p-1'>Prioridad</th>
+        <th className='py-2 p-1'>Creado</th>
+        <th className='py-2 p-1'>Vencimiento</th>
+        <th className='py-2 p-1'>Assets</th>
       </tr>
     </thead>
   );
@@ -52,50 +52,51 @@ const Table = ({ tickets }) => {
   const TableRow = ({ ticket }) => (
     <tr className='border-b border-gray-200 text-gray-600 hover:bg-gray-300/10'>
       <td className='py-2'>
-        <div className='flex items-center gap-2'>
+        <div className='flex items-left gap-2'>
           <div
-            className={clsx("w-4 h-4 rounded-full", TICKET_TYPE[ticket.estado])}
+          style={{minWidth:"5px", minHeight:"5px"}}
+            className={clsx("w-5 h-5 rounded-full", TICKET_TYPE[ticket.estado])}
           />
-          <p className='w-full line-clamp-2 text-base text-black'>
+          <a href={`/helpdesk/task/${ticket.id}`} className='text-decoration-none w-full line-clamp-2 text-base text-black'>
             {ticket?.tema}
-          </p>
+          </a>
         </div>
       </td>
 
       <td className='py-2'>
         <div className={"flex gap-1 items-center"}>
-          <span className={clsx("text-lg", PRIOTITYSTYELS[ticket?.prioridad])}>
+          <div className={clsx("text-lg", PRIOTITYSTYELS[ticket?.prioridad])}>
             {ICONS[ticket?.prioridad]}
-          </span>
-          <span className='capitalize line-clamp-1'>
-            Prioridad {ticket?.prioridad} 
-          </span>
+          </div>
+          <div className={clsx("capitalize line-clamp-1", PRIOTITYSTYELS[ticket?.prioridad])}>
+            Prioridad {PRIORITYNAMES[ticket?.prioridad]} 
+          </div>
         </div>
       </td>
 
       <td className='py-2'>
-        <span className='text-sm text-gray-600'>
+        <div className='text-sm text-gray-600'>
           {formatDate(new Date(ticket?.fechaCreacion))}
-        </span>
+        </div>
       </td><td className='py-2'>
-        <span className='text-sm text-gray-600'>
-          {formatDate(new Date(ticket?.fechaVencimiento))}
-        </span>
+        <div className='text-sm text-gray-600'>
+          {getVencimiento(new Date(ticket?.fechaVencimiento))}
+        </div>
       </td>
 
       <td className='py-2'>
         <div className='flex items-center gap-3'>
           <div className='flex gap-1 items-center text-sm text-gray-600'>
             <BiMessageAltDetail />
-            <span>{ticket?.activities?.length}</span>
+            <div>{ticket?.activities?.length}</div>
           </div>
           <div className='flex gap-1 items-center text-sm text-gray-600 dark:text-gray-400'>
             <MdAttachFile />
-            <span>{ticket?.assets?.length}</span>
+            <div>{ticket?.assets?.length}</div>
           </div>
           <div className='flex gap-1 items-center text-sm text-gray-600 dark:text-gray-400'>
             <FaList />
-            <span>0/{ticket?.subtickets?.length}</span>
+            <div>0/{ticket?.subtickets?.length}</div>
           </div>
         </div>
       </td>
@@ -119,12 +120,12 @@ const Table = ({ tickets }) => {
       <td className='py-2 flex gap-2 md:gap-4 justify-end'>
         <Button
           className='text-blue-600 hover:text-blue-500 sm:px-0 text-sm md:text-base'
-          label='Edit'
+          label='Editar'
           type='button'
         />
         <Button
           className='text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base'
-          label='Delete'
+          label='Eliminar'
           type='button'
           onClick={() => deleteClicks(ticket.id)}
         />
@@ -134,7 +135,7 @@ const Table = ({ tickets }) => {
   
   return (
     <>
-      <div className='bg-white  px-2 md:px-4 pt-4 pb-9 shadow-md rounded'>
+      <div className='bg-white px-2 md:px-4 pt-4 pb-9 shadow-md rounded'>
         <div className='overflow-x-auto'>
           <table className='w-full '>
             <TableHeader />

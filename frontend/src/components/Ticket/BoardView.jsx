@@ -3,7 +3,7 @@ import Card from "./Card";
 
 const BoardView = ({ tickets, status }) => {
   return (
-    <div  className=' w-full py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 2xl:gap-5'>
+    <div  className=' w-full pb-2 pt-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 2xl:gap-5'>
       {tickets.map((ticket, index) => ( // Changed 'tickets' to 'ticket' here
         <Card ticket={ticket} key={index} status={status}/>
       ))}

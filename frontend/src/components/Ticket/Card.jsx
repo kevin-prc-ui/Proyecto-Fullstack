@@ -6,9 +6,8 @@ import {
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
-import { useSelector } from "react-redux";
-import { BGS, PRIOTITYSTYELS, TICKET_TYPE, formatDate } from "../../utils/utils";//CREATE
-import TicketDialog from "./Dialog";//CREATE
+import { BGS, PRIOTITYSTYELS,PRIORITYNAMES, TICKET_TYPE, formatDate, getVencimiento } from "../../utils/utils";//CREATE
+import ConfirmationDialog from "./ConfirmationDialog";//CREATE
 import { BiMessageAltDetail } from "react-icons/bi";
 import { FaList } from "react-icons/fa";
 import UserInfo from "../Users/UserInfo";//CREATE
@@ -22,8 +21,7 @@ const ICONS = {
 };
 
 const Card = ({ ticket, status}) => {
-  const { user } = useSelector((state) => state.auth);
-  const [open, setOpen] = useState(false);  
+  const [open, setOpen] = useState(false);    
 
   return (
     <>
@@ -36,24 +34,27 @@ const Card = ({ ticket, status}) => {
             )}
           >
             <span className="text-lg">{ICONS[ticket?.prioridad]}</span>
-            <span className="uppercase">prioridad {ticket?.prioridad} </span>
+            <span className="uppercase">prioridad {PRIORITYNAMES[ticket?.prioridad]} </span>
           </div>
 
-          {user?.isAdmin && <TicketDialog ticket={ticket} />}
         </div>
-
         <>
-          <div className="flex items-center gap-2">
+          <a href={`/helpdesk/task/${ticket.id}`} className="flex items-center gap-2 hover:text-blue-700 text-decoration-none">
             <div
               className={clsx("w-4 h-4 rounded-full", TICKET_TYPE[ticket.estado])}
             />
-            <h4 className="line-clamp-1 text-black">{ticket?.tema}</h4>
-          </div>
+            <span className="font-semibold text-xl line-clamp-1 text-black">{ticket?.tema}</span>
+          </a>
           <span className="text-sm text-black-600">
             {formatDate(new Date(ticket?.fechaCreacion))}<br></br>
-          </span><span className="text-sm text-red-600">
+          </span>
+          <span className="text-sm text-red-600">
             {formatDate(new Date(ticket?.fechaVencimiento))}
           </span>
+          <span className="text-sm text-red-600">
+            , {" "} {getVencimiento(new Date(ticket?.fechaVencimiento))}
+          </span>
+
         </>
 
         <div className="w-full border-t border-gray-200 my-2" />
@@ -89,30 +90,14 @@ const Card = ({ ticket, status}) => {
         </div>
 
         {/* sub tickets */}
-        {ticket?.subTickets?.length > 0 ? (
+        
           <div className="py-4 border-t border-gray-200">
-            <h5 className="text-base line-clamp-1 text-black">
-              {ticket?.subTickets[0].tema}
-            </h5>
-
-            <div className="p-4 space-x-8">
-            <span className="text-sm text-gray-600">
-                {formatDate(new Date(ticket?.subTickets[0]?.fechaCreacion))}
-              </span><span className="text-sm text-gray-600">
-                {formatDate(new Date(ticket?.subTickets[0]?.fechaVencimiento))}
-              </span>
-              <span className="bg-blue-600/10 px-3 py-1 rounded0full text-blue-700 font-medium">
-                {ticket?.subTickets[0].tag}
-              </span>
+            <div className="text-base line-clamp-1 text-black">
+              <div className="textLimited">
+              {ticket?.descripcion}
+              </div>
             </div>
           </div>
-        ) : (
-          <>
-            <div className="py-4 border-t border-gray-200">
-              <span className="text-gray-500">No Sub Ticket</span>
-            </div>
-          </>
-        )}
 
         <div className="w-full pb-2">
           <button
