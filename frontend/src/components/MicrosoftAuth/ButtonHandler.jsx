@@ -23,16 +23,12 @@ export const UseLoginHandler = () => {
     // 3. Login en tu backend
     const respuesta = await login(loginData);
     localStorage.setItem("authToken", JSON.stringify(respuesta.data));
+    console.log(respuesta.status);
 
-    //4. Postear Ip en backend
-    // const ipResponse = await fetch("https://api.ipify.org/?format=json");
-    // const data = await ipResponse.json();
-    // console.log(data.ip);
-    // postIp(data.ip);
-
-    if (respuesta.status !== 200 || !respuesta.status !== 201) {
-      return toast.error("Error al iniciar sesión");
-    }
+    // 4. Postear Ip en backend
+    const ipResponse = await fetch("https://api.ipify.org/?format=json");
+    const data = await ipResponse.json();
+    postIp(data);
 
     // 5. Manejar éxito
     toast.success("Sesión iniciada correctamente");
@@ -49,7 +45,6 @@ export const UseLogoutHandler = () => {
         postLogoutRedirectUri: "/",
         mainWindowRedirectUri: "/",
       });
-      logout();
       localStorage.clear();
       toast.info("Sesión cerrada correctamente");
     } catch (error) {

@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { Navbar } from "react-bootstrap";
 import MicrosoftLoginButton from "../MicrosoftAuth/LoginButton";
 import {
@@ -23,9 +24,9 @@ const Index = () => {
           />
         </a>
         <AuthenticatedTemplate>
-          <ProfileContent/>
+          <ProfileContent />
         </AuthenticatedTemplate>
-        <UnauthenticatedTemplate/>
+        <UnauthenticatedTemplate />
         <MicrosoftLoginButton /> {/* Reemplaza el Button anterior */}
       </Navbar>
     </>
@@ -40,10 +41,11 @@ const ProfileContent = () => {
         Inicia sesión para ver tu información de perfil.
       </div>
     );
-  else return (
-    <>
-      <div className="">Bienvenido, {accounts[0].name}!</div>
-    </>
-  );
+  else
+    return (
+      <>
+        <div className="">Bienvenido, {accounts[0].name}!</div>
+      </>
+    );
 };
 export default Index;
