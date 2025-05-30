@@ -68,12 +68,7 @@ const People = () => {
         filteredUsers={filteredUsers}
       />
       
-      <UserList 
-        loading={loading}
-        error={error}
-        filteredUsers={filteredUsers}
-        searchTerm={searchTerm}
-      />
+
     </CardLayout>
   );
 };
