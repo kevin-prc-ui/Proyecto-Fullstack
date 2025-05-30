@@ -1,5 +1,8 @@
 package com.webserdi.backend.dto;
 
+import lombok.Data;
+
+@Data
 public class ArchivoDto {
     private Long id;
     private String nombre;
