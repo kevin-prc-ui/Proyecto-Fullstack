@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import { listAllPrioridades } from "../../services/PrioridadService";
+import { toast } from "sonner"; // Importar toast
+import { FaSearch } from "react-icons/fa"; // Importar icono de búsqueda
+import {
+  listAllPrioridades,
+  deletePrioridad,
+} from "../../services/PrioridadService"; // Asegúrate de tener deletePrioridad
 
 export const Prioridades = () => {
   const [prioridades, setPrioridades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
   const itemsPerPage = 5;
 
   const navigate = useNavigate();
@@ -33,11 +39,28 @@ export const Prioridades = () => {
     setCurrentPage(pageNumber);
   };
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Resetear a la primera página con nueva búsqueda
+  };
+
+  // Filtrar prioridades basado en el término de búsqueda
+  const filteredPrioridades = prioridades.filter((prioridad) => {
+    const term = searchTerm.toLowerCase();
+    const nombre = prioridad.nombre
+      ? String(prioridad.nombre).toLowerCase()
+      : "";
+    return nombre.includes(term);
+  });
+
   // Calcular prioridades para la página actual
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = prioridades.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(prioridades.length / itemsPerPage);
+  const currentItems = filteredPrioridades.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  ); // Usar prioridades filtradas
+  const totalPages = Math.ceil(filteredPrioridades.length / itemsPerPage); // Usar longitud de prioridades filtradas
 
   // Generar paginación
   const renderPagination = () => {
@@ -95,6 +118,25 @@ export const Prioridades = () => {
     return items;
   };
 
+  const deleteHandler = async (prioridadId) => {
+    if (
+      window.confirm("¿Estás seguro de que deseas eliminar esta prioridad?")
+    ) {
+      try {
+        setLoading(true);
+        await deletePrioridad(prioridadId); // Llamar al servicio de eliminación
+        toast.success("Prioridad eliminada correctamente");
+        fetchPrioridades(); // Recargar la lista
+      } catch (err) {
+        setError("Error al eliminar prioridad");
+        toast.error("Error al eliminar la prioridad");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   if (error) {
     return (
       <div className="bg-white rounded shadow-md p-6 mt-4">
@@ -144,6 +186,26 @@ export const Prioridades = () => {
 
         {/* Contenido */}
         <div className="p-6">
+          {/* Recuadro de búsqueda */}
+          <div className="m-2">
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <input
+                type="text"
+                name="searchPrioridad"
+                id="searchPrioridad"
+                className="p-4 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2"
+                placeholder="Buscar por nombre..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+          </div>
           {loading ? (
             <div className="flex justify-center py-10">
               <div className="animate-spin rounded h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
@@ -186,7 +248,7 @@ export const Prioridades = () => {
                       </button>
                       <button
                         className="text-red-500 hover:text-red-700 m-1 bg-red-50 hover:bg-red-100 rounded p-2 transition-colors"
-                        onClick={() => console.log("Eliminar", prioridad.id)}
+                        onClick={() => deleteHandler(prioridad.id)} // Pasar el id de la prioridad
                         title="Eliminar"
                       >
                         <svg

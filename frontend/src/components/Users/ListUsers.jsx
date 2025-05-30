@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import { listUsers } from "../../services/UsuarioService";
+import { toast } from "sonner"; // Importar toast
+import { FaSearch } from "react-icons/fa"; // Importar icono de búsqueda
+import { deleteUser, listUsers } from "../../services/UsuarioService";
 
 export const ListedUsers = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
+  const itemsPerPage = 8;
 
   const navigate = useNavigate();
 
@@ -33,11 +36,43 @@ export const ListedUsers = () => {
     setCurrentPage(pageNumber);
   };
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Resetear a la primera página con nueva búsqueda
+  };
+
+  // Filtrar usuarios basado en el término de búsqueda
+  const filteredUsuarios = usuarios.filter((usuario) => {
+    const term = searchTerm.toLowerCase();
+    // Asegurarse de que los campos existan y convertirlos a string para búsqueda segura
+    const nombre = usuario.nombre ? String(usuario.nombre).toLowerCase() : "";
+    const apellido = usuario.apellido
+      ? String(usuario.apellido).toLowerCase()
+      : "";
+    const email = usuario.email ? String(usuario.email).toLowerCase() : "";
+    // Asumimos que roles y permisos son strings o se pueden convertir a string y buscar
+    const roles = usuario.roles ? String(usuario.roles).toLowerCase() : "";
+    const permisos = usuario.permisos
+      ? String(usuario.permisos).toLowerCase()
+      : "";
+
+    return (
+      nombre.includes(term) ||
+      apellido.includes(term) ||
+      email.includes(term) ||
+      roles.includes(term) ||
+      permisos.includes(term)
+    );
+  });
+
   // Calcular usuarios para la página actual
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = usuarios.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(usuarios.length / itemsPerPage);
+  const currentItems = filteredUsuarios.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  ); // Usar usuarios filtrados
+  const totalPages = Math.ceil(filteredUsuarios.length / itemsPerPage); // Usar longitud de usuarios filtrados
 
   // Generar paginación
   const renderPagination = () => {
@@ -95,6 +130,23 @@ export const ListedUsers = () => {
     return items;
   };
 
+  const deleteHandler = async (userId) => {
+    // Confirmación antes de eliminar
+    if (window.confirm("¿Estás seguro de que deseas eliminar este usuario?")) {
+      try {
+        setLoading(true); // Podrías tener un estado de loading específico para la eliminación si prefieres
+        await deleteUser(userId);
+        toast.success("Usuario eliminado correctamente");
+        fetchUsuarios(); // Recargar la lista de usuarios
+      } catch (err) {
+        setError("Error al eliminar usuario");
+        toast.error("Error al eliminar el usuario");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
   if (error) {
     return (
       <div className="bg-white rounded shadow-md p-6 mt-4">
@@ -144,6 +196,27 @@ export const ListedUsers = () => {
 
         {/* Contenido */}
         <div className="p-6">
+          {/* Recuadro de búsqueda */}
+          <div className="m-2">
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <input
+                type="text"
+                name="searchUser"
+                id="searchUser"
+                className="p-4 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-60 0 rounded-md py-2"
+                placeholder="Buscar por nombre, apellido, email, rol o permisos..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+          </div>
+
           {loading ? (
             <div className="flex justify-center py-10">
               <div className="animate-spin rounded h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
@@ -165,7 +238,7 @@ export const ListedUsers = () => {
                 currentItems.map((usuario) => (
                   <div
                     key={usuario.id}
-                    className="grid grid-cols-12 gap-4 items-center px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    className="grid grid-cols-12 gap-4 items-center px-4 py-3 border-t border-gray-100 hover:bg-gray-50 transition-colors"
                   >
                     {" "}
                     <div className=" text-gray-700">{usuario.nombre}</div>
@@ -185,7 +258,7 @@ export const ListedUsers = () => {
                       <button
                         className="text-blue-500 hover:text-blue-700 m-1 bg-blue-50 hover:bg-blue-100 rounded p-2 transition-colors"
                         onClick={() =>
-                          navigate(`/usuarios/editar/${usuario.id}`)
+                          navigate(`/admin/edit-user/${usuario.id}`)
                         }
                         title="Editar"
                       >
@@ -200,7 +273,7 @@ export const ListedUsers = () => {
                       </button>
                       <button
                         className="text-red-500 hover:text-red-700 m-1 bg-red-50 hover:bg-red-100 rounded p-2 transition-colors"
-                        onClick={() => console.log("Eliminar", usuario.id)}
+                        onClick={() => deleteHandler(usuario.id)} // Pasar el id del usuario
                         title="Eliminar"
                       >
                         <svg

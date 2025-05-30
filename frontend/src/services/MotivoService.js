@@ -39,3 +39,6 @@ const getHeaders = () => {
 export const listAllMotivos = () => {
   return axios.get(`${REST_API_BASE_URL}/motivos`, getHeaders());
 };
+export const deleteMotivo = (id) => {
+  return axios.delete(`${REST_API_BASE_URL}/motivo/${id}`, getHeaders());
+};

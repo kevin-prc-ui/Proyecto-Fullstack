@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import { listAllIncidencias } from "../../services/IncidenciaService";
+import { toast } from "sonner"; // Importar toast
+import { FaSearch } from "react-icons/fa"; // Importar icono de búsqueda
+import {
+  listAllIncidencias,
+  deleteIncidencia,
+} from "../../services/IncidenciaService"; // Asegúrate de tener deleteIncidencia
 
 export const Incidencias = () => {
   const [incidencias, setIncidencias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
   const itemsPerPage = 8;
 
   const navigate = useNavigate();
@@ -15,7 +21,7 @@ export const Incidencias = () => {
   useEffect(() => {
     fetchIncidencias();
     console.log(incidencias);
-  }, []);
+  }, []); // El console.log aquí mostrará el estado inicial (array vacío)
 
   const fetchIncidencias = async () => {
     try {
@@ -34,11 +40,32 @@ export const Incidencias = () => {
     setCurrentPage(pageNumber);
   };
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Resetear a la primera página con nueva búsqueda
+  };
+
+  // Filtrar incidencias basado en el término de búsqueda
+  const filteredIncidencias = incidencias.filter((incidencia) => {
+    const term = searchTerm.toLowerCase();
+    const nombre = incidencia.nombre
+      ? String(incidencia.nombre).toLowerCase()
+      : "";
+    const departamentoNombre = incidencia.departamento?.nombre
+      ? String(incidencia.departamento.nombre).toLowerCase()
+      : "";
+
+    return nombre.includes(term) || departamentoNombre.includes(term);
+  });
+
   // Calcular incidencias para la página actual
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = incidencias.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(incidencias.length / itemsPerPage);
+  const currentItems = filteredIncidencias.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  ); // Usar incidencias filtradas
+  const totalPages = Math.ceil(filteredIncidencias.length / itemsPerPage); // Usar longitud de incidencias filtradas
 
   // Generar paginación
   const renderPagination = () => {
@@ -96,6 +123,25 @@ export const Incidencias = () => {
     return items;
   };
 
+  const deleteHandler = async (incidenciaId) => {
+    if (
+      window.confirm("¿Estás seguro de que deseas eliminar esta incidencia?")
+    ) {
+      try {
+        setLoading(true);
+        await deleteIncidencia(incidenciaId); // Llamar al servicio de eliminación
+        toast.success("Incidencia eliminada correctamente");
+        fetchIncidencias(); // Recargar la lista
+      } catch (err) {
+        setError("Error al eliminar incidencia");
+        toast.error("Error al eliminar la incidencia");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   if (error) {
     return (
       <div className="bg-white rounded shadow-md p-6 mt-4">
@@ -145,6 +191,26 @@ export const Incidencias = () => {
 
         {/* Contenido */}
         <div className="p-6">
+          {/* Recuadro de búsqueda */}
+          <div className="m-2">
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <input
+                type="text"
+                name="searchIncidencia"
+                id="searchIncidencia"
+                className="p-4 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2"
+                placeholder="Buscar por nombre o departamento..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+          </div>
           {loading ? (
             <div className="flex justify-center py-10">
               <div className="animate-spin rounded h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
@@ -191,7 +257,7 @@ export const Incidencias = () => {
                       </button>
                       <button
                         className="text-red-500 hover:text-red-700 m-1 bg-red-50 hover:bg-red-100 rounded p-2 transition-colors"
-                        onClick={() => console.log("Eliminar", incidencia.id)}
+                        onClick={() => deleteHandler(incidencia.id)} // Pasar el id de la incidencia
                         title="Eliminar"
                       >
                         <svg

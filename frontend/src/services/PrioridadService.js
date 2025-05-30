@@ -39,3 +39,7 @@ const getHeaders = () => {
 export const listAllPrioridades = () => {
   return axios.get(`${REST_API_BASE_URL}/prioridades`, getHeaders());
 };
+
+export const deletePrioridad = (id) => {
+  return axios.delete(`${REST_API_BASE_URL}/prioridad/${id}`, getHeaders());
+};

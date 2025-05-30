@@ -22,8 +22,6 @@ const getAuthToken = () => {
 
 // Function to create headers with the Authorization token
 const getHeaders = () => {
-  console.log();
-
   const accessToken = getAuthToken();
   if (!accessToken) {
     // Handle case where token is not available, maybe redirect to login or throw error

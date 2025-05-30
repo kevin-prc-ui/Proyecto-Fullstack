@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import { listAllMotivos } from "../../services/MotivoService";
+import { toast } from "sonner"; // Importar toast
+import { FaSearch } from "react-icons/fa"; // Importar icono de búsqueda
+import { listAllMotivos, deleteMotivo } from "../../services/MotivoService"; // Asegúrate de tener deleteMotivo
 
 export const Motivos = () => {
   const [motivoss, setMotivos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
   const itemsPerPage = 5;
 
   const navigate = useNavigate();
@@ -33,11 +36,24 @@ export const Motivos = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Calcular motivoss para la página actual
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Resetear a la primera página con nueva búsqueda
+  };
+
+  // Filtrar motivos basado en el término de búsqueda
+  // Nota: el estado es 'motivoss' y el item individual es 'motivos' en el map
+  const filteredMotivos = motivoss.filter((motivo) => {
+    const term = searchTerm.toLowerCase();
+    const nombre = motivo.nombre ? String(motivo.nombre).toLowerCase() : "";
+    return nombre.includes(term);
+  });
+
+  // Calcular motivos para la página actual
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = motivoss.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(motivoss.length / itemsPerPage);
+  const currentItems = filteredMotivos.slice(indexOfFirstItem, indexOfLastItem); // Usar motivos filtrados
+  const totalPages = Math.ceil(filteredMotivos.length / itemsPerPage); // Usar longitud de motivos filtrados
 
   // Generar paginación
   const renderPagination = () => {
@@ -95,6 +111,23 @@ export const Motivos = () => {
     return items;
   };
 
+  const deleteHandler = async (motivoId) => {
+    if (window.confirm("¿Estás seguro de que deseas eliminar este motivo?")) {
+      try {
+        setLoading(true);
+        await deleteMotivo(motivoId); // Llamar al servicio de eliminación
+        toast.success("Motivo eliminado correctamente");
+        fetchMotivos(); // Recargar la lista
+      } catch (err) {
+        setError("Error al eliminar motivo");
+        toast.error("Error al eliminar el motivo");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   if (error) {
     return (
       <div className="bg-white rounded shadow-md p-6 mt-4">
@@ -144,6 +177,26 @@ export const Motivos = () => {
 
         {/* Contenido */}
         <div className="p-6">
+          {/* Recuadro de búsqueda */}
+          <div className="m-2">
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <input
+                type="text"
+                name="searchMotivo"
+                id="searchMotivo"
+                className="p-4 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2"
+                placeholder="Buscar por nombre..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+          </div>
           {loading ? (
             <div className="flex justify-center py-10">
               <div className="animate-spin rounded h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
@@ -186,7 +239,7 @@ export const Motivos = () => {
                       </button>
                       <button
                         className="text-red-500 hover:text-red-700 m-1 bg-red-50 hover:bg-red-100 rounded p-2 transition-colors"
-                        onClick={() => console.log("Eliminar", motivos.id)}
+                        onClick={() => deleteHandler(motivos.id)} // Pasar el id del motivo
                         title="Eliminar"
                       >
                         <svg

@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import { listAllDepartamentos } from "../../services/DepartamentoService";
+import { toast } from "sonner"; // Importar toast
+import { FaSearch } from "react-icons/fa"; // Importar icono de búsqueda
+import {
+  listAllDepartamentos,
+  deleteDepartamento,
+} from "../../services/DepartamentoService"; // Asegúrate de tener deleteDepartamento
 
 export const Departamentos = () => {
   const [departamentos, setDepartamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
   const itemsPerPage = 5;
 
   const navigate = useNavigate();
@@ -33,11 +39,28 @@ export const Departamentos = () => {
     setCurrentPage(pageNumber);
   };
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1); // Resetear a la primera página con nueva búsqueda
+  };
+
+  // Filtrar departamentos basado en el término de búsqueda
+  const filteredDepartamentos = departamentos.filter((departamento) => {
+    const term = searchTerm.toLowerCase();
+    const nombre = departamento.nombre
+      ? String(departamento.nombre).toLowerCase()
+      : "";
+    return nombre.includes(term);
+  });
+
   // Calcular departamentos para la página actual
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = departamentos.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(departamentos.length / itemsPerPage);
+  const currentItems = filteredDepartamentos.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  ); // Usar departamentos filtrados
+  const totalPages = Math.ceil(filteredDepartamentos.length / itemsPerPage); // Usar longitud de departamentos filtrados
 
   // Generar paginación
   const renderPagination = () => {
@@ -95,6 +118,25 @@ export const Departamentos = () => {
     return items;
   };
 
+  const deleteHandler = async (departamentoId) => {
+    if (
+      window.confirm("¿Estás seguro de que deseas eliminar este departamento?")
+    ) {
+      try {
+        setLoading(true); // Puedes usar un estado de loading específico si prefieres
+        await deleteDepartamento(departamentoId); // Llamar al servicio de eliminación
+        toast.success("Departamento eliminado correctamente");
+        fetchDepartamentos(); // Recargar la lista
+      } catch (err) {
+        setError("Error al eliminar departamento"); // Puedes usar un estado de error específico
+        toast.error("Error al eliminar el departamento");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   if (error) {
     return (
       <div className="bg-white rounded shadow-md p-6 mt-4">
@@ -144,6 +186,26 @@ export const Departamentos = () => {
 
         {/* Contenido */}
         <div className="p-6">
+          {/* Recuadro de búsqueda */}
+          <div className="m-2">
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaSearch
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <input
+                type="text"
+                name="searchDepartamento"
+                id="searchDepartamento"
+                className="p-4 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2"
+                placeholder="Buscar por nombre..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+          </div>
           {loading ? (
             <div className="flex justify-center py-10">
               <div className="animate-spin rounded h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
@@ -186,7 +248,7 @@ export const Departamentos = () => {
                       </button>
                       <button
                         className="text-red-500 hover:text-red-700 m-1 bg-red-50 hover:bg-red-100 rounded p-2 transition-colors"
-                        onClick={() => console.log("Eliminar", departamento.id)}
+                        onClick={() => deleteHandler(departamento.id)} // Pasar el id del departamento
                         title="Eliminar"
                       >
                         <svg

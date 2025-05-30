@@ -39,3 +39,7 @@ const getHeaders = () => {
 export const listAllIncidencias = () => {
   return axios.get(`${REST_API_BASE_URL}/incidencias`, getHeaders());
 };
+
+export const deleteIncidencia = (id) => {
+  return axios.delete(`${REST_API_BASE_URL}/incidencias/${id}`, getHeaders());
+};

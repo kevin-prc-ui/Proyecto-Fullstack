@@ -38,3 +38,7 @@ const getHeaders = () => {
 
 export const listAllDepartamentos = () =>
   axios.get(`${REST_API_BASE_URL}/departamentos`, getHeaders());
+
+export const deleteDepartamento = (id) => {
+  return axios.delete(`${REST_API_BASE_URL}/departamentos/${id}`, getHeaders());
+};
