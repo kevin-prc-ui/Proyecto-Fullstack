@@ -19,7 +19,7 @@ public class ArchivoMapper {
     }
 
     public ArchivoDto toDto(Archivo archivo) {
-        ArchivoDto archivoDto = new com.webserdi.backend.dto.ArchivoDto();
+        ArchivoDto archivoDto = new ArchivoDto();
         archivoDto.setId(archivo.getId());
         archivoDto.setNombre(archivo.getNombre());
         archivoDto.setTipo(archivo.getTipo());
