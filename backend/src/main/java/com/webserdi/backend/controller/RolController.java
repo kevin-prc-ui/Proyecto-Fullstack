@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/roles")
 @AllArgsConstructor
-public class RolController extends BaseController {
+public class RolController {
     private RolService rolService;
 
     @PostMapping

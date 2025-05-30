@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/permisos")
 @AllArgsConstructor
-public class PermisoController extends BaseController {
+public class PermisoController {
     private PermisoService permisoService;
 
     @PostMapping
