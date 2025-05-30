@@ -24,8 +24,4 @@ public class Incidencia {
     @JoinColumn(name = "departamento_id", nullable = false)
     @JsonBackReference // Evita que se serialice el departamento al serializar la incidencia
     private Departamento departamento;
-
-    // Puedes añadir un campo para identificar incidencias especiales si es necesario
-    // @Column(name = "es_de_sistemas_unica") // Ejemplo
-    // private boolean esDeSistemasUnica = false;
 }

@@ -40,9 +40,6 @@ const getHeaders = () => {
 export const getTicketById = (ticketId) =>
   axios.get(`${REST_API_BASE_URL}/tickets/${ticketId}`, getHeaders());
 
-export const listDepartamentos = () =>
-  axios.get(`${REST_API_BASE_URL}/departamentos`, getHeaders());
-
 /**
  * Lists tickets, optionally filtered by department. Fetches all statuses.
  * @param {number} page - The page number (0-indexed).
@@ -120,35 +117,21 @@ export const listTrashedTickets = (page) => {
   });
 };
 
-
 export const deleteTicket = (ticketId) =>
   axios.delete(`${REST_API_BASE_URL}/tickets/${ticketId}`, getHeaders());
 
 export const restoreTicket = (ticketId) =>
   //Se envia null debido a que la firma de axios.put es axios.put(url[,data[,config]]).
   //Debemos pasar el header como 3er argumento y no como 2do, mandando null de segundo argumento
-  axios.put(`${REST_API_BASE_URL}/tickets/restore/${ticketId}`,null, getHeaders()); 
+  axios.put(
+    `${REST_API_BASE_URL}/tickets/restore/${ticketId}`,
+    null,
+    getHeaders()
+  );
 
-  // Función para crear un nuevo ticket
+// Función para crear un nuevo ticket
 export const createTicket = (ticketData) =>
   axios.post(`${REST_API_BASE_URL}/tickets`, ticketData, getHeaders());
 
 export const updateTicket = (id, ticketData) =>
   axios.put(`${REST_API_BASE_URL}/tickets/${id}`, ticketData, getHeaders());
-
-export const listAllIncidencias = () => {
-  return axios.get(`${REST_API_BASE_URL}/incidencias`, { // Endpoint a crear en el backend
-      headers: { Authorization: `Bearer ${getAuthToken()}` }
-  });
-};
-export const listAllPrioridades = () => {
-  return axios.get(`${REST_API_BASE_URL}/prioridades`, { // Endpoint a crear en el backend
-      headers: { Authorization: `Bearer ${getAuthToken()}` }
-  });
-};
-export const listAllMotivos = () => {
-  return axios.get(`${REST_API_BASE_URL}/motivos`, { // Endpoint a crear en el backend
-      headers: { Authorization: `Bearer ${getAuthToken()}` }
-  });
-};
-

@@ -1,252 +1,256 @@
-import { useEffect, useState } from "react";
-import { Table, Button, Spinner, Alert, Form, InputGroup } from "react-bootstrap";
-import { deleteUser, listUsers } from "../../services/UsuarioService";
+import React, { useState, useEffect } from "react";
+import { Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import { useIsAuthenticated } from "@azure/msal-react";
-import { BsFillPencilFill, BsFillTrash3Fill, BsSearch } from "react-icons/bs";
-import '../../styles/index.css';
+import { listUsers } from "../../services/UsuarioService";
 
-// Importando constantes y funciones de utilidad
-import {
-  DEFAULT_ERROR_MESSAGE,
-  formatUserRole,
-} from "../../utils/utils";
-import { toast } from "sonner";
+export const ListedUsers = () => {
+  const [usuarios, setUsuarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-/**
- * Componente para listar usuarios.
- * Muestra una tabla con la información de los usuarios y permite
- * agregar, editar y eliminar usuarios.
- */
-function ListUsuarioComponent() {
-  const isAuth = localStorage.getItem("authToken");
-  const [usuarios, setUsuarios] = useState([]); // Estado para la lista de usuarios
-  const [loading, setLoading] = useState(true); // Estado para indicar si se están cargando los datos
-  const [errorConexion, setErrorConexion] = useState(false); // Estado para indicar si hubo un error de conexión
-  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
-  const [sortColumn, setSortColumn] = useState(null); // Estado para la columna por la que se está ordenando
-  const [sortOrder, setSortOrder] = useState("asc"); // Estado para el orden de ordenamiento (ascendente/descendente)
-  const navigator = useNavigate(); // Hook para la navegación
+  const navigate = useNavigate();
 
-  /**
-   * Efecto que se ejecuta al montar el componente y cuando cambia el estado de autenticación.
-   * Si el usuario está autenticado, obtiene la lista de usuarios.
-   */
   useEffect(() => {
-    const fetchUsers = async () => {
-      await getAllUsers();
-    };
+    fetchUsuarios();
+  }, []);
 
-    if (isAuth) fetchUsers();
-  }, [isAuth]);
-
-  /**
-   * Obtiene la lista de todos los usuarios.
-   * Actualiza el estado de `usuarios`, `loading` y `errorConexion`.
-   */
-  async function getAllUsers() {
-    setLoading(true); // Mostrar el spinner de carga
-    setErrorConexion(false);
+  const fetchUsuarios = async () => {
     try {
-      const response = await listUsers(); // Llama al servicio para obtener los usuarios
-      setUsuarios(response.data); // Actualiza el estado con la lista de usuarios
-    } catch (error) {
-      setErrorConexion(error!=null); // Indica que hubo un error de conexión
+      setLoading(true);
+      const response = await listUsers();
+      setUsuarios(response.data);
+    } catch (err) {
+      setError("Error al cargar usuarios");
+      console.error(err);
     } finally {
-      setLoading(false); // Oculta el spinner de carga
-    }
-  }
-
-  /**
-   * Navega a la página para agregar un nuevo usuario.
-   */
-  function addNewUser() {
-    navigator("/admin/add-user");
-  }
-
-  /**
-   * Navega a la página para editar un usuario.
-   * @param {number} id - ID del usuario a editar.
-   */
-  function updateUser(id) {
-    navigator(`/admin/edit-user/${id}`);
-  }
-
-  /**
-   * Elimina un usuario.
-   * @param {number} id - ID del usuario a eliminar.
-   */
-  function removeUser(id) {
-    if (window.confirm("¿Estás seguro que deseas eliminar este usuario?")) {
-      deleteUser(id) // Llama al servicio para eliminar el usuario
-        .then(() => {
-          // Elimina al usuario del estado
-          setUsuarios(usuarios.filter((usuario) => usuario.id !== id));
-        })
-        .catch((error) => {
-          toast.error("Error"(error));
-        });
-    }
-  }
-
-  /**
-   * Función para manejar la búsqueda de usuarios.
-   * @param {Event} e - Evento de cambio en el campo de búsqueda.
-   */
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  /**
-   * Función para ordenar la tabla por una columna específica.
-   * @param {string} column - Nombre de la columna por la que se va a ordenar.
-   */
-  const handleSort = (column) => {
-    if (sortColumn === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      setSortOrder("asc");
+      setLoading(false);
     }
   };
 
-  /**
-   * Filtra la lista de usuarios basándose en el término de búsqueda.
-   */
-  const filteredUsuarios = usuarios.filter((usuario) => {
-    const nombreCompleto = `${usuario.nombre} ${usuario.apellido}`.toLowerCase();
-    const email = usuario.email.toLowerCase();
-    const term = searchTerm.toLowerCase();
-    return (
-      nombreCompleto.includes(term) ||
-      email.includes(term)
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Calcular usuarios para la página actual
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = usuarios.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(usuarios.length / itemsPerPage);
+
+  // Generar paginación
+  const renderPagination = () => {
+    let items = [];
+
+    // Botón "Anterior"
+    items.push(
+      <button
+        key="prev"
+        disabled={currentPage === 1}
+        onClick={() => handlePageChange(currentPage - 1)}
+        className={`px-3 py-1 rounded ${
+          currentPage === 1
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            : "bg-white text-gray-700 hover:bg-gray-100"
+        }`}
+      >
+        Anterior
+      </button>
     );
-  });
 
-  /**
-   * Ordena la lista de usuarios basándose en la columna y el orden de ordenamiento.
-   */
-  const sortedUsuarios = [...filteredUsuarios].sort((a, b) => {
-    if (sortColumn) {
-      const aValue =
-        sortColumn === "nombre"
-          ? `${a.nombre} ${a.apellido}`.toLowerCase()
-          : a[sortColumn];
-      const bValue =
-        sortColumn === "nombre"
-          ? `${b.nombre} ${b.apellido}`.toLowerCase()
-          : b[sortColumn];
-      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+    // Números de página
+    for (let number = 1; number <= totalPages; number++) {
+      items.push(
+        <button
+          key={number}
+          onClick={() => handlePageChange(number)}
+          className={`px-3 py-1 ${
+            currentPage === number
+              ? "bg-blue-500 text-white rounded"
+              : "bg-white text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          {number}
+        </button>
+      );
     }
-    return 0;
-  });
 
-  // Si el usuario no está autenticado, muestra un mensaje
-  if (!isAuth) {
-    return <Alert variant="warning">Por favor inicie sesión primero.</Alert>;
-  }
+    // Botón "Siguiente"
+    items.push(
+      <button
+        key="next"
+        disabled={currentPage === totalPages}
+        onClick={() => handlePageChange(currentPage + 1)}
+        className={`px-3 py-1 rounded ${
+          currentPage === totalPages
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            : "bg-white text-gray-700 hover:bg-gray-100"
+        }`}
+      >
+        Siguiente
+      </button>
+    );
 
-  // Si se están cargando los datos, muestra un spinner
-  if (loading) {
+    return items;
+  };
+
+  if (error) {
     return (
-      <div className="text-center mt-4">
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Cargando...</span>
-        </Spinner>
+      <div className="bg-white rounded shadow-md p-6 mt-4">
+        <div className="text-red-500 font-medium">{error}</div>
+        <button
+          className="mt-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded transition-colors"
+          onClick={fetchUsuarios}
+        >
+          Reintentar
+        </button>
       </div>
     );
   }
 
   return (
-    <>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="mb-0">Lista de empleados</h2>
-        <Button className="disabled" variant="primary" onClick={addNewUser}>
-          Agregar usuario
-        </Button>
+    <Transition
+      as="div"
+      appear
+      show
+      enter="transition-opacity duration-300"
+      enterFrom="opacity-0"
+      enterTo="opacity-100"
+    >
+      <div className="flex justify-between items-center p-6 border-b border-gray-100">
+        <h2 className="text-xl font-bold text-gray-800">Usuarios</h2>
+        <button
+          className="bg-blue-500 rounded hover:bg-blue-600 text-white font-medium py-2 px-4 transition-colors flex items-center"
+          onClick={() => navigate("/usuarios/nuevo")}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-1"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Nuevo Usuario
+        </button>
       </div>
-      {/* Barra de busqueda */}
-      <InputGroup className="mb-3">
-        <InputGroup.Text id="search-icon">
-          <BsSearch />
-        </InputGroup.Text>
-        <Form.Control
-          type="search"
-          placeholder="Buscar usuario por nombre o email"
-          aria-label="Buscar usuario por nombre o email"
-          aria-describedby="search-icon"
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
-      </InputGroup>
+      <div className="bg-white rounded shadow-md overflow-hidden">
+        {/* Header de la tarjeta */}
 
-      {/* Muestra un mensaje de error si hubo un problema de conexión */}
-      {errorConexion ? (
-        <Alert variant="danger">
-          ⚠️ {DEFAULT_ERROR_MESSAGE}
-        </Alert>
-      ) : usuarios.length === 0 ? (
-        // Muestra un mensaje si no hay usuarios registrados
-        <Alert variant="info">No se encontraron usuarios registrados.</Alert>
-      ) : (
-        // Muestra la tabla de usuarios si hay datos y no hay error
-        <Table striped bordered hover responsive className="user-table">
-          <thead className="table-dark">
-            <tr>
-              <th onClick={() => handleSort("nombre")} className="sortable-header">
-                Nombre
-                {sortColumn === "nombre" && (sortOrder === "asc" ? " ▲" : " ▼")}
-              </th>
-              <th onClick={() => handleSort("apellido")} className="sortable-header">
-                Apellido
-                {sortColumn === "apellido" && (sortOrder === "asc" ? " ▲" : " ▼")}
-              </th>
-              <th onClick={() => handleSort("email")} className="sortable-header">
-                Email
-                {sortColumn === "email" && (sortOrder === "asc" ? " ▲" : " ▼")}
-              </th>
-              <th>Rol</th>
-              <th>Permisos</th>
-              <th>Acciones</th>
-              
-            </tr>
-          </thead>
-          <tbody>
-            {sortedUsuarios.map((usuario) => (
-              <tr key={usuario.id}>
-                <td>{usuario.nombre}</td>
-                <td>{usuario.apellido}</td>
-                <td>{usuario.email}</td>
-                <td>{usuario.roles.join(", ")}</td>
-                <td>{usuario.permisos.join(", ")}</td>
-                <td>
-                  <div className="action-buttons">
-                    <Button
-                      variant="outline-secondary"
-                      onClick={() => updateUser(usuario.id)}
-                      aria-label="Editar usuario"
-                      className="edit-button"
-                    >
-                      <BsFillPencilFill />
-                    </Button>
-                    <Button
-                      variant="outline-danger"
-                      onClick={() => removeUser(usuario.id)}
-                      aria-label="Eliminar usuario"
-                      className="delete-button"
-                    >
-                      <BsFillTrash3Fill />
-                    </Button>
+        {/* Contenido */}
+        <div className="p-6">
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <div className="animate-spin rounded h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : (
+            <>
+              {/* Encabezados de la tabla */}
+              <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 rounded mb-3 font-medium text-gray-600 uppercase text-sm">
+                <div className="">Nombre</div>
+                <div className="col-span-2 text-center">Apellido</div>
+                <div className="col-span-2 text-center">Email</div>
+                <div className="col-span-2 text-center">Rol</div>
+                <div className="col-span-2 text-center">Permisos</div>
+                <div className="col-span-2 text-center">Acciones</div>
+              </div>
+
+              {/* Lista de usuarios */}
+              {currentItems.length > 0 ? (
+                currentItems.map((usuario) => (
+                  <div
+                    key={usuario.id}
+                    className="grid grid-cols-12 gap-4 items-center px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    {" "}
+                    <div className=" text-gray-700">{usuario.nombre}</div>
+                    <div className="col-span-2 text-center text-gray-700">
+                      {usuario.apellido}
+                    </div>
+                    <div className="col-span-2 text-center text-gray-700">
+                      {usuario.email}
+                    </div>
+                    <div className="col-span-2 text-center text-gray-700">
+                      {usuario.roles}
+                    </div>
+                    <div className="col-span-2 text-gray-700 text-center">
+                      {usuario.permisos}
+                    </div>
+                    <div className="col-span-2 flex justify-center">
+                      <button
+                        className="text-blue-500 hover:text-blue-700 m-1 bg-blue-50 hover:bg-blue-100 rounded p-2 transition-colors"
+                        onClick={() =>
+                          navigate(`/usuarios/editar/${usuario.id}`)
+                        }
+                        title="Editar"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                      </button>
+                      <button
+                        className="text-red-500 hover:text-red-700 m-1 bg-red-50 hover:bg-red-100 rounded p-2 transition-colors"
+                        onClick={() => console.log("Eliminar", usuario.id)}
+                        title="Eliminar"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
-    </>
-  );
-}
+                ))
+              ) : (
+                <div className="text-center py-10 text-gray-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-16 w-16 mx-auto text-gray-300 mb-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  No se encontraron usuarios
+                </div>
+              )}
 
-export default ListUsuarioComponent;
+              {/* Paginación */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex justify-center">
+                  <div className="inline-flex rounded shadow-sm" role="group">
+                    {renderPagination()}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </Transition>
+  );
+};

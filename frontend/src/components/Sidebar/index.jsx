@@ -1,12 +1,14 @@
 // c:\react\Proyecto\frontend\src\components\Sidebar\index.jsx
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { MdSettings } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
-import { Container, Nav, Navbar, Button, Spinner } from "react-bootstrap"; 
+import { Container, Nav, Navbar, Button, Spinner } from "react-bootstrap";
 import PropTypes from 'prop-types';
-import linkData from "../../assets/routes"; 
+import linkData from "../../assets/routes";
 import { useUserRoles } from "../../hooks/useUserRoles";
+import React from 'react'
+
 
 const Sidebar = () => {
   const { roles, isLoading, error } = useUserRoles();
@@ -20,19 +22,19 @@ const Sidebar = () => {
       return items
         .map(item => {
           const filteredItem = { ...item };
-          
+
           if (item.children) {
             filteredItem.children = filterItems(item.children);
           }
-          
+
           return filteredItem;
         })
         .filter(item => {
           const hasRequiredRoles = !item.roles || item.roles.length === 0 || item.roles.some(role => roles.includes(role));
-          
+
           const hasVisibleChildren = item.children && item.children.length > 0;
           const isLink = !!item.link;
-          
+
           return hasRequiredRoles && (hasVisibleChildren || isLink);
         });
     };
@@ -59,11 +61,11 @@ const Sidebar = () => {
     if (item.link && location.pathname.startsWith(item.link)) {
       return true;
     }
-    
+
     if (item.children) {
       return item.children.some(child => isItemActive(child));
     }
-    
+
     return false;
   };
 
@@ -132,10 +134,10 @@ const Sidebar = () => {
             aria-hidden={!expanded}
           >
             {item.children.map((child) => (
-              <MenuItem 
-                key={`${depth+1}-${child.label}`} 
-                item={child} 
-                depth={depth + 1} 
+              <MenuItem
+                key={`${depth + 1}-${child.label}`}
+                item={child}
+                depth={depth + 1}
               />
             ))}
           </div>
@@ -160,7 +162,7 @@ const Sidebar = () => {
       <Navbar expand="lg" className="flex-column h-100 align-items-stretch">
         <Nav className="flex-column flex-grow-1 w-100">
           {filteredLinkData.length === 0 && !isLoading && (
-             <p className="text-muted text-center mt-3">No hay opciones de menú disponibles.</p>
+            <p className="text-muted text-center mt-3">No hay opciones de menú disponibles.</p>
           )}
 
           {filteredLinkData.map((parent) => (
@@ -181,11 +183,11 @@ const SettingsButton = ({ isActive }) => (
   <Button
     variant="link"
     className={clsx(
-        "settings-button",
-        "text-dark d-flex align-items-center gap-2 w-100 px-3 py-2 rounded",
-        "text-decoration-none",
-        isActive && "active"
-        )}
+      "settings-button",
+      "text-dark d-flex align-items-center gap-2 w-100 px-3 py-2 rounded",
+      "text-decoration-none",
+      isActive && "active"
+    )}
     as={Link}
     to="/helpdesk/tasks"
   >
@@ -195,7 +197,7 @@ const SettingsButton = ({ isActive }) => (
 );
 
 SettingsButton.propTypes = {
-    isActive: PropTypes.bool.isRequired,
+  isActive: PropTypes.bool.isRequired,
 };
 
 export default Sidebar;

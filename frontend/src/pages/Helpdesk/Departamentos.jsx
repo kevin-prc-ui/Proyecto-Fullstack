@@ -1,29 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import { listAllIncidencias } from "../../services/IncidenciaService";
+import { listAllDepartamentos } from "../../services/DepartamentoService";
 
-export const Incidencias = () => {
-  const [incidencias, setIncidencias] = useState([]);
+export const Departamentos = () => {
+  const [departamentos, setDepartamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 5;
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchIncidencias();
-    console.log(incidencias);
+    fetchDepartamentos();
   }, []);
 
-  const fetchIncidencias = async () => {
+  const fetchDepartamentos = async () => {
     try {
       setLoading(true);
-      const response = await listAllIncidencias();
-      setIncidencias(response.data);
+      const response = await listAllDepartamentos();
+      setDepartamentos(response.data);
     } catch (err) {
-      setError("Error al cargar incidencias");
+      setError("Error al cargar departamentos");
       console.error(err);
     } finally {
       setLoading(false);
@@ -34,11 +33,11 @@ export const Incidencias = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Calcular incidencias para la página actual
+  // Calcular departamentos para la página actual
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = incidencias.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(incidencias.length / itemsPerPage);
+  const currentItems = departamentos.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(departamentos.length / itemsPerPage);
 
   // Generar paginación
   const renderPagination = () => {
@@ -102,7 +101,7 @@ export const Incidencias = () => {
         <div className="text-red-500 font-medium">{error}</div>
         <button
           className="mt-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded transition-colors"
-          onClick={fetchIncidencias}
+          onClick={fetchDepartamentos}
         >
           Reintentar
         </button>
@@ -120,10 +119,10 @@ export const Incidencias = () => {
       enterTo="opacity-100"
     >
       <div className="flex justify-between items-center p-6 border-b border-gray-100">
-        <h2 className="text-xl font-bold text-gray-800">Incidencias</h2>
+        <h2 className="text-xl font-bold text-gray-800">Departamentos</h2>
         <button
           className="bg-blue-500 rounded hover:bg-blue-600 text-white font-medium py-2 px-4 transition-colors flex items-center"
-          onClick={() => navigate("/incidencias/nuevo")}
+          onClick={() => navigate("/departamentos/nuevo")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +136,7 @@ export const Incidencias = () => {
               clipRule="evenodd"
             />
           </svg>
-          Nuevo Incidencia
+          Nuevo Departamento
         </button>
       </div>
       <div className="bg-white rounded shadow-md overflow-hidden">
@@ -154,29 +153,25 @@ export const Incidencias = () => {
               {/* Encabezados de la tabla */}
               <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 rounded mb-3 font-medium text-gray-600 uppercase text-sm">
                 <div className="col-span-6">Nombre</div>
-                <div className="col-span-2">Departamento</div>
                 <div className="col-span-4 text-center">Acciones</div>
               </div>
 
-              {/* Lista de incidencias */}
+              {/* Lista de departamentos */}
               {currentItems.length > 0 ? (
-                currentItems.map((incidencia) => (
+                currentItems.map((departamento) => (
                   <div
-                    key={incidencia.id}
+                    key={departamento.id}
                     className="grid grid-cols-12 gap-4 items-center px-4 py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors"
                   >
                     {" "}
                     <div className="col-span-6 text-gray-700">
-                      {incidencia.nombre}
-                    </div>
-                    <div className="col-span-2 text-gray-700">
-                      {incidencia.departamento.nombre}
+                      {departamento.nombre}
                     </div>
                     <div className="col-span-4 flex justify-center">
                       <button
                         className="text-blue-500 hover:text-blue-700 m-1 bg-blue-50 hover:bg-blue-100 rounded p-2 transition-colors"
                         onClick={() =>
-                          navigate(`/incidencias/editar/${incidencia.id}`)
+                          navigate(`/departamentos/editar/${departamento.id}`)
                         }
                         title="Editar"
                       >
@@ -191,7 +186,7 @@ export const Incidencias = () => {
                       </button>
                       <button
                         className="text-red-500 hover:text-red-700 m-1 bg-red-50 hover:bg-red-100 rounded p-2 transition-colors"
-                        onClick={() => console.log("Eliminar", incidencia.id)}
+                        onClick={() => console.log("Eliminar", departamento.id)}
                         title="Eliminar"
                       >
                         <svg
@@ -226,7 +221,7 @@ export const Incidencias = () => {
                       d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  No se encontraron incidencias
+                  No se encontraron departamentos
                 </div>
               )}
 

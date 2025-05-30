@@ -4,25 +4,15 @@ import { callMsGraph } from "../../graph";
 import { loginRequest } from "../../services/authConfig";
 import { useNavigate } from "react-router-dom";
 import { useMsal } from "@azure/msal-react";
-import { useState } from "react";
 
 export const UseLoginHandler = () => {
-  const [ip, setIp] = useState(null);
   const navigate = useNavigate();
   const { instance } = useMsal();
-  async function getIP() {
-      const response = await fetch('https://api.ipify.org/?format=json');
-      const data = await response.json();
-      return response.status === 200 ? data : "err";
-      
-      }
-      getIP().then(data => setIp(data));
-      
-      const handleLogin = async () => {
-    
+
+  const handleLogin = async () => {
     // 1. Autenticación con Microsoft
     const response = await instance.loginPopup(loginRequest);
-    const graphResponse = await callMsGraph(response.accessToken);   
+    const graphResponse = await callMsGraph(response.accessToken);
 
     // 2. Preparar datos para el backend
     const loginData = {
@@ -33,10 +23,17 @@ export const UseLoginHandler = () => {
     // 3. Login en tu backend
     const respuesta = await login(loginData);
     localStorage.setItem("authToken", JSON.stringify(respuesta.data));
-    
+
     //4. Postear Ip en backend
-    postIp(ip);
-    
+    // const ipResponse = await fetch("https://api.ipify.org/?format=json");
+    // const data = await ipResponse.json();
+    // console.log(data.ip);
+    // postIp(data.ip);
+
+    if (respuesta.status !== 200 || !respuesta.status !== 201) {
+      return toast.error("Error al iniciar sesión");
+    }
+
     // 5. Manejar éxito
     toast.success("Sesión iniciada correctamente");
     navigate("/dashboard");
@@ -45,7 +42,6 @@ export const UseLoginHandler = () => {
 };
 
 export const UseLogoutHandler = () => {
-  
   const { instance } = useMsal();
   const handleLogout = () => {
     try {

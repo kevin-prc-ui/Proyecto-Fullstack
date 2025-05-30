@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { FaList } from "react-icons/fa";
 import { MdGridView } from "react-icons/md";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Transition } from "@headlessui/react";
 // Componentes locales
@@ -11,14 +11,11 @@ import Table from "../../components/Ticket/Table";
 import PaginationBar from "../../components/Ticket/PaginadoTickets";
 import TaskTitle from "../../components/Ticket/TaskTitle";
 import Title from "../../components/Ticket/Title";
-import CreateTicket  from "../../components/Ticket/CreateTicket";
+import CreateTicket from "../../components/Ticket/CreateTicket";
 
 // Servicios y utilidades
-import {
-  listTickets,
-  listFilteredTickets,
-  listDepartamentos,
-} from "../../services/TicketService";
+import { listTickets, listFilteredTickets } from "../../services/TicketService";
+import { listAllDepartamentos } from "../../services/DepartamentoService";
 import { TASK_TYPE } from "../../utils/utils"; // Objeto para mapear estados a clases CSS
 
 /**
@@ -39,11 +36,9 @@ const TABS = [
  * @returns {JSX.Element} El componente renderizado.
  */
 const Tasks = () => {
-    const [openDialog, setOpenDialog] = useState(false);
-  
+  const [openDialog, setOpenDialog] = useState(false);
+
   const params = useParams();
-  console.log(params);
-  
   const isAuth = localStorage.getItem("authToken"); // Verifica si el usuario está autenticado
 
   /**
@@ -97,7 +92,6 @@ const Tasks = () => {
   // --- New State for Departamentos ---
   const [departamentos, setDepartamentos] = useState([]);
   const [selectedDepartamento, setSelectedDepartamento] = useState(""); // Store selected department ID, "" means all
-  const [loadingDepartamentos, setLoadingDepartamentos] = useState(false);
   // --- End of New State ---
 
   /**
@@ -146,17 +140,14 @@ const Tasks = () => {
   // --- Fetch Departamentos ---
   const fetchDepartamentos = useCallback(async () => {
     if (!isAuth) return; // Don't fetch if not authenticated
-    setLoadingDepartamentos(true);
     try {
-      const response = await listDepartamentos();
+      const response = await listAllDepartamentos();
       // Assuming response.data is an array of department objects { id: '...', name: '...' }
       setDepartamentos(response.data || []);
     } catch (error) {
       showErrorToast("Error al cargar los departamentos.");
       console.error("Error fetching departamentos:", error);
       setDepartamentos([]); // Clear departamentos on error
-    } finally {
-      setLoadingDepartamentos(false);
     }
   }, [isAuth]); // Dependency on isAuth
 
@@ -227,8 +218,8 @@ const Tasks = () => {
 
   // --- Navigation Handler for Create Ticket ---
   const handleCreateTicket = () => {
-    toast.info("Creando ticket...")
-    setOpenDialog(true)
+    toast.info("Creando ticket...");
+    setOpenDialog(true);
     // navigate("/create-ticket"); // Or your çctual route for creating a ticket
   };
   // --- End Navigation Handler ---
@@ -334,18 +325,6 @@ const Tasks = () => {
           selected === 0 && ( // Mostrar títulos solo si no hay filtro de estado Y se está en la vista Cuadrícula (selected === 0)
             <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-x-12 py-4">
               {/* Asegúrate que las claves coincidan exactamente con tu objeto TASK_TYPE */}
-              <TaskTitle
-                label="Pendiente"
-                className={getTaskTypeClass("pendiente")}
-              />
-              <TaskTitle
-                label="En Proceso"
-                className={getTaskTypeClass("en-proceso")}
-              />
-              <TaskTitle
-                label="Completado"
-                className={getTaskTypeClass("completado")}
-              />
             </div>
           )}
 
@@ -387,11 +366,10 @@ const Tasks = () => {
         <div className="text-gray-500 text-center mt-4">
           No se encontraron tickets
           {status ? ` con el estado "${status.replace("-", " ")}"` : ""}
-          {selectedDepartamento ? ` en el departamento seleccionado` : ""}
-          .
+          {selectedDepartamento ? ` en el departamento seleccionado` : ""}.
         </div>
       )}
-      <CreateTicket open={openDialog} setOpen={setOpenDialog}/>
+      <CreateTicket open={openDialog} setOpen={setOpenDialog} />
     </Transition>
   );
 };

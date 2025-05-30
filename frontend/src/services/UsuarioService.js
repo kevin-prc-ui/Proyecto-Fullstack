@@ -8,11 +8,10 @@ const token = () => localStorage.getItem("authToken");
 const getAuthToken = () => JSON.parse(token()).accessToken;
 
 // Function to create headers with the Authorization token
-const getHeaders = () => ({  
+const getHeaders = () => ({
   headers: {
     Authorization: `Bearer ${getAuthToken()}`,
   },
-  
 });
 
 export const listUsers = () =>
@@ -27,40 +26,58 @@ export const listUsers = () =>
       throw error;
     });
 
-export const signUp = (userData) => axios.post(`${REST_API_BASE_URL}/auth/signup`, userData);
+export const signUp = (userData) =>
+  axios.post(`${REST_API_BASE_URL}/auth/signup`, userData);
 
-export const getUserById = (userId) => axios.get(`${REST_API_BASE_URL}/users/${userId}`, getHeaders());
+export const getUserById = (userId) =>
+  axios.get(`${REST_API_BASE_URL}/users/${userId}`, getHeaders());
 
-export const updateUser = (userId,user) => axios.put(`${REST_API_BASE_URL}/users/edit/${userId}`, user, getHeaders());
+export const updateUser = (userId, user) =>
+  axios.put(`${REST_API_BASE_URL}/users/edit/${userId}`, user, getHeaders());
 
-export const deleteUser = (userId) => axios.delete(`${REST_API_BASE_URL}/users/delete/${userId}`, getHeaders());
+export const deleteUser = (userId) =>
+  axios.delete(`${REST_API_BASE_URL}/users/delete/${userId}`, getHeaders());
 
 export const getUserPermissions = async () => {
-  const response = await axios.get(`${REST_API_BASE_URL}/users/permisos`, getHeaders());
+  const response = await axios.get(
+    `${REST_API_BASE_URL}/users/permisos`,
+    getHeaders()
+  );
   return response;
 };
 
-export const checkOrCreateUser = (userData) => 
-  axios.post(`${REST_API_BASE_URL}/users/check-or-create`, userData, getHeaders());
+export const checkOrCreateUser = (userData) =>
+  axios.post(
+    `${REST_API_BASE_URL}/users/check-or-create`,
+    userData,
+    getHeaders()
+  );
 
-export const login = (loginData) => axios.post(`${REST_API_BASE_URL}/auth/login`, loginData);
-export const logout = () => axios.post(`${REST_API_BASE_URL}/auth/logout`,getHeaders());
+export const login = (loginData) =>
+  axios.post(`${REST_API_BASE_URL}/auth/login`, loginData);
+
+export const logout = () =>
+  axios.post(`${REST_API_BASE_URL}/auth/logout`, getHeaders());
+
 export const getUserRoles = (email) => {
-  return axios.get(`${REST_API_BASE_URL}/users/email/roles?email=${email}`, getHeaders())
-  .then(response => response)
-  .catch(error => {
-    if (!error.response) {
-      toast.error("Error de conexión con el servidor");
-      throw new Error("Error de conexion con el servidor");
-    }
-    throw error;
-  });
+  return axios
+    .get(
+      `${REST_API_BASE_URL}/users/email/roles?email=${email}`,
+      null,
+      getHeaders()
+    )
+    .then((response) => response)
+    .catch((error) => {
+      if (!error.response) {
+        toast.error("Error de conexión con el servidor");
+        throw new Error("Error de conexion con el servidor");
+      }
+      throw error;
+    });
 };
 
-export const postIp = (ip) => axios.post(`${REST_API_BASE_URL}/ip`,ip,getHeaders());
+export const postIp = (ip) =>
+  axios.post(`${REST_API_BASE_URL}/ip`, ip, getHeaders());
 
-export const getUserId = () => axios.get(`${REST_API_BASE_URL}/users/me/id`, getHeaders());
-
-
-
-
+export const getUserId = () =>
+  axios.get(`${REST_API_BASE_URL}/users/me/id`, getHeaders());

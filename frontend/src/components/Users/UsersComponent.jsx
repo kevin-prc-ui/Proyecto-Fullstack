@@ -1,10 +1,7 @@
+import React from "react";
 import { Button, Alert, Form, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import {
-  signUp,
-  getUserById,
-  updateUser,
-} from "../../services/UsuarioService";
+import { signUp, getUserById, updateUser } from "../../services/UsuarioService";
 import { useNavigate, useParams } from "react-router-dom";
 
 // Importando constantes y funciones de utilidad
@@ -29,7 +26,7 @@ const UsersComponent = () => {
     nombre: "",
     apellido: "",
     email: "",
-    rol: "", 
+    rol: "",
   });
 
   const { id } = useParams(); // Obtiene el ID del usuario de los parámetros de la URL
@@ -87,7 +84,9 @@ const UsersComponent = () => {
           setNombre(userData.nombre);
           setApellido(userData.apellido);
           setEmail(userData.email);
-          setRol(userData.roles && userData.roles.length > 0 ? userData.roles[0] : "");
+          setRol(
+            userData.roles && userData.roles.length > 0 ? userData.roles[0] : ""
+          );
           setSelectedPermisos(userData.permisos || []);
         })
         .catch((error) => {
@@ -143,7 +142,8 @@ const UsersComponent = () => {
       navigator("/admin/users"); // Navega a la lista de usuarios
     } catch (error) {
       // Improved error logging
-      const errorMessage = error.response?.data?.message || error.message || "Error desconocido";
+      const errorMessage =
+        error.response?.data?.message || error.message || "Error desconocido";
       toast.error(`Error al guardar los cambios del usuario: ${errorMessage}`);
       console.error("Save/Update User Error:", error.response || error);
     } finally {
@@ -158,10 +158,10 @@ const UsersComponent = () => {
   const isFormValid = (formData) => {
     let valid = true;
     const newErrors = {
-        nombre: "",
-        apellido: "",
-        email: "",
-        rol: "",
+      nombre: "",
+      apellido: "",
+      email: "",
+      rol: "",
     };
 
     // Validaciones
@@ -178,10 +178,9 @@ const UsersComponent = () => {
     if (!formData.email || formData.email.trim() === "") {
       newErrors.email = "El email es obligatorio";
       valid = false;
-    }
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.email = "El formato del email no es válido";
-        valid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "El formato del email no es válido";
+      valid = false;
     }
 
     if (!formData.rol || formData.rol.trim() === "") {
@@ -208,13 +207,13 @@ const UsersComponent = () => {
 
   return (
     <>
-      <div className="container mt-4"> 
-        <div className="row justify-content-center"> 
-          <div className="card col-md-8 col-lg-6"> 
-            <div className="card-header text-center">{pageTitle()}</div> 
+      <div className="container mt-4">
+        <div className="row justify-content-center">
+          <div className="card col-md-8 col-lg-6">
+            <div className="card-header text-center">{pageTitle()}</div>
             <div className="card-body">
               {/* Formulario */}
-              <Form noValidate onSubmit={saveOrUpdateUser}> 
+              <Form noValidate onSubmit={saveOrUpdateUser}>
                 {/* Nombre */}
                 <Form.Group className="mb-3" controlId="formNombre">
                   <Form.Label>Nombre:</Form.Label>
@@ -225,7 +224,7 @@ const UsersComponent = () => {
                     name="nombre"
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
-                    isInvalid={!!errors.nombre} 
+                    isInvalid={!!errors.nombre}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.nombre}
@@ -238,7 +237,7 @@ const UsersComponent = () => {
                   <Form.Control
                     required
                     type="text"
-                    placeholder="Ingresa el apellido" 
+                    placeholder="Ingresa el apellido"
                     name="apellido"
                     value={apellido}
                     onChange={(e) => setApellido(e.target.value)}
@@ -254,9 +253,9 @@ const UsersComponent = () => {
                   <Form.Label>Email:</Form.Label>
                   <Form.Control
                     required
-                    type="email" 
+                    type="email"
                     placeholder="Ingresa el Email"
-                    name="email" 
+                    name="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     isInvalid={!!errors.email}
@@ -269,15 +268,15 @@ const UsersComponent = () => {
                 {/* Rol */}
                 <Form.Group className="mb-3" controlId="formRol">
                   <Form.Label>Rol:</Form.Label>
-                  <Form.Select 
+                  <Form.Select
                     required
                     name="rol"
-                    value={rol} 
+                    value={rol}
                     onChange={(e) => setRol(e.target.value)}
                     isInvalid={!!errors.rol}
                   >
                     <option value="">Seleccione un rol</option>
-                    {roles.map((r) => ( 
+                    {roles.map((r) => (
                       <option key={r.nombre} value={r.nombre}>
                         {r.nombre}
                       </option>
@@ -289,7 +288,7 @@ const UsersComponent = () => {
                 </Form.Group>
 
                 {/* Permisos */}
-                <Form.Group className="mb-3"> 
+                <Form.Group className="mb-3">
                   <Form.Label>Permisos (Módulo Usuarios):</Form.Label>
                   <Row>
                     {permisosDisponibles.length > 0 ? (
@@ -297,7 +296,7 @@ const UsersComponent = () => {
                         <Col key={permiso.nombre} md={6}>
                           <Form.Check
                             type="checkbox"
-                            id={`permiso-${permiso.nombre}`} 
+                            id={`permiso-${permiso.nombre}`}
                             label={permiso.nombre}
                             checked={selectedPermisos.includes(permiso.nombre)}
                             onChange={() =>
@@ -309,40 +308,42 @@ const UsersComponent = () => {
                       ))
                     ) : (
                       <Col>
-                        <small className="text-muted">No hay permisos de usuario disponibles.</small>
+                        <small className="text-muted">
+                          No hay permisos de usuario disponibles.
+                        </small>
                       </Col>
                     )}
                   </Row>
                 </Form.Group>
                 {loading && (
                   <Alert variant="info" className="mt-3 text-center">
-                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
                     Cargando...
                   </Alert>
                 )}
 
                 {/* Botones */}
-                <div className="d-flex justify-content-evenly mt-4"> 
-                  <Button
-                    variant="success"
-                    type="submit" 
-                    disabled={loading} 
-                  >
-                    {id ? "Actualizar" : "Guardar"} 
+                <div className="d-flex justify-content-evenly mt-4">
+                  <Button variant="success" type="submit" disabled={loading}>
+                    {id ? "Actualizar" : "Guardar"}
                   </Button>
                   <Button
-                    variant="danger" 
-                    onClick={() => navigator("/admin/users")}
+                    variant="danger"
+                    onClick={() => navigator("/admin/helpdesk/users")}
                     disabled={loading}
                   >
                     Cancelar
                   </Button>
                 </div>
               </Form>
-            </div> 
-          </div> 
-        </div> 
-      </div> 
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

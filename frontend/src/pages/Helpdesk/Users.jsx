@@ -1,5 +1,6 @@
 import { Transition } from "@headlessui/react";
-import ListedUsers from "../../components/Users/ListUsers";
+import { ListedUsers } from "../../components/Users/ListUsers";
+import React from "react";
 
 const Users = () => {
   return (

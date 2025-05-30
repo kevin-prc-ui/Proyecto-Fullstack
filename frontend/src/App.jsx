@@ -1,3 +1,4 @@
+import React from "react";
 import MicrosoftSignUp from "./components/MicrosoftAuth/SignupButton";
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import UsersComponent from "./components/Users/UsersComponent";
@@ -23,8 +24,10 @@ import Navbar from "./components/Navbar";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
 import { Incidencias } from "./pages/Helpdesk/Incidencias";
-import { Dpm } from "./pages/Helpdesk/Dpm";
+import { Departamentos } from "./pages/Helpdesk/Departamentos";
+import { Motivos } from "./pages/Helpdesk/Motivos";
 import { Logs } from "./pages/Helpdesk/Logs";
+import { Prioridades } from "./pages/Helpdesk/Prioridades";
 
 function Layout() {
   const isAuthenticated = localStorage.getItem("authToken");
@@ -43,12 +46,12 @@ function Layout() {
     >
       <div className="flex flex-1 flex-col md:flex-row">
         {/* Sidebar condicional */}
-        {isAuthenticated!==null && !isDashboard && (
+        {isAuthenticated !== null && !isDashboard && (
           <div className="hidden md:block sticky top-0 h-[calc(100vh)]">
             <Sidebar />
           </div>
         )}
-        
+
         {/* Contenido principal */}
         <div className="flex-1 flex flex-col">
           <Navbar />
@@ -64,7 +67,7 @@ function Layout() {
 
 function App() {
   const isAuthenticated = localStorage.getItem("authToken");
-  
+
   if (!isAuthenticated)
     return (
       <main className="w-full min-h-screen bg-[#e7ebf3] ">
@@ -75,7 +78,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/signup" element={<MicrosoftSignUp />} />
             <Route path="/notfound" element={<NotFound />} />
-            <Route path="*" element={<Navigate to="/dashboard"/>}/>
+            <Route path="*" element={<Navigate to="/dashboard" />} />
           </Route>
         </Routes>
       </main>
@@ -121,19 +124,22 @@ function App() {
           <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
             <Route element={<Layout />}>
               <Route path="/admin/helpdesk/users" element={<Users />} />
+              <Route path="/admin/add-user" element={<UsersComponent />} />
               <Route
-                path="/admin/add-user"
-                element={<UsersComponent />}
+                path="/admin/helpdesk/incidencias"
+                element={<Incidencias />}
               />
-              <Route path="/admin/helpdesk/incidencias" element={<Incidencias />} />
-              <Route path="/admin/helpdesk/departamentos" element={< Dpm/>} />
-              <Route path="/admin/helpdesk/prioridades" element={< Dpm/>} />
-              <Route path="/admin/helpdesk/motivos" element={<Dpm />} />
-              <Route path="/admin/helpdesk/logs" element={< Logs/>} />
               <Route
-                path="/admin/edit-user/:id"
-                element={<UsersComponent />}
+                path="/admin/helpdesk/departamentos"
+                element={<Departamentos />}
               />
+              <Route path="/admin/helpdesk/motivos" element={<Motivos />} />
+              <Route
+                path="/admin/helpdesk/prioridades"
+                element={<Prioridades />}
+              />
+              <Route path="/admin/helpdesk/logs" element={<Logs />} />
+              <Route path="/admin/edit-user/:id" element={<UsersComponent />} />
               <Route path="/knowledge/admintools" element={<AdminTools />} />
             </Route>
           </Route>
