@@ -1,56 +1,148 @@
 // c:\react\Proyecto\frontend\src\components\Sidebar\index.jsx
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { MdSettings } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
-import { Container, Nav, Navbar, Button, Spinner, Alert } from "react-bootstrap"; // Added Spinner, Alert
+import { Container, Nav, Navbar, Button, Spinner } from "react-bootstrap"; 
 import PropTypes from 'prop-types';
+import linkData from "../../assets/routes"; 
+import { useUserRoles } from "../../hooks/useUserRoles";
 
-import linkData from "../../assets/routes"; // Data source for links
-import { useUserRoles } from "../../hooks/useUserRoles"; // Import the custom hook
-/**
- * Componente Sidebar - Barra lateral de navegación mejorada.
- * Muestra opciones de navegación filtradas por roles de usuario.
- * Incluye transiciones suaves y manejo de estado de carga/error.
- */
 const Sidebar = () => {
-  const { roles, isLoading, error } = useUserRoles(); // Use the custom hook
-  const [expandedParent, setExpandedParent] = useState(null);
+  const { roles, isLoading, error } = useUserRoles();
+  const [expandedParents, setExpandedParents] = useState({});
   const location = useLocation();
 
-  // Memoize filtered link data based on user roles
   const filteredLinkData = useMemo(() => {
-    if (isLoading || error) return []; // Don't filter until roles are loaded successfully
+    if (isLoading || error) return [];
 
-    return linkData
-      .map(parent => ({
-        ...parent,
-        // Filter children based on roles. Show if no roles defined or user has at least one required role.
-        children: parent.children?.filter(child =>
-          !child.roles || child.roles.length === 0 || child.roles.some(role => roles.includes(role))
-        )
-      }))
-      // Keep parent only if it has children after filtering OR if the parent itself is a direct link (optional)
-      .filter(parent => parent.children?.length > 0 || (!parent.children && parent.link)); // Adjust if parents can be direct links
+    const filterItems = (items) => {
+      return items
+        .map(item => {
+          const filteredItem = { ...item };
+          
+          if (item.children) {
+            filteredItem.children = filterItems(item.children);
+          }
+          
+          return filteredItem;
+        })
+        .filter(item => {
+          const hasRequiredRoles = !item.roles || item.roles.length === 0 || item.roles.some(role => roles.includes(role));
+          
+          const hasVisibleChildren = item.children && item.children.length > 0;
+          const isLink = !!item.link;
+          
+          return hasRequiredRoles && (hasVisibleChildren || isLink);
+        });
+    };
 
-  }, [roles, isLoading, error]); // Recalculate when roles, loading, or error changes
+    return filterItems(linkData);
+  }, [roles, isLoading, error]);
 
-  // Handle expand/collapse toggle
-  const toggleParent = (parentLabel) => {
-    setExpandedParent(prev => (prev === parentLabel ? null : parentLabel));
+  // Manejar expansión de menús
+  const toggleParent = (label, depth) => {
+    const key = `${depth}-${label}`;
+    setExpandedParents(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
   };
 
-  // Check if a link (or any child link) is active
-  const isParentActive = (parent) => {
-    // Check if parent link itself is active
-    if (parent.link && location.pathname.startsWith(parent.link)) {
-        return true;
+  // Verificar si un menú está expandido
+  const isExpanded = (label, depth) => {
+    return !!expandedParents[`${depth}-${label}`];
+  };
+
+  // Verificar si un ítem o sus hijos están activos
+  const isItemActive = (item) => {
+    if (item.link && location.pathname.startsWith(item.link)) {
+      return true;
     }
-    // Check if any child link is active
-    return parent.children?.some(child => location.pathname.startsWith(child.link)) ?? false;
+    
+    if (item.children) {
+      return item.children.some(child => isItemActive(child));
+    }
+    
+    return false;
   };
 
-  const isChildActive = (link) => location.pathname.startsWith(link);
+  // Componente recursivo para ítems de menú
+  const MenuItem = ({ item, depth = 0 }) => {
+    const hasChildren = item.children && item.children.length > 0;
+    const expanded = isExpanded(item.label, depth);
+    const active = isItemActive(item);
+    const key = `${depth}-${item.label}`;
+
+    return (
+      <div className="w-100 mb-1">
+        {/* Elemento principal - puede ser enlace o botón */}
+        {item.link && !hasChildren ? (
+          <Link
+            to={item.link}
+            className={clsx(
+              "sidebar-parent-button",
+              "w-100 d-flex gap-2 px-3 py-2 rounded align-items-center",
+              "text-decoration-none mb-1 text-start",
+              depth === 0 ? "text-dark fw-medium" : "text-dark",
+              active && "active"
+            )}
+            style={{ paddingLeft: `${1 + depth}rem` }}
+          >
+            {item.icon && <span className="fs-5">{item.icon}</span>}
+            <span className="fs-6">{item.label}</span>
+          </Link>
+        ) : (
+          <Button
+            variant="link"
+            className={clsx(
+              "sidebar-parent-button",
+              "w-100 d-flex gap-2 px-3 py-2 rounded align-items-center",
+              "text-decoration-none mb-1 text-start",
+              depth === 0 ? "text-dark fw-medium" : "text-dark",
+              active && "active"
+            )}
+            onClick={() => toggleParent(item.label, depth)}
+            aria-expanded={expanded}
+            aria-controls={`submenu-${key}`}
+            style={{ paddingLeft: `${1 + depth}rem` }}
+          >
+            {item.icon && <span className="fs-5">{item.icon}</span>}
+            <span className="fs-6">{item.label}</span>
+            {hasChildren && (
+              <span className="ms-auto transition-transform">
+                {expanded ? '⮝' : '⮟'}
+              </span>
+            )}
+          </Button>
+        )}
+
+        {/* Submenús con animación */}
+        {hasChildren && (
+          <div
+            id={`submenu-${key}`}
+            className={clsx(
+              "child-links",
+              expanded ? "child-links-expanded" : "child-links-collapsed"
+            )}
+            style={{
+              paddingLeft: `${depth}rem`
+            }}
+            role="menu"
+            aria-hidden={!expanded}
+          >
+            {item.children.map((child) => (
+              <MenuItem 
+                key={`${depth+1}-${child.label}`} 
+                item={child} 
+                depth={depth + 1} 
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Render loading state
   if (isLoading) {
@@ -63,36 +155,18 @@ const Sidebar = () => {
     );
   }
 
-  // Render error state
-  if (error) {
-      return (
-          <Container fluid className="h-100 p-3">
-              <Alert variant="danger">Error al cargar menú, inicia sesion nuevamente: {error}</Alert>
-          </Container>
-      );
-  }
-
-  // Render sidebar content
   return (
-    <Container fluid className="h-100 p-3 bg-light border-end"> {/* Added bg-light and border */}
-      <Navbar expand="lg" className=" flex-column h-100 align-items-stretch"> {/* Ensure Navbar stretches */}
-        <Nav className="flex-column flex-grow-1 w-100"> {/* Use w-100 */}
+    <Container fluid className="h-100 p-3 bg-light border-end sidebar-container">
+      <Navbar expand="lg" className="flex-column h-100 align-items-stretch">
+        <Nav className="flex-column flex-grow-1 w-100">
           {filteredLinkData.length === 0 && !isLoading && (
              <p className="text-muted text-center mt-3">No hay opciones de menú disponibles.</p>
           )}
 
           {filteredLinkData.map((parent) => (
-            <ParentMenuItem
-              key={parent.label}
-              parent={parent}
-              isExpanded={expandedParent === parent.label}
-              isActive={isParentActive(parent)}
-              toggleParent={toggleParent}
-              isChildActive={isChildActive} // Pass down for child highlighting
-            />
+            <MenuItem key={`0-${parent.label}`} item={parent} depth={0} />
           ))}
 
-          {/* Separator and Settings Section */}
           <div className="w-100 border-top pt-3 mt-auto">
             <SettingsButton isActive={location.pathname.startsWith('/settings')} />
           </div>
@@ -102,107 +176,18 @@ const Sidebar = () => {
   );
 };
 
-// --- Sub-Components ---
-
-const ParentMenuItem = ({ parent, isExpanded, isActive, toggleParent, isChildActive }) => (
-  <div className="w-100 mb-1"> {/* Use mb-1 for spacing */}
-    <Button
-      variant="link" // Use link variant for custom styling
-      className={clsx(
-        "sidebar-parent-button ", // Custom class for styling/hover
-        "w-100 d-flex gap-2 px-3 py-2 rounded align-items-center",
-        "text-decoration-none mb-1 text-start text-dark", // Base text color
-        isActive && "active" // Active class for highlighting
-      )}
-      onClick={() => toggleParent(parent.label)}
-      aria-expanded={isExpanded}
-      aria-controls={`submenu-${parent.label}`} // Accessibility
-    >
-      {parent.icon && <span className="fs-5">{parent.icon}</span>}
-      <span className="fs-6 fw-medium">{parent.label}</span> {/* Slightly bolder label */}
-      {/* Add dropdown indicator if it has children */}
-      {parent.children && parent.children.length > 0 && (
-         <span className="ms-auto"> {/* Push indicator to the right */}
-            {/* Simple chevron indicator - replace with icons if preferred */}
-            {isExpanded ? '⮝' : '⮟'}
-         </span>
-      )}
-    </Button>
-
-    {/* Conditionally render children with transitions */}
-    {parent.children && parent.children.length > 0 && (
-      <div
-        id={`submenu-${parent.label}`} // Match aria-controls
-        className={clsx("child-links", isExpanded && "child-links-expanded")}
-        role="menu"
-        aria-hidden={!isExpanded}
-      >
-        {parent.children.map((child, index) => (
-          <ChildMenuItem
-            key={child.label}
-            child={child}
-            index={index} // Keep index if needed for animation delay (though CSS handles fade-in now)
-            isActive={isChildActive(child.link)}
-          />
-        ))}
-      </div>
-    )}
-  </div>
-);
-
-ParentMenuItem.propTypes = {
-  parent: PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    icon: PropTypes.node,
-    link: PropTypes.string, // Parent might be a direct link
-    children: PropTypes.arrayOf(PropTypes.object)
-  }).isRequired,
-  isExpanded: PropTypes.bool.isRequired,
-  isActive: PropTypes.bool.isRequired,
-  toggleParent: PropTypes.func.isRequired,
-  isChildActive: PropTypes.func.isRequired,
-};
-
-const ChildMenuItem = ({ child, index, isActive }) => (
-  <Link
-    to={child.link}
-    className={clsx(
-      "child-link", // Custom class for styling/animation
-      "w-100 d-flex gap-2 px-3 py-2 rounded align-items-center mb-1", // Use mb-1
-      "text-decoration-none text-dark", // Base text color
-      isActive && "active" // Active class
-    )}
-    style={{ animationDelay: `${index * 0.03}s` }} // Subtle staggered fade-in
-    role="menuitem"
-  >
-    {child.icon && <span className="fs-5">{child.icon}</span>}
-    <span className="fs-6">{child.label}</span>
-  </Link>
-);
-
-ChildMenuItem.propTypes = {
-  child: PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      icon: PropTypes.node,
-      link: PropTypes.string.isRequired,
-      roles: PropTypes.arrayOf(PropTypes.string) // Keep roles info if needed elsewhere
-  }).isRequired,
-  index: PropTypes.number.isRequired,
-  isActive: PropTypes.bool.isRequired,
-};
-
-
+// SettingsButton (sin cambios)
 const SettingsButton = ({ isActive }) => (
   <Button
     variant="link"
     className={clsx(
-        "settings-button", // Custom class
+        "settings-button",
         "text-dark d-flex align-items-center gap-2 w-100 px-3 py-2 rounded",
         "text-decoration-none",
-        isActive && "active" // Apply active style if settings page is active
+        isActive && "active"
         )}
     as={Link}
-    to="/helpdesk/tasks" // Assuming settings route is /settings
+    to="/helpdesk/tasks"
   >
     <MdSettings className="fs-5" />
     <span className="fs-6 fw-medium">Configuración</span>
@@ -212,6 +197,5 @@ const SettingsButton = ({ isActive }) => (
 SettingsButton.propTypes = {
     isActive: PropTypes.bool.isRequired,
 };
-
 
 export default Sidebar;

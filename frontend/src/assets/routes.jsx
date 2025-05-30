@@ -17,6 +17,7 @@ import {
 } from "react-icons/md";
 import { PiFolderSimpleUser } from "react-icons/pi";
 import { MdAdminPanelSettings } from "react-icons/md";
+import { BiDetail } from "react-icons/bi";
 
 const linkData = [
   {
@@ -109,24 +110,12 @@ const linkData = [
     children: [
       {
         label: "Helpdesk",
-        icon: <MdSupportAgent />,  // Nuevo icono para la subsección
-        children: [  // Cambiar de 'helpdesk' a 'children'
+        icon: <MdSupportAgent />,
+        children: [ 
           {
             label: "Usuarios",
             link: "/admin/helpdesk/users",
             icon: <FaUsers />,
-            roles: ["ROLE_ADMIN"]
-          },
-          {
-            label: "Incidencias",
-            link: "/admin/helpdesk/incidencias",
-            icon: <FaFileAlt />,
-            roles: ["ROLE_ADMIN"]
-          },
-          {
-            label: "Prioridades",
-            link: "/admin/helpdesk/prioridades",
-            icon: <MdOutlinePendingActions />,
             roles: ["ROLE_ADMIN"]
           },
           {
@@ -136,8 +125,26 @@ const linkData = [
             roles: ["ROLE_ADMIN"]
           },
           {
-            label: "Sistema",
-            link: "/admin/helpdesk/sistemas",
+            label: "Prioridades",
+            link: "/admin/helpdesk/prioridades",
+            icon: <MdOutlinePendingActions />,
+            roles: ["ROLE_ADMIN"]
+          },
+          {
+            label: "Motivos",
+            link: "/admin/helpdesk/motivos",
+            icon: <BiDetail />,
+            roles: ["ROLE_ADMIN"]
+          },
+          {
+            label: "Incidencias",
+            link: "/admin/helpdesk/incidencias",
+            icon: <FaFileAlt />,
+            roles: ["ROLE_ADMIN"]
+          },
+          {
+            label: "Logs",
+            link: "/admin/helpdesk/logs",
             icon: <MdSettings />,
             roles: ["ROLE_ADMIN"]
           }
@@ -145,8 +152,8 @@ const linkData = [
       },
       {
         label: "Gestión Documental",
-        icon: <PiFolderSimpleUser />,  // Nuevo icono
-        children: [  // Cambiar de 'helpdesk' a 'children'
+        icon: <PiFolderSimpleUser />,  
+        children: [ 
           {
             label: "Gestión doc",
             link: "/admin/gestion/gestion",

@@ -235,12 +235,12 @@ export default function CreateTicket({ open, setOpen, refreshTickets, ticket}) {
         fechaVencimiento: data.fechaVencimiento,
         descripcion: data.descripcion,
         usuarioCreador: usuarioCreador,// Usar el ID del usuario creador obtenido
-        usuarioAsignado: data.usuarioAsignado,
-        departamento: data.departamento,
+        usuarioAsignado: parseInt(data.usuarioAsignado),
+        departamento: parseInt(data.departamento),
         fuente: 1,// Asumimos fuente fija por ahora
         incidencia: parseInt(data.incidencia),
         motivo: parseInt(data.motivo),
-        estado: 3,
+        estado: 1,
         prioridad: parseInt(data.prioridad),
       };
       console.log("Enviando datos del Ticket:", ticketData);

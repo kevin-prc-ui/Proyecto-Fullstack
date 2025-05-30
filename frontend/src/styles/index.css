@@ -470,3 +470,41 @@ h1 {
   -webkit-box-orient: vertical;
 }
 
+/* Animaciones para el sidebar */
+.child-links {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: 
+    max-height 0.4s ease-in-out, 
+    opacity 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+}
+
+.child-links-expanded {
+  max-height: 1000px; /* Valor suficientemente alto */
+  opacity: 1;
+  transform: translateY(0);
+  transition: 
+    max-height 0.5s ease-in-out, 
+    opacity 0.4s ease-in-out 0.1s,
+    transform 0.4s ease-in-out 0.1s;
+}
+
+.child-links-collapsed {
+  transition: 
+    max-height 0.4s ease-in-out 0.1s, 
+    opacity 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+}
+
+/* Transiciones más suaves */
+.sidebar-parent-button {
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.sidebar-parent-button:hover {
+  background-color: #e9ecef;
+  transform: translateX(2px);
+}

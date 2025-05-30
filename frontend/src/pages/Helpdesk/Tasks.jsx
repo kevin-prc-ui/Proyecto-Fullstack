@@ -41,8 +41,9 @@ const TABS = [
 const Tasks = () => {
     const [openDialog, setOpenDialog] = useState(false);
   
-  const navigate = useNavigate();
   const params = useParams();
+  console.log(params);
+  
   const isAuth = localStorage.getItem("authToken"); // Verifica si el usuario está autenticado
 
   /**
