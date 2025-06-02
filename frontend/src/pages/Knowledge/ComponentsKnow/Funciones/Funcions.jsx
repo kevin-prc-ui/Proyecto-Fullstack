@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { createMisArchivo, createCarpeta, getAllCarpetas } from '../../../../services/MisArchivosService';
+import { useState, useEffect } from 'react';
+import {
+  createCarpeta,
+  getAllCarpetas,
+  uploadArchivo
+} from '../../../../services/MisArchivosService';
 
 export const useFileManager = () => {
   const [items, setItems] = useState([]);
@@ -11,40 +15,36 @@ export const useFileManager = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
+  // Guardar favoritos en localStorage
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
 
+  // ✅ Subida de archivo usando servicio
   const handleFileUpload = async (file) => {
-    const archivoDto = {
-      nombre: file.name,
-      tipo: file.type.includes('pdf') ? 'pdf' : 'image',
-      tamaño: file.size,
-      fechaSubida: new Date().toISOString(),
-      carpetaId: currentFolder, // ID de carpeta padre actual
-    };
-
     try {
-      const response = await createMisArchivo(archivoDto);
+      const response = await uploadArchivo(file, currentFolder);
+      const data = response.data;
 
       const newItem = {
-        id: response.data.id, // ID generado por el backend
+        id: data.id,
         type: 'file',
         fileObject: file,
-        name: response.data.nombre,
-        fileType: response.data.tipo,
+        name: data.nombre,
+        fileType: data.tipo,
         size: (file.size / 1024).toFixed(2) + ' KB',
-        date: new Date(response.data.fechaSubida).toLocaleDateString(),
+        date: new Date(data.fechaSubida).toLocaleDateString(),
         parentId: currentFolder,
         isFavorite: false,
       };
 
       setItems(prev => [...prev, newItem]);
     } catch (error) {
-      console.error('Error al guardar el archivo en el backend:', error);
+      console.error('Error al subir archivo:', error);
     }
   };
 
+  // ✅ Crear carpeta
   const handleCreateFolder = async (folderName) => {
     const carpetaDto = {
       nombre: folderName,
@@ -55,49 +55,55 @@ export const useFileManager = () => {
       const response = await createCarpeta(carpetaDto);
       const nuevaCarpeta = response.data;
 
-      setItems(prev => [...prev, {
-        ...nuevaCarpeta,
-        type: 'folder',
-        name: nuevaCarpeta.nombre,
-        date: new Date(nuevaCarpeta.fechaCreacion).toLocaleDateString(),
-      }]);
+      setItems(prev => [
+        ...prev,
+        {
+          id: nuevaCarpeta.id,
+          type: 'folder',
+          name: nuevaCarpeta.nombre,
+          date: new Date(nuevaCarpeta.fechaCreacion).toLocaleDateString(),
+          parentId: nuevaCarpeta.carpetaPadreId,
+        }
+      ]);
     } catch (error) {
-      console.error("Error al guardar la carpeta en el backend:", error);
+      console.error("Error al crear carpeta:", error);
     }
   };
 
+  // ✅ Obtener carpetas al montar
   useEffect(() => {
-    // Cargar carpetas del backend al iniciar y reemplazar items
     const fetchCarpetas = async () => {
       try {
         const response = await getAllCarpetas();
-        const carpetasBackend = response.data.map(carpeta => ({
-          id: carpeta.id,
+        const carpetas = response.data.map(c => ({
+          id: c.id,
           type: 'folder',
-          name: carpeta.nombre,
-          date: new Date(carpeta.fechaCreacion).toLocaleDateString(),
-          parentId: carpeta.carpetaPadreId,
+          name: c.nombre,
+          date: new Date(c.fechaCreacion).toLocaleDateString(),
+          parentId: c.carpetaPadreId,
         }));
-        setItems(carpetasBackend); // Reemplaza el estado, no acumula
+        setItems(carpetas);
       } catch (error) {
-        console.error("Error al obtener carpetas:", error);
+        console.error("Error al cargar carpetas:", error);
       }
     };
 
     fetchCarpetas();
   }, []);
 
+  // ✅ Favoritos
   const toggleFavorite = (itemId) => {
-    setFavorites(prev => {
-      const newFavorites = prev.includes(itemId)
+    setFavorites(prev =>
+      prev.includes(itemId)
         ? prev.filter(id => id !== itemId)
-        : [...prev, itemId];
-      return newFavorites;
-    });
+        : [...prev, itemId]
+    );
 
-    setItems(prev => prev.map(item =>
-      item.id === itemId ? { ...item, isFavorite: !item.isFavorite } : item
-    ));
+    setItems(prev =>
+      prev.map(item =>
+        item.id === itemId ? { ...item, isFavorite: !item.isFavorite } : item
+      )
+    );
   };
 
   const handleRemoveItem = (id) => {
@@ -113,14 +119,13 @@ export const useFileManager = () => {
     setCurrentFolder(null);
   };
 
+  // ✅ Filtrado
   const getFilteredItems = () => {
-    const currentItems = items.filter(item => {
-      if (currentFolder === null) {
-        return item.parentId == null; // Mostrar solo items raíz
-      }
-      // Asegurar que coincidan como string para evitar problemas de tipo
-      return String(item.parentId) === String(currentFolder);
-    });
+    const currentItems = items.filter(item =>
+      currentFolder === null
+        ? item.parentId == null
+        : String(item.parentId) === String(currentFolder)
+    );
 
     switch (currentFilter) {
       case 'favorites':

@@ -1,14 +1,24 @@
 package com.webserdi.backend.controller;
 
-
 import com.webserdi.backend.dto.ArchivoDto;
 import com.webserdi.backend.entity.Archivo;
+import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.service.ArchivoService;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import com.webserdi.backend.repository.ArchivoRepository;
 
+
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -17,11 +27,22 @@ import java.util.List;
 public class ArchivoController {
 
     private final ArchivoService archivoService;
-
+    private final ArchivoRepository archivoRepository;
+    // Guardar metadatos del archivo
     @PostMapping
     public ResponseEntity<ArchivoDto> createArchivo(@RequestBody ArchivoDto archivoDto) {
         ArchivoDto createdArchivo = archivoService.createArchivo(archivoDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdArchivo);
+    }
+
+    // Subir archivo físico + metadatos
+    @PostMapping("/upload")
+    public ResponseEntity<ArchivoDto> subirArchivoConContenido(
+            @RequestParam("archivo") MultipartFile archivo,
+            @RequestParam(value = "carpetaId", required = false) Long carpetaId) {
+
+        ArchivoDto archivoDto = archivoService.guardarArchivoConContenido(archivo, carpetaId);
+        return new ResponseEntity<>(archivoDto, HttpStatus.CREATED);
     }
 
     @GetMapping("/{archivoId}")
@@ -29,12 +50,18 @@ public class ArchivoController {
         ArchivoDto archivoDto = archivoService.getArchivoById(archivoId);
         return ResponseEntity.ok(archivoDto);
     }
+    @GetMapping("/carpeta/{carpetaId}")
+    public ResponseEntity<List<ArchivoDto>> listarArchivosPorCarpeta(@PathVariable Long carpetaId) {
+        List<ArchivoDto> archivos = archivoService.getArchivosPorCarpeta(carpetaId);
+        return ResponseEntity.ok(archivos);
+    }
 
     @GetMapping
     public ResponseEntity<List<ArchivoDto>> getAllArchivos() {
         List<ArchivoDto> archivos = archivoService.getAllArchivos();
         return ResponseEntity.ok(archivos);
     }
+
 
     @PutMapping("/{archivoId}")
     public ResponseEntity<ArchivoDto> updateArchivo(@PathVariable Long archivoId, @RequestBody ArchivoDto archivoDto) {
@@ -47,4 +74,30 @@ public class ArchivoController {
         archivoService.deleteArchivo(archivoId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/ver/{id}")
+    public ResponseEntity<Resource> verArchivo(@PathVariable Long id) {
+        Archivo archivo = archivoRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Archivo no encontrado"));
+
+        try {
+            Path path = Paths.get(archivo.getRuta());
+            Resource recurso = new UrlResource(path.toUri());
+
+            if (!recurso.exists() || !recurso.isReadable()) {
+                throw new RuntimeException("No se puede leer el archivo");
+            }
+
+            String contentType = archivo.getTipo();
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + archivo.getNombre() + "\"")
+                    .body(recurso);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error al leer el archivo: " + e.getMessage());
+        }
+    }
+
 }

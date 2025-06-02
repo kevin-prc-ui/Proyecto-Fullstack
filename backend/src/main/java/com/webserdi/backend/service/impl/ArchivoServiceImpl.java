@@ -11,7 +11,15 @@ import com.webserdi.backend.service.ArchivoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +31,8 @@ public class ArchivoServiceImpl implements ArchivoService {
     private final ArchivoRepository archivoRepository;
     private final ArchivoMapper archivoMapper;
     private final CarpetaRepository carpetaRepository;
+
+    private static final String UPLOAD_DIR = "uploads/";
 
     @Override
     public ArchivoDto createArchivo(ArchivoDto archivoDto) {
@@ -40,10 +50,59 @@ public class ArchivoServiceImpl implements ArchivoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Carpeta no encontrada con id: " + archivoDto.getCarpetaId()));
 
         Archivo archivo = archivoMapper.toEntity(archivoDto);
-        archivo.setCarpeta(carpeta); // asignar carpeta encontrada
+        archivo.setCarpeta(carpeta);
         archivo = archivoRepository.save(archivo);
 
         return archivoMapper.toDto(archivo);
+    }
+
+    @Override
+    public ArchivoDto guardarArchivoConContenido(MultipartFile archivoMultipart, Long carpetaId) {
+        if (archivoMultipart == null || archivoMultipart.isEmpty()) {
+            throw new IllegalArgumentException("El archivo está vacío o es nulo.");
+        }
+
+        Carpeta carpeta = carpetaRepository.findById(carpetaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Carpeta no encontrada con id: " + carpetaId));
+
+        try {
+            // Crear carpeta física si no existe
+            String rutaBase = "uploads/";
+            String rutaCarpeta = rutaBase + "carpeta_" + carpetaId;
+            File directorio = new File(rutaCarpeta);
+            if (!directorio.exists()) {
+                directorio.mkdirs();
+            }
+
+            // Guardar archivo físico
+            String rutaCompleta = rutaCarpeta + "/" + archivoMultipart.getOriginalFilename();
+            Path pathDestino = Paths.get(rutaCompleta);
+            Files.copy(archivoMultipart.getInputStream(), pathDestino, StandardCopyOption.REPLACE_EXISTING);
+
+            // Guardar metadatos en BD
+            Archivo archivo = new Archivo();
+            archivo.setNombre(archivoMultipart.getOriginalFilename());
+            archivo.setTipo(archivoMultipart.getContentType());
+            archivo.setTamaño(archivoMultipart.getSize());
+            archivo.setFechaSubida(LocalDateTime.now());
+            archivo.setRuta(rutaCompleta); // <-- Agrega este campo en la entidad
+            archivo.setCarpeta(carpeta);
+
+            archivo = archivoRepository.save(archivo);
+
+            return archivoMapper.toDto(archivo);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error al guardar el archivo: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<ArchivoDto> getArchivosPorCarpeta(Long carpetaId) {
+        List<Archivo> archivos = archivoRepository.findByCarpetaId(carpetaId);
+        return archivos.stream()
+                .map(archivoMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -71,7 +130,6 @@ public class ArchivoServiceImpl implements ArchivoService {
 
         archivo.setNombre(archivoDto.getNombre().trim());
 
-        // Actualiza la carpeta si se proporciona una diferente
         if (archivoDto.getCarpetaId() != null && !archivoDto.getCarpetaId().equals(archivo.getCarpeta().getId())) {
             Carpeta nuevaCarpeta = carpetaRepository.findById(archivoDto.getCarpetaId())
                     .orElseThrow(() -> new ResourceNotFoundException("Carpeta no encontrada con id: " + archivoDto.getCarpetaId()));

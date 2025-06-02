@@ -1,46 +1,59 @@
 import axios from "axios";
 
-const REST_API_BASE_URL = "http://localhost:8080/api"; // Update the base URL
-// Helper function to get the token from localStorage
+const REST_API_BASE_URL = "http://localhost:8080/api";
+
+// Obtener token del localStorage
 const token = () => localStorage.getItem("authToken");
-// Basic check if token exists and is valid JSON before parsing
+
 const getAuthToken = () => {
   const storedToken = token();
-  if (storedToken) {
-    try {
-      const parsedToken = JSON.parse(storedToken);
-      return parsedToken?.accessToken; // Use optional chaining
-    } catch (e) {
-      console.error("Error parsing auth token from localStorage", e);
-      return null; // Handle parsing error
-    }
+  try {
+    return storedToken ? JSON.parse(storedToken)?.accessToken : null;
+  } catch (e) {
+    console.error("Error parsing auth token:", e);
+    return null;
   }
-  return null; // Handle case where token doesn't exist
 };
 
 const getHeaders = () => {
   const accessToken = getAuthToken();
-  if (!accessToken) {
-    // Handle case where token is not available, maybe redirect to login or throw error
-    console.warn("No access token found for API request.");
-    // Depending on your app's logic, you might want to throw an error
-    // or return empty headers, which will likely cause the API call to fail (401/403)
-    return {};
-  }
-  
-  return {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  };
-}
-
-export const getMisArchivos = () => axios.get(`${REST_API_BASE_URL}/mis-archivos/`, getHeaders());
-export const getMisArchivosById = (id) => axios.get(`${REST_API_BASE_URL}/mis-archivos/${id}`, getHeaders());
-
-export const createMisArchivo = (archivoDto) => axios.post(`${REST_API_BASE_URL}/mis-archivos/save`, archivoDto, getHeaders());
-export const createCarpeta = async (carpetaDto) => {
-  const response = await axios.post(`${REST_API_BASE_URL}/carpetas`, carpetaDto, getHeaders());
-  return response;
+  return accessToken
+    ? { headers: { Authorization: `Bearer ${accessToken}` } }
+    : {};
 };
-export const getAllCarpetas = () => axios.get(`${REST_API_BASE_URL}/carpetas`, getHeaders());
+
+// === Endpoints ===
+export const getArchivoUrl = (id) =>
+  `${REST_API_BASE_URL}/archivos/download/${id}`;
+
+export const getMisArchivos = () =>
+  axios.get(`${REST_API_BASE_URL}/mis-archivos/`, getHeaders());
+
+export const getMisArchivosById = (id) =>
+  axios.get(`${REST_API_BASE_URL}/mis-archivos/${id}`, getHeaders());
+
+export const createMisArchivo = (archivoDto) =>
+  axios.post(`${REST_API_BASE_URL}/mis-archivos/save`, archivoDto, getHeaders());
+
+export const createCarpeta = (carpetaDto) =>
+  axios.post(`${REST_API_BASE_URL}/carpetas`, carpetaDto, getHeaders());
+
+export const getAllCarpetas = () =>
+  axios.get(`${REST_API_BASE_URL}/carpetas`, getHeaders());
+
+// ✅ Nuevo método para subir archivos binarios
+export const uploadArchivo = (file, carpetaId) => {
+  const formData = new FormData();
+  formData.append("archivo", file);
+  if (carpetaId) {
+    formData.append("carpetaId", carpetaId);
+  }
+
+  
+  return axios.post(`${REST_API_BASE_URL}/archivos/upload`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${getAuthToken()}`
+    }
+  });
+};

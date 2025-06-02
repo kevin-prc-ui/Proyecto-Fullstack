@@ -1,6 +1,8 @@
 package com.webserdi.backend.service;
 
 import com.webserdi.backend.dto.ArchivoDto;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 public interface ArchivoService {
@@ -9,4 +11,6 @@ public interface ArchivoService {
     List<ArchivoDto> getAllArchivos();         // no carpetas, sino archivos
     ArchivoDto updateArchivo(Long archivoId, ArchivoDto archivoDto);
     void deleteArchivo(Long archivoId);        // minúscula en el parámetro
+    List<ArchivoDto> getArchivosPorCarpeta(Long carpetaId);
+    ArchivoDto guardarArchivoConContenido(MultipartFile archivo, Long carpetaId);
 }
