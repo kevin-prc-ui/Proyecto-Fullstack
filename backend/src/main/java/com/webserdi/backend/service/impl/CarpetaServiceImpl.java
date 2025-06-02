@@ -24,6 +24,14 @@ public class CarpetaServiceImpl implements CarpetaService {
     @Override
     public CarpetaDto createCarpeta(CarpetaDto carpetaDto) {
         Carpeta carpeta = carpetaMapper.toEntity(carpetaDto);
+
+        // Aquí se resuelve la carpeta padre si se proporcionó el ID
+        if (carpetaDto.getCarpetaPadreId() != null) {
+            Carpeta carpetaPadre = carpetaRepository.findById(carpetaDto.getCarpetaPadreId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Carpeta padre no encontrada con ID: " + carpetaDto.getCarpetaPadreId()));
+            carpeta.setCarpetaPadre(carpetaPadre);
+        }
+
         carpeta = carpetaRepository.save(carpeta);
         return carpetaMapper.toDto(carpeta);
     }

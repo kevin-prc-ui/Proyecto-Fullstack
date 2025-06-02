@@ -43,3 +43,4 @@ export const createCarpeta = async (carpetaDto) => {
   const response = await axios.post(`${REST_API_BASE_URL}/carpetas`, carpetaDto, getHeaders());
   return response;
 };
+export const getAllCarpetas = () => axios.get(`${REST_API_BASE_URL}/carpetas`, getHeaders());
