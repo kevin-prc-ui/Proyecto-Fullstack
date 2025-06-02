@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { createMisArchivo, createCarpeta } from '../../../../services/MisArchivosService';
+
 
 export const useFileManager = () => {
   const [items, setItems] = useState([]);
@@ -14,31 +16,58 @@ export const useFileManager = () => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
 
-  const handleFileUpload = (file) => {
-    const newItem = {
-      id: Date.now(),
-      type: 'file',
-      fileObject: file,
-      name: file.name,
-      fileType: file.type.includes('pdf') ? 'pdf' : 'image',
-      size: (file.size / 1024).toFixed(2) + ' KB',
-      date: new Date().toLocaleDateString(),
-      parentId: currentFolder,
-      isFavorite: favorites.includes(Date.now())
-    };
-    setItems(prev => [...prev, newItem]);
+const handleFileUpload = async (file) => {
+  const archivoDto = {
+    nombre: file.name,
+    tipo: file.type.includes('pdf') ? 'pdf' : 'image',
+    tamaño: file.size,
+    fechaSubida: new Date().toISOString(),
+    carpetaId: currentFolder, // Asumiendo que lo estás usando como parentId
   };
 
-  const handleCreateFolder = (folderName) => {
-    const newFolder = {
-      id: Date.now(),
-      type: 'folder',
-      name: folderName,
-      date: new Date().toLocaleDateString(),
-      parentId: currentFolder
+  try {
+    const response = await createMisArchivo(archivoDto);
+
+    const newItem = {
+      id: response.data.id, // ID generado por la base de datos
+      type: 'file',
+      fileObject: file,
+      name: response.data.nombre,
+      fileType: response.data.tipo,
+      size: (file.size / 1024).toFixed(2) + ' KB',
+      date: new Date(response.data.fechaSubida).toLocaleDateString(),
+      parentId: currentFolder,
+      isFavorite: false
     };
-    setItems(prev => [...prev, newFolder]);
+
+    setItems(prev => [...prev, newItem]);
+
+  } catch (error) {
+    console.error('Error al guardar el archivo en el backend:', error);
+  }
+};
+
+const handleCreateFolder = async (folderName) => {
+  const carpetaDto = {
+    nombre: folderName,
+    carpetaPadreId: currentFolder
   };
+
+  try {
+    const response = await createCarpeta(carpetaDto);
+    const nuevaCarpeta = response.data;
+
+    setItems(prev => [...prev, {
+      ...nuevaCarpeta,
+      type: 'folder',
+      name: nuevaCarpeta.nombre,
+      date: new Date(nuevaCarpeta.fechaCreacion).toLocaleDateString()
+    }]);
+  } catch (error) {
+    console.error("Error al guardar la carpeta en el backend:", error);
+  }
+};
+
 
   const toggleFavorite = (itemId) => {
     setFavorites(prev => {
