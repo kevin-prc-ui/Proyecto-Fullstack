@@ -1,0 +1,12 @@
+package com.webserdi.backend.service;
+
+import com.webserdi.backend.dto.ArchivoDto;
+import java.util.List;
+
+public interface ArchivoService {
+    ArchivoDto createArchivo(ArchivoDto archivoDto);
+    ArchivoDto getArchivoById(Long archivoId); // nombre consistente con la implementación
+    List<ArchivoDto> getAllArchivos();         // no carpetas, sino archivos
+    ArchivoDto updateArchivo(Long archivoId, ArchivoDto archivoDto);
+    void deleteArchivo(Long archivoId);        // minúscula en el parámetro
+}

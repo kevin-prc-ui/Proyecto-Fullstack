@@ -16,8 +16,9 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     priority: 'Medium',
     description: '',
     usuariosCreadores:  '',
-    usuariosAsignados: '',
-    approvalPercentage: '',
+    usuariosAsignados: [],
+    reviewers: [],
+    approvalPercentage: '70',
     items: [],
     sendNotifications: true
   });
@@ -33,11 +34,19 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
   });
 
   // Si se está editando una tarea existente, precargar los datos
-  useEffect(() => {
-    if (taskToEdit) {
-      setFormData(taskToEdit);
-    }
-  }, [taskToEdit]);
+useEffect(() => {
+  if (taskToEdit) {
+    setFormData({
+      ...taskToEdit,
+      usuariosAsignados: Array.isArray(taskToEdit.usuariosAsignados) 
+        ? taskToEdit.usuariosAsignados 
+        : [taskToEdit.usuariosAsignados].filter(Boolean),
+      reviewers: Array.isArray(taskToEdit.reviewers) 
+        ? taskToEdit.reviewers 
+        : [taskToEdit.reviewers].filter(Boolean)
+    });
+  }
+}, [taskToEdit]);
 
   // Toggle para expandir o contraer las secciones del formulario
   const toggleSection = (section) => {
@@ -58,7 +67,9 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
 
   // Manejador para selects múltiples (asignados, revisores)
   const handleMultiSelect = (e, field) => {
-    const selected = Array.from(e.target.selectedOptions, opt => parseInt(opt.value));
+    const selected = Array.from(e.target.selectedOptions, opt => 
+      parseInt(opt.value) || opt.value // Convierte a número o mantiene string
+    );
     setFormData(prev => ({ ...prev, [field]: selected }));
   };
 
@@ -251,7 +262,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                             className="form-select"
                             multiple
                             size="4"
-                            value={formData.usuariosCreadores}
+                            value={formData.reviewers || []}
                             onChange={(e) => handleMultiSelect(e, 'reviewers')}
                             required
                           >
