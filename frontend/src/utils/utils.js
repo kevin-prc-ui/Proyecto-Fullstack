@@ -2,8 +2,6 @@
  * Archivo de utilidades que contiene funciones y constantes compartidas
  */
 
-import { listRol } from "../services/RolService";
-
 /**
  * Formatea el rol del usuario para mostrar un nombre legible.
  * @param {string} rolId - ID del rol del usuario.
@@ -12,9 +10,11 @@ import { listRol } from "../services/RolService";
 export const formatUserRole = (rolId) => {
     switch (rolId) {
     case 1:
-        return "ROLE_ADMIN";
+        return "ADMIN";
     case 2:
-        return "ROLE_USER";
+        return "USER";
+    case 3:
+        return "AGENTE";
     default:
         return "Desconocido";
     }

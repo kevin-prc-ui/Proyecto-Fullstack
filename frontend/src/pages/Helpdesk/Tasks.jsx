@@ -220,7 +220,6 @@ const Tasks = () => {
   const handleCreateTicket = () => {
     toast.info("Creando ticket...");
     setOpenDialog(true);
-    // navigate("/create-ticket"); // Or your çctual route for creating a ticket
   };
   // --- End Navigation Handler ---
 

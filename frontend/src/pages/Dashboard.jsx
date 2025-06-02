@@ -5,10 +5,14 @@ import {
 } from "@azure/msal-react";
 import { TbBulb } from "react-icons/tb";
 import { LiaUserAstronautSolid } from "react-icons/lia";
-import { Transition } from "@headlessui/react";
+import { Button, Transition } from "@headlessui/react";
 import { FaRegHandPeace, FaUserPlus, FaSignInAlt } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UseLoginHandler } from "../components/MicrosoftAuth/ButtonHandler";
+import { useState } from "react";
+import CreateTicket from "../components/Ticket/CreateTicket";
+import { getUserRoles } from "../services/UsuarioService";
+import { useUserRoles } from "../hooks/useUserRoles";
 
 const Dashboard = () => {
   return (
@@ -26,7 +30,6 @@ const Dashboard = () => {
 };
 const AuthPrompt = () => {
   const { handleLogin } = UseLoginHandler();
-
   return (
     <>
       <Transition
@@ -85,6 +88,15 @@ const AuthPrompt = () => {
   );
 };
 const ProfileContent = () => {
+  const [openDialog, setOpenDialog] = useState(false);
+  
+
+  // --- Navigation Handler for Create Ticket ---
+
+  const handleCreateTicket = () => {
+    setOpenDialog(true);
+  };
+  // --- End Navigation Handler ---
   return (
     <>
       <div className="flex flex-row justify-content-evenly items-center">
@@ -93,8 +105,8 @@ const ProfileContent = () => {
       </div>
 
       <div className="flex flex-row justify-content-evenly items-center">
-        <a
-          href="/helpdesk/tasks"
+        <Button
+          onClick={handleCreateTicket}
           className="flex w-96 min-h-30 h-fit bg-white m-2 p-1 justify-center rounded text-decoration-none text-black"
         >
           <div className="flex flex-row w-90 row-auto">
@@ -108,7 +120,7 @@ const ProfileContent = () => {
               </div>
             </div>
           </div>
-        </a>
+        </Button>
         <a
           href="/knowledge/home"
           className="flex w-96 min-h-30 h-fit bg-white m-2 p-1 justify-center rounded text-decoration-none text-black"
@@ -125,6 +137,7 @@ const ProfileContent = () => {
             </div>
           </div>
         </a>
+        <CreateTicket open={openDialog} setOpen={setOpenDialog} />
       </div>
     </>
   );

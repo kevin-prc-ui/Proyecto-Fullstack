@@ -84,9 +84,9 @@ export const logout = () =>
   // and getHeaders() as the config (third argument).
   axios.post(`${REST_API_BASE_URL}/auth/logout`, getHeaders());
 
-export const getUserRoles = (email) => {
+export const getUserRoles = () => {
   return axios
-    .get(`${REST_API_BASE_URL}/users/email/roles?email=${email}`, getHeaders())
+    .get(`${REST_API_BASE_URL}/users/email/roles`, getHeaders())
     .then((response) => response)
     .catch((error) => {
       if (!error.response) {

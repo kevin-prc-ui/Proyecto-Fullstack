@@ -1,5 +1,10 @@
 import { toast } from "sonner";
-import { login, logout, postIp } from "../../services/UsuarioService";
+import {
+  getUserRoles,
+  login,
+  logout,
+  postIp,
+} from "../../services/UsuarioService";
 import { callMsGraph } from "../../graph";
 import { loginRequest } from "../../services/authConfig";
 import { useNavigate } from "react-router-dom";
@@ -23,17 +28,26 @@ export const UseLoginHandler = () => {
     // 3. Login en tu backend
     const respuesta = await login(loginData);
     localStorage.setItem("authToken", JSON.stringify(respuesta.data));
-    console.log(respuesta.status);
+    const roles = await getUserRoles();
 
     // 4. Postear Ip en backend
     const ipResponse = await fetch("https://api.ipify.org/?format=json");
     const data = await ipResponse.json();
     postIp(data);
-
     // 5. Manejar éxito
     toast.success("Sesión iniciada correctamente");
-    navigate("/dashboard");
+
+    const userRoles = roles.data || [];
+    console.log(userRoles);
+
+    if (userRoles.includes("ROLE_ADMIN") || userRoles.includes("ROLE_AGENTE")) {
+      navigate("/helpdesk/tasks");
+    }
+    else {
+      navigate("/dashboard");
+    }
   };
+
   return { handleLogin };
 };
 

@@ -30,11 +30,9 @@ const Sidebar = () => {
           return filteredItem;
         })
         .filter(item => {
-          const hasRequiredRoles = !item.roles || item.roles.length === 0 || item.roles.some(role => roles.includes(role));
-
+          const hasRequiredRoles = !item.roles || item.roles.length === 0 || item.roles.some(role => roles.includes(role));          
           const hasVisibleChildren = item.children && item.children.length > 0;
           const isLink = !!item.link;
-
           return hasRequiredRoles && (hasVisibleChildren || isLink);
         });
     };

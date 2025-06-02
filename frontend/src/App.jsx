@@ -66,87 +66,70 @@ function Layout() {
 }
 
 function App() {
-  const isAuthenticated = localStorage.getItem("authToken");
+  return (
+    <main className="w-full min-h-screen bg-[#e7ebf3]">
+      <Routes>
+        <Route index path="/" element={<Navigate to="/dashboard" replace />} />
 
-  if (!isAuthenticated)
-    return (
-      <main className="w-full min-h-screen bg-[#e7ebf3] ">
-        {/* Rutas públicas */}
-        <Routes>
-          <Route index path="/" element={<Navigate to="/dashboard" />} />
+        {/* Rutas públicas o que manejan su propia lógica de autenticación (como Dashboard) */}
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/signup" element={<MicrosoftSignUp />} />
+        </Route>
+
+        {/* Rutas protegidas generales (Helpdesk, Knowledge) */}
+        {/* Ajusta allowedRoles según sea necesario. ROLE_USER podría necesitar acceso a /knowledge/home, etc. */}
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={["ROLE_USER", "ROLE_ADMIN", "ROLE_HELPDESK", "ROLE_AGENT"]}
+            />
+          }
+        >
           <Route element={<Layout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/signup" element={<MicrosoftSignUp />} />
-            <Route path="/notfound" element={<NotFound />} />
-            <Route path="*" element={<Navigate to="/dashboard" />} />
+            <Route path="/helpdesk/tasks" element={<Tasks />} />
+            <Route path="/helpdesk/completados/:estado" element={<Tasks />} />
+            <Route path="/helpdesk/en-proceso/:estado" element={<Tasks />} />
+            <Route path="/helpdesk/pendientes/:estado" element={<Tasks />} />
+            <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
+            <Route path="/helpdesk/trash" element={<Trash />} />
+            
+            <Route path="/knowledge/home" element={<Home />} />
+            <Route path="/knowledge/myfile" element={<MyFile />} />
+            <Route path="/knowledge/sharedfile" element={<SharedFile />} />
+            <Route path="/knowledge/sites" element={<Sites />} />
+            <Route path="/knowledge/task" element={<Task />} />
+            <Route path="/knowledge/people" element={<People />} />
+            <Route path="/knowledge/repository" element={<Repository />} />
+            {/* Considera si /knowledge/admintools es solo para admin y muévelo si es así */}
           </Route>
-        </Routes>
-      </main>
-    );
-  else
-    return (
-      <main className="w-full min-h-screen bg-[#e7ebf3] ">
-        <Routes>
-          <Route index path="/" element={<Navigate to="/dashboard" />} />
-          {/* Rutas públicas */}
+        </Route>
+
+        {/* Rutas protegidas específicas para Administradores */}
+        <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
           <Route element={<Layout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/signup" element={<MicrosoftSignUp />} />
+            <Route path="/admin/helpdesk/users" element={<Users />} />
+            <Route path="/admin/add-user" element={<UsersComponent />} />
+            <Route path="/admin/edit-user/:id" element={<UsersComponent />} />
+            <Route path="/admin/helpdesk/incidencias" element={<Incidencias />} />
+            <Route path="/admin/helpdesk/departamentos" element={<Departamentos />} />
+            <Route path="/admin/helpdesk/motivos" element={<Motivos />} />
+            <Route path="/admin/helpdesk/prioridades" element={<Prioridades />} />
+            <Route path="/admin/helpdesk/logs" element={<Logs />} />
+            <Route path="/knowledge/admintools" element={<AdminTools />} /> {/* Ejemplo: si es solo para admin */}
+          </Route>
+        </Route>
+        
+        {/* Ruta NotFound general */}
+        {/* Es buena idea que NotFound también use el Layout si quieres mantener la UI */}
+        <Route element={<Layout />}>
             <Route path="/notfound" element={<NotFound />} />
-          </Route>
-          {/* Rutas protegidas para usuarios autenticados */}
-          <Route
-            element={
-              <ProtectedRoute
-                allowedRoles={["ROLE_USER", "ROLE_ADMIN", "ROLE_HELPDESK"]}
-              />
-            }
-          >
-            <Route element={<Layout />}>
-              <Route path="/helpdesk/tasks" element={<Tasks />} />
-              <Route path="/helpdesk/completados/:estado" element={<Tasks />} />
-              <Route path="/helpdesk/en-proceso/:estado" element={<Tasks />} />
-              <Route path="/helpdesk/pendientes/:estado" element={<Tasks />} />
-              <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
-              <Route path="/helpdesk/trash" element={<Trash />} />
-              <Route path="/knowledge/home" element={<Home />} />
-              <Route path="/knowledge/myfile" element={<MyFile />} />
-              <Route path="/knowledge/sharedfile" element={<SharedFile />} />
-              <Route path="/knowledge/sites" element={<Sites />} />
-              <Route path="/knowledge/task" element={<Task />} />
-              <Route path="/knowledge/people" element={<People />} />
-              <Route path="/knowledge/repository" element={<Repository />} />
-              <Route path="/knowledge/admintools" element={<AdminTools />} />
-              <Route path="/notfound" element={<NotFound />} />
-            </Route>
-          </Route>
-          {/* Rutas solo para administradores */}
-          <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
-            <Route element={<Layout />}>
-              <Route path="/admin/helpdesk/users" element={<Users />} />
-              <Route path="/admin/add-user" element={<UsersComponent />} />
-              <Route
-                path="/admin/helpdesk/incidencias"
-                element={<Incidencias />}
-              />
-              <Route
-                path="/admin/helpdesk/departamentos"
-                element={<Departamentos />}
-              />
-              <Route path="/admin/helpdesk/motivos" element={<Motivos />} />
-              <Route
-                path="/admin/helpdesk/prioridades"
-                element={<Prioridades />}
-              />
-              <Route path="/admin/helpdesk/logs" element={<Logs />} />
-              <Route path="/admin/edit-user/:id" element={<UsersComponent />} />
-              <Route path="/knowledge/admintools" element={<AdminTools />} />
-            </Route>
-          </Route>
-          <Route path="*" element={<Navigate to="/notfound" />} />
-        </Routes>
-        <Toaster />
-      </main>
-    );
+        </Route>
+        {/* Captura todas las demás rutas y redirige a /notfound */}
+        <Route path="*" element={<Navigate to="/notfound" replace />} />
+      </Routes>
+      <Toaster />
+    </main>
+  );
 }
 export default App;

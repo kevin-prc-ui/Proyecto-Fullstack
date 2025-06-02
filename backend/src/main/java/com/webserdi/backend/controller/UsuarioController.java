@@ -124,7 +124,8 @@ public class UsuarioController {
      * @return Conjunto de nombres de roles.
      */
     @GetMapping("/email/roles") // Endpoint más descriptivo
-    public ResponseEntity<Set<String>> getRolesByEmail(@RequestParam String email) {
+    public ResponseEntity<Set<String>> getRolesByEmail(Authentication auth) {
+        String email = auth.getName();
         Set<String> roles = usuarioService.getRole(email);
         return ResponseEntity.ok(roles);
     }

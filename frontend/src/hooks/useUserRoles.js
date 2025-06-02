@@ -1,6 +1,5 @@
 // src/hooks/useUserRoles.js
 import { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import { getUserRoles } from '../services/UsuarioService'; // Adjust path if needed
 
 /**
@@ -17,30 +16,14 @@ export const useUserRoles = () => {
   useEffect(() => {
     let isMounted = true;
     const fetchRoles = async () => {
-      const accessToken = localStorage.getItem('authToken');
-
-      if (!accessToken) {
-        if (isMounted) {
-          setState({ roles: [], isLoading: false, error: null });
-        }
-        return;
-      }
-
       try {
         // Start loading
         if (isMounted) {
-            // Only set loading true if it wasn't already (avoids flicker on quick refreshes)
-             setState(s => s.isLoading ? s : { ...s, isLoading: true, error: null });
+          // Only set loading true if it wasn't already (avoids flicker on quick refreshes)
+          setState(s => s.isLoading ? s : { ...s, isLoading: true, error: null });
         }
 
-        const decoded = jwtDecode(accessToken);
-        const userId = decoded?.sub; // Assuming 'sub' contains the user ID
-
-        if (!userId) {
-          throw new Error("Token inválido o no contiene ID de usuario (sub).");
-        }
-
-        const response = await getUserRoles(userId);
+        const response = await getUserRoles();
         
         if (isMounted) {
           setState({ roles: response?.data || [], isLoading: false, error: null });
