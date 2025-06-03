@@ -7,7 +7,7 @@ import { TbBulb } from "react-icons/tb";
 import { LiaUserAstronautSolid } from "react-icons/lia";
 import { Button, Transition } from "@headlessui/react";
 import { FaRegHandPeace, FaUserPlus, FaSignInAlt } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link} from "react-router-dom";
 import { UseLoginHandler } from "../components/MicrosoftAuth/ButtonHandler";
 import { useState } from "react";
 import CreateTicket from "../components/Ticket/CreateTicket";

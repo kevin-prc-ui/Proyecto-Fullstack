@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getUserRoles } from "../services/UsuarioService";
 import {LoadingSpinner} from "./LoadingSpinner"; // Componente de carga personalizado
 import { jwtDecode } from 'jwt-decode';
-
+import React from "react";
 
 /**
  * Componente de ruta protegida que verifica autenticación y roles de usuario

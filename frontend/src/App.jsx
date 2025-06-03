@@ -78,11 +78,10 @@ function App() {
         </Route>
 
         {/* Rutas protegidas generales (Helpdesk, Knowledge) */}
-        {/* Ajusta allowedRoles según sea necesario. ROLE_USER podría necesitar acceso a /knowledge/home, etc. */}
         <Route
           element={
             <ProtectedRoute
-              allowedRoles={["ROLE_ADMIN", "ROLE_SUPERVISOR", "ROLE_AGENT","ROLE_USER"]}
+              allowedRoles={["ROLE_ADMIN", "ROLE_SUPERVISOR", "ROLE_AGENT", "ROLE_USER"]}
             />
           }
         >
