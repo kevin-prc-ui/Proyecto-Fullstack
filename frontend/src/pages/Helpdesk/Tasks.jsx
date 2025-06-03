@@ -9,15 +9,12 @@ import Tabs from "../../components/Tabs/Tabs";
 import BoardView from "../../components/Ticket/BoardView";
 import Table from "../../components/Ticket/Table";
 import PaginationBar from "../../components/Ticket/PaginadoTickets";
-import TaskTitle from "../../components/Ticket/TaskTitle";
 import Title from "../../components/Ticket/Title";
 import CreateTicket from "../../components/Ticket/CreateTicket";
 
 // Servicios y utilidades
 import { listTickets, listFilteredTickets } from "../../services/TicketService";
 import { listAllDepartamentos } from "../../services/DepartamentoService";
-import { TASK_TYPE } from "../../utils/utils"; // Objeto para mapear estados a clases CSS
-
 /**
  * @constant TABS
  * @description Configuración para las pestañas de visualización (Cuadrícula y Lista).
@@ -193,12 +190,10 @@ const Tasks = () => {
    */
   // --- Update useEffect to fetch tickets when department changes ---
   useEffect(() => {
-    if (isAuth) {
       // Pass selectedDepartamento to fetchTickets
       fetchTickets(pagina, status, selectedDepartamento);
-    }
     // Add selectedDepartamento to the dependency array
-  }, [isAuth, pagina, status, selectedDepartamento, fetchTickets]);
+  }, [pagina, status, selectedDepartamento]);
 
   /**
    * @effect Reinicia la paginación a la primera página (índice 0)
@@ -274,11 +269,7 @@ const Tasks = () => {
    * @param {string} statusKey - La clave del estado (ej. "pendiente", "en-proceso"). Debe coincidir con las claves en `TASK_TYPE`.
    * @returns {string} La clase CSS (ej. "bg-blue-600") o una clase por defecto ("bg-gray-400").
    */
-  const getTaskTypeClass = (statusKey) => {
-    // Asegura que la clave se compare en minúsculas y maneja casos donde statusKey podría ser null/undefined
-    const lowerCaseStatusKey = statusKey?.toLowerCase() || "";
-    return TASK_TYPE[lowerCaseStatusKey] || "bg-gray-400"; // Color por defecto
-  };
+
 
   // Renderizado condicional mientras se cargan los datos
   if (loading) {

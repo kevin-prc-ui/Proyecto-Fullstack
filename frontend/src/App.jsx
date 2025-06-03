@@ -82,18 +82,18 @@ function App() {
         <Route
           element={
             <ProtectedRoute
-              allowedRoles={["ROLE_USER", "ROLE_ADMIN", "ROLE_HELPDESK", "ROLE_AGENT"]}
+              allowedRoles={["ROLE_ADMIN", "ROLE_HELPDESK", "ROLE_AGENT"]}
             />
           }
         >
           <Route element={<Layout />}>
             <Route path="/helpdesk/tasks" element={<Tasks />} />
+            <Route path="/helpdesk/mytickets" element={<Tasks />} />
             <Route path="/helpdesk/completados/:estado" element={<Tasks />} />
             <Route path="/helpdesk/en-proceso/:estado" element={<Tasks />} />
             <Route path="/helpdesk/pendientes/:estado" element={<Tasks />} />
             <Route path="/helpdesk/task/:id" element={<TaskDetails />} />
             <Route path="/helpdesk/trash" element={<Trash />} />
-            
             <Route path="/knowledge/home" element={<Home />} />
             <Route path="/knowledge/myfile" element={<MyFile />} />
             <Route path="/knowledge/sharedfile" element={<SharedFile />} />

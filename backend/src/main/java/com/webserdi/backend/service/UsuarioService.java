@@ -17,4 +17,5 @@ public interface UsuarioService {
     void updateUsuarioEmail(Long usuarioId, String newEmail);
     Set<String> getRole (String email);
     Long getIdByEmail(String email);
+    List<UsuarioDto> getUsuarioByDepartamento (Long id);
 }

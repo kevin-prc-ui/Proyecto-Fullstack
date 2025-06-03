@@ -1,4 +1,4 @@
-// c:\react\Proyecto\frontend\src\assets\routes.jsx
+import React from "react";
 import {
   FaHome,
   FaFileAlt,
@@ -18,6 +18,8 @@ import {
 import { PiFolderSimpleUser } from "react-icons/pi";
 import { MdAdminPanelSettings } from "react-icons/md";
 import { BiDetail } from "react-icons/bi";
+import { BsFillPassFill } from "react-icons/bs";
+
 
 const linkData = [
   {
@@ -28,31 +30,36 @@ const linkData = [
         label: "Tickets",
         link: "/helpdesk/tasks",
         icon: <FaTasks />,
-        roles: ["ROLE_ADMIN", "ROLE_USER"],
+        roles: ["ROLE_ADMIN", "ROLE_AGENT"],
+      },{
+        label: "Mis tickets",
+        link: "/helpdesk/mytickets",
+        icon: <BsFillPassFill />,
+        roles: ["ROLE_ADMIN", "ROLE_AGENT"],
       },
       {
         label: "Completados",
         link: "/helpdesk/completados/completados",
         icon: <MdTaskAlt />,
-        roles: ["ROLE_ADMIN", "ROLE_USER"],
+        roles: ["ROLE_ADMIN", "ROLE_AGENT"],
       },
       {
         label: "En proceso",
         link: "/helpdesk/en-proceso/en-proceso",
         icon: <MdOutlinePendingActions />,
-        roles: ["ROLE_ADMIN", "ROLE_USER"],
+        roles: ["ROLE_ADMIN", "ROLE_AGENT"],
       },
       {
         label: "Pendientes",
         link: "/helpdesk/pendientes/pendientes",
         icon: <MdOutlinePendingActions />,
-        roles: ["ROLE_ADMIN", "ROLE_USER"],
+        roles: ["ROLE_ADMIN", "ROLE_AGENT"],
       },
       {
         label: "Eliminados",
         link: "/helpdesk/trash",
         icon: <FaTrashAlt />,
-        roles: ["ROLE_ADMIN", "ROLE_USER"],
+        roles: ["ROLE_ADMIN", "ROLE_AGENT"],
       },
     ],
   },

@@ -23,6 +23,8 @@ export const ListedUsers = () => {
     try {
       setLoading(true);
       const response = await listUsers();
+      console.log(response);
+      
       setUsuarios(response.data);
     } catch (err) {
       setError("Error al cargar usuarios");
@@ -229,7 +231,6 @@ export const ListedUsers = () => {
                 <div className="col-span-2 text-center">Apellido</div>
                 <div className="col-span-2 text-center">Email</div>
                 <div className="col-span-2 text-center">Rol</div>
-                <div className="col-span-2 text-center">Permisos</div>
                 <div className="col-span-2 text-center">Acciones</div>
               </div>
 
@@ -251,9 +252,7 @@ export const ListedUsers = () => {
                     <div className="col-span-2 text-center text-gray-700">
                       {usuario.roles}
                     </div>
-                    <div className="col-span-2 text-gray-700 text-center">
-                      {usuario.permisos}
-                    </div>
+                   
                     <div className="col-span-2 flex justify-center">
                       <button
                         className="text-blue-500 hover:text-blue-700 m-1 bg-blue-50 hover:bg-blue-100 rounded p-2 transition-colors"

@@ -169,7 +169,15 @@ public class UsuarioServiceImpl implements UsuarioService {
         List<Usuario> usuarios = usuarioRepository.findAll();
         return usuarios.stream()
                 .map(UsuarioMapper::mapToUsuarioDto)
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    @Override
+    public List<UsuarioDto> getUsuarioByDepartamento(Long id) {
+        List<Usuario> usuarios = usuarioRepository.findAllByDepartamentoId(id);
+        return usuarios.stream()
+                .map(UsuarioMapper::mapToUsuarioDto)
+                .toList();
     }
 
     /**
@@ -345,6 +353,7 @@ public class UsuarioServiceImpl implements UsuarioService {
      * @return Conjunto de nombres de roles.
      * @throws ResourceNotFoundException Si el usuario no existe.
      */
+
     @Override
     @Transactional(readOnly = true)
     public Set<String> getRole(String email) {
@@ -380,4 +389,5 @@ public class UsuarioServiceImpl implements UsuarioService {
                     return new ResourceNotFoundException("No existe el usuario con el email: " + email);
                 });
     }
+
 }

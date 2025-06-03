@@ -61,7 +61,11 @@ public class UsuarioController {
         List<UsuarioDto> usuarios = usuarioService.getAllUsuarios();
         return ResponseEntity.ok(usuarios);
     }
-
+    @GetMapping("/departamento/{id}")
+    public ResponseEntity<List<UsuarioDto>>getUsuariosByDepartamento(@PathVariable("id") Long departamentoId){
+        List<UsuarioDto> usuarios = usuarioService.getUsuarioByDepartamento(departamentoId);
+        return ResponseEntity.ok(usuarios);
+    }
     /**
      * Actualiza un usuario existente.
      * Se requiere rol de administrador.
