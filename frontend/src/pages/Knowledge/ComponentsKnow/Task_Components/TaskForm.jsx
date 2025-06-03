@@ -117,7 +117,6 @@ useEffect(() => {
     preparedData.usuariosCreadores = (await getUserId()).data;
 
     // Llamamos al servicio para crear o actualizar la actividad
-    console.log('Datos enviados al backend:', preparedData);
     
     createActivity(preparedData);
   };

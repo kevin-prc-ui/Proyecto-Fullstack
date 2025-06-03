@@ -36,6 +36,9 @@ const getHeaders = () => {
   };
 };
 
+export const createMotivo = (motivo) =>
+  axios.post(`${REST_API_BASE_URL}/motivos`, motivo, getHeaders());
+
 export const listAllMotivos = () => {
   return axios.get(`${REST_API_BASE_URL}/motivos`, getHeaders());
 };

@@ -164,7 +164,7 @@ export const Prioridades = () => {
         <h2 className="text-xl font-bold text-gray-800">Prioridades</h2>
         <button
           className="bg-blue-500 rounded hover:bg-blue-600 text-white font-medium py-2 px-4 transition-colors flex items-center"
-          onClick={() => navigate("/prioridades/nuevo")}
+          onClick={() => navigate("/admin/helpdesk/prioridades/nuevo")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

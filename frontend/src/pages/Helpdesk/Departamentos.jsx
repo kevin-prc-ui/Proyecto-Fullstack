@@ -14,7 +14,7 @@ export const Departamentos = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
-  const itemsPerPage = 5;
+  const itemsPerPage = 8;
 
   const navigate = useNavigate();
 
@@ -164,7 +164,7 @@ export const Departamentos = () => {
         <h2 className="text-xl font-bold text-gray-800">Departamentos</h2>
         <button
           className="bg-blue-500 rounded hover:bg-blue-600 text-white font-medium py-2 px-4 transition-colors flex items-center"
-          onClick={() => navigate("/departamentos/nuevo")}
+          onClick={() => navigate("/admin/helpdesk/departamentos/nuevo")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

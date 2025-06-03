@@ -38,10 +38,8 @@ export const UseLoginHandler = () => {
     toast.success("Sesión iniciada correctamente");
     
     const userRoles = roles.data || [];
-    console.log(userRoles);
     
     if (userRoles.includes("ROLE_ADMIN") || userRoles.includes("ROLE_AGENT")) {
-      console.log("wep");
       navigate("/helpdesk/tasks");
     }
     else if (userRoles.includes("ROLE_USER")) {

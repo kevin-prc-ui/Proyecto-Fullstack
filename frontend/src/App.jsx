@@ -28,6 +28,10 @@ import { Departamentos } from "./pages/Helpdesk/Departamentos";
 import { Motivos } from "./pages/Helpdesk/Motivos";
 import { Logs } from "./pages/Helpdesk/Logs";
 import { Prioridades } from "./pages/Helpdesk/Prioridades";
+import { AddDepartamento } from "./components/Generic/AddDepartamento";
+import { AddPrioridad } from "./components/Generic/AddPrioridades";
+import { AddMotivo } from "./components/Generic/AddMotivos";
+import { AddIncidencia } from "./components/Generic/AddIncidencias";
 
 function Layout() {
   const isAuthenticated = localStorage.getItem("authToken");
@@ -81,7 +85,12 @@ function App() {
         <Route
           element={
             <ProtectedRoute
-              allowedRoles={["ROLE_ADMIN", "ROLE_SUPERVISOR", "ROLE_AGENT", "ROLE_USER"]}
+              allowedRoles={[
+                "ROLE_ADMIN",
+                "ROLE_SUPERVISOR",
+                "ROLE_AGENT",
+                "ROLE_USER",
+              ]}
             />
           }
         >
@@ -108,21 +117,47 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
           <Route element={<Layout />}>
             <Route path="/admin/helpdesk/users" element={<Users />} />
-            <Route path="/admin/add-user" element={<UsersComponent />} />
+            <Route path="/admin/helpdesk/add-user" element={<UsersComponent />} />
             <Route path="/admin/edit-user/:id" element={<UsersComponent />} />
-            <Route path="/admin/helpdesk/incidencias" element={<Incidencias />} />
-            <Route path="/admin/helpdesk/departamentos" element={<Departamentos />} />
+            <Route
+              path="/admin/helpdesk/incidencias"
+              element={<Incidencias />}
+            />
+            <Route
+              path="/admin/helpdesk/departamentos"
+              element={<Departamentos />}
+            />
+            <Route
+              path="/admin/helpdesk/prioridades"
+              element={<Prioridades />}
+            />
             <Route path="/admin/helpdesk/motivos" element={<Motivos />} />
-            <Route path="/admin/helpdesk/prioridades" element={<Prioridades />} />
             <Route path="/admin/helpdesk/logs" element={<Logs />} />
-            <Route path="/knowledge/admintools" element={<AdminTools />} /> {/* Ejemplo: si es solo para admin */}
+            <Route path="/knowledge/admintools" element={<AdminTools />} />{" "}
+            <Route
+              path="/admin/helpdesk/departamentos/nuevo"
+              element={<AddDepartamento />}
+            />
+            <Route
+              path="/admin/helpdesk/incidencias/nuevo"
+              element={<AddIncidencia />}
+            />
+            <Route
+              path="/admin/helpdesk/motivos/nuevo"
+              element={<AddMotivo />}
+            />
+            <Route
+              path="/admin/helpdesk/prioridades/nuevo"
+              element={<AddPrioridad />}
+            />
+            {/* Ejemplo: si es solo para admin */}
           </Route>
         </Route>
-        
+
         {/* Ruta NotFound general */}
         {/* Es buena idea que NotFound también use el Layout si quieres mantener la UI */}
         <Route element={<Layout />}>
-            <Route path="/notfound" element={<NotFound />} />
+          <Route path="/notfound" element={<NotFound />} />
         </Route>
         {/* Captura todas las demás rutas y redirige a /notfound */}
         <Route path="*" element={<Navigate to="/notfound" replace />} />

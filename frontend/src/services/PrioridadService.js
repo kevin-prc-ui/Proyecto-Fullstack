@@ -36,6 +36,9 @@ const getHeaders = () => {
   };
 };
 
+export const createPrioridad = (prioridad) =>
+  axios.post(`${REST_API_BASE_URL}/prioridades`, prioridad, getHeaders());
+
 export const listAllPrioridades = () => {
   return axios.get(`${REST_API_BASE_URL}/prioridades`, getHeaders());
 };

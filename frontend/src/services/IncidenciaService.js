@@ -36,6 +36,9 @@ const getHeaders = () => {
   };
 };
 
+export const createIncidencia = (incidencia) =>
+  axios.post(`${REST_API_BASE_URL}/incidencias`, incidencia, getHeaders());
+
 export const listAllIncidencias = () => {
   return axios.get(`${REST_API_BASE_URL}/incidencias`, getHeaders());
 };

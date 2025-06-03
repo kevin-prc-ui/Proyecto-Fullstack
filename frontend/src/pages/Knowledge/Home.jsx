@@ -4,7 +4,6 @@ import "../../styles/estilos.css";
 const Home = () => {
   // Funciones para manejar los cambios en los filtros
   const handleFilterChange = (filterName, value) => {
-    console.log(`Filtro ${filterName} cambiado a:`, value);
     // Aquí puedes agregar la lógica para filtrar los datos
   };
 

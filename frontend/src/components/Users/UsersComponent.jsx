@@ -139,7 +139,7 @@ const UsersComponent = () => {
         await signUp(userData); // Llama al servicio para crear el usuario
         toast.info("Usuario creado correctamente");
       }
-      navigator("/admin/users"); // Navega a la lista de usuarios
+      navigator("/admin/helpdesk/users"); // Navega a la lista de usuarios
     } catch (error) {
       // Improved error logging
       const errorMessage =
@@ -329,7 +329,7 @@ const UsersComponent = () => {
                 {/* Botones */}
                 <div className="d-flex justify-content-evenly mt-4">
                   <Button variant="success" type="submit" disabled={loading}>
-                    {id ? "Actualizar" : "Guardar"}
+                    {"Guardar"}
                   </Button>
                   <Button
                     variant="danger"

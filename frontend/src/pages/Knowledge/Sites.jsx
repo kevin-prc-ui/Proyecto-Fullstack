@@ -25,7 +25,6 @@ const Sites = () => {
 
   // Agregar nuevo sitio
   const addSite = (newSite) => {
-    console.log("Sitio nuevo creado:", newSite);
     setSites([...sites, {...newSite, favorite: false}]);
     setActiveTab('misSitios');
   };

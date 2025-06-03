@@ -3,6 +3,7 @@ import ModalWrapper from "../ModalWrapper";
 import { Dialog } from "@headlessui/react";
 import Textbox from "../Textbox";
 import Button from "../Button";
+import React from "react";
 
 const AddSubTicket = ({ open, setOpen, id }) => {
   const {

@@ -6,12 +6,12 @@ import { FaSearch } from "react-icons/fa"; // Importar icono de búsqueda
 import { listAllMotivos, deleteMotivo } from "../../services/MotivoService"; // Asegúrate de tener deleteMotivo
 
 export const Motivos = () => {
-  const [motivoss, setMotivos] = useState([]);
+  const [motivos, setMotivos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
-  const itemsPerPage = 5;
+  const itemsPerPage = 8;
 
   const navigate = useNavigate();
 
@@ -25,7 +25,7 @@ export const Motivos = () => {
       const response = await listAllMotivos();
       setMotivos(response.data);
     } catch (err) {
-      setError("Error al cargar motivoss");
+      setError("Error al cargar motivos");
       console.error(err);
     } finally {
       setLoading(false);
@@ -42,8 +42,8 @@ export const Motivos = () => {
   };
 
   // Filtrar motivos basado en el término de búsqueda
-  // Nota: el estado es 'motivoss' y el item individual es 'motivos' en el map
-  const filteredMotivos = motivoss.filter((motivo) => {
+  // Nota: el estado es 'motivos' y el item individual es 'motivos' en el map
+  const filteredMotivos = motivos.filter((motivo) => {
     const term = searchTerm.toLowerCase();
     const nombre = motivo.nombre ? String(motivo.nombre).toLowerCase() : "";
     return nombre.includes(term);
@@ -155,7 +155,7 @@ export const Motivos = () => {
         <h2 className="text-xl font-bold text-gray-800">Motivos</h2>
         <button
           className="bg-blue-500 rounded hover:bg-blue-600 text-white font-medium py-2 px-4 transition-colors flex items-center"
-          onClick={() => navigate("/motivoss/nuevo")}
+          onClick={() => navigate("/admin/helpdesk/motivos/nuevo")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -209,7 +209,7 @@ export const Motivos = () => {
                 <div className="col-span-4 text-center">Acciones</div>
               </div>
 
-              {/* Lista de motivoss */}
+              {/* Lista de motivos */}
               {currentItems.length > 0 ? (
                 currentItems.map((motivos) => (
                   <div
@@ -224,7 +224,7 @@ export const Motivos = () => {
                       <button
                         className="text-blue-500 hover:text-blue-700 m-1 bg-blue-50 hover:bg-blue-100 rounded p-2 transition-colors"
                         onClick={() =>
-                          navigate(`/motivoss/editar/${motivos.id}`)
+                          navigate(`/motivos/editar/${motivos.id}`)
                         }
                         title="Editar"
                       >
@@ -274,7 +274,7 @@ export const Motivos = () => {
                       d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  No se encontraron motivoss
+                  No se encontraron motivos
                 </div>
               )}
 

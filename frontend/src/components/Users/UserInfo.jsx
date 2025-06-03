@@ -4,7 +4,6 @@ import { getInitials } from "../../utils/utils";
 
 const UserInfo = ({ user }) => {
   const token = localStorage.getItem("token");
-  console.log(token);
   return (
     <div className='px-4'>
       <Popover className='relative'>

@@ -251,7 +251,6 @@ export default function CreateTicket({
         estado: 1,
         prioridad: parseInt(data.prioridad),
       };
-      console.log("Enviando datos del Ticket:", ticketData);
       if (ticket?.id) {
         await updateTicket(ticket.id, ticketData);
         window.location.reload();

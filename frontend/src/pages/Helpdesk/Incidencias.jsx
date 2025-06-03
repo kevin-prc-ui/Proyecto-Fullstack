@@ -20,7 +20,6 @@ export const Incidencias = () => {
 
   useEffect(() => {
     fetchIncidencias();
-    console.log(incidencias);
   }, []); // El console.log aquí mostrará el estado inicial (array vacío)
 
   const fetchIncidencias = async () => {
@@ -169,7 +168,7 @@ export const Incidencias = () => {
         <h2 className="text-xl font-bold text-gray-800">Incidencias</h2>
         <button
           className="bg-blue-500 rounded hover:bg-blue-600 text-white font-medium py-2 px-4 transition-colors flex items-center"
-          onClick={() => navigate("/incidencias/nuevo")}
+          onClick={() => navigate("/admin/helpdesk/incidencias/nuevo")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

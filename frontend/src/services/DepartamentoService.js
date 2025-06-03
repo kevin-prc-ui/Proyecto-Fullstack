@@ -36,6 +36,9 @@ const getHeaders = () => {
   };
 };
 
+export const createDepartamento = (departamento) =>
+  axios.post(`${REST_API_BASE_URL}/departamentos`, departamento, getHeaders());
+
 export const listAllDepartamentos = () =>
   axios.get(`${REST_API_BASE_URL}/departamentos`, getHeaders());
 
