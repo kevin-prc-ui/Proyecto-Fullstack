@@ -11,8 +11,6 @@ import { Link} from "react-router-dom";
 import { UseLoginHandler } from "../components/MicrosoftAuth/ButtonHandler";
 import { useState } from "react";
 import CreateTicket from "../components/Ticket/CreateTicket";
-import { getUserRoles } from "../services/UsuarioService";
-import { useUserRoles } from "../hooks/useUserRoles";
 import React from "react";
 
 const Dashboard = () => {
@@ -48,7 +46,6 @@ const AuthPrompt = () => {
             ¡Bienvenido a nuestra plataforma!
           </h2>
         </div>
-
         <p className="text-gray-600">
           ¡Gestiona los tickets de soporte y accede a todos nuestros recursos!
         </p>

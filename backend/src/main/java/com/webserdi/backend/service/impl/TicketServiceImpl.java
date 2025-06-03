@@ -298,6 +298,12 @@ public class TicketServiceImpl implements TicketService {
         return ticketsPage.map(ticketMapper::toDto);
     }
 
+    @Override
+    public Page<TicketDto> GetTicketsByUsuario(Pageable pageable,Long id) {
+        Page<Ticket> ticketsPage = ticketRepository.findAllByUsuarioCreadorId(pageable,id);
+        return ticketsPage.map(ticketMapper::toDto);
+    }
+
     /**
      * Obtiene tickets activos (no en la papelera) filtrados por estado y opcionalmente por departamento.
      *

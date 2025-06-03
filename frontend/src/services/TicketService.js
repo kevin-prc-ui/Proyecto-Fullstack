@@ -59,6 +59,7 @@ export const listTickets = (page, departamento = "") => {
   }
 
   const url = `${REST_API_BASE_URL}/tickets/all?${params.toString()}`;
+console.log(url);
 
   return axios.get(url, getHeaders()).catch((error) => {
     if (!error.response) {
