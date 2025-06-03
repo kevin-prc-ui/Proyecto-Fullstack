@@ -23,7 +23,7 @@ import CreateTicket from "../../components/Ticket/CreateTicket";
 //  */
 const TaskDetails = () => {
   const params = useParams();
-    
+
   const id = params?.id || ""; // Ticket ID
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -97,10 +97,9 @@ const TaskDetails = () => {
           <FaExclamationTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-semibold text-red-700 mb-2">Error</h2>
           <p className="text-gray-600">
-            {
-              `El ticket ${id} no pudo ser encontrado o está incompleto.`}
-              <br></br>
-              Contacte a Ivan de sistemas.
+            {`El ticket ${id} no pudo ser encontrado o está incompleto.`}
+            <br></br>
+            Contacte a Ivan de sistemas.
           </p>
           <button
             onClick={() => window.history.back()}
@@ -203,7 +202,7 @@ const TaskDetails = () => {
                 />
                 <DetailItem
                   label="Vencimiento"
-                  value={formatDateTime(ticket.fechaVencimiento)}
+                  value={formatDateTime(ticket.fechaVencimiento, true)}
                   icon={<FaClock className="text-gray-400" />}
                 />
               </DetailSection>
@@ -281,7 +280,7 @@ const DetailItem = ({ label, value, badgeColor, icon }) => (
 );
 
 // --- Funciones Auxiliares (formatDateTime, getBadgeColor, getPriorityColor - slightly adapted) ---
-const formatDateTime = (dateTimeString) => {
+const formatDateTime = (dateTimeString, isDueDate = false) => {
   if (!dateTimeString) return "N/A";
   try {
     const date = new Date(dateTimeString);
@@ -289,13 +288,21 @@ const formatDateTime = (dateTimeString) => {
     if (isNaN(date.getTime())) {
       return "Fecha inválida";
     }
-    return date.toLocaleDateString("es-ES", {
+    const options = {
       year: "numeric",
       month: "short",
       day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit", // Added time
-    });
+    };
+
+    if (isDueDate) {
+      // Para fechas de vencimiento (yyyy-mm-dd), interpretar y mostrar en UTC para evitar corrimiento de día.
+      // No se muestra la hora ya que la fecha de vencimiento usualmente se refiere al día completo.
+      options.timeZone = "UTC";
+    } else {
+      options.hour = "2-digit";
+      options.minute = "2-digit";
+    }
+    return date.toLocaleDateString("es-ES", options);
   } catch (error) {
     console.error("Error formatting date:", error);
     return dateTimeString; // Return original string on error
