@@ -395,44 +395,6 @@ export default function CreateTicket({
               )}{" "}
               {/* Corregido error check */}
             </div>
-            {/* Campo Usuario (Agente Asignado) */}
-            <div className="w-full">
-              <label
-                htmlFor="usuarioAsignado"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Agente:
-              </label>
-              <Controller
-                name="usuarioAsignado"
-                control={control}
-                rules={{ required: "El agente es obligatorio" }} // Mensaje de error más específico
-                render={({ field }) => (
-                  <select
-                    id="usuarioAsignado"
-                    className={clsx(
-                      "w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
-                      errors.usuarioAsignado && "border-red-500"
-                    )}
-                    {...field}
-                  >
-                    <option value="" disabled>
-                      {loadingDeps ? "Cargando..." : "Selecciona un agente"}
-                    </option>
-                    {usuarios.map((usuario) => (
-                      <option key={usuario.id} value={usuario.id}>
-                        {usuario.nombre}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              />
-              {errors.usuarioAsignado && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.usuarioAsignado.message}
-                </p>
-              )}
-            </div>
             {/* Campo Departamento */}
             <div className="w-full">
               <label
@@ -471,6 +433,44 @@ export default function CreateTicket({
               {errors.departamento && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.departamento.message}
+                </p>
+              )}
+            </div>
+            {/* Campo Usuario (Agente Asignado) */}
+            <div className="w-full">
+              <label
+                htmlFor="usuarioAsignado"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Agente:
+              </label>
+              <Controller
+                name="usuarioAsignado"
+                control={control}
+                rules={{ required: "El agente es obligatorio" }} // Mensaje de error más específico
+                render={({ field }) => (
+                  <select
+                    id="usuarioAsignado"
+                    className={clsx(
+                      "w-full rounded border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+                      errors.usuarioAsignado && "border-red-500"
+                    )}
+                    {...field}
+                  >
+                    <option value="" disabled>
+                      {loadingDeps ? "Cargando..." : "Selecciona un agente"}
+                    </option>
+                    {usuarios.map((usuario) => (
+                      <option key={usuario.id} value={usuario.id}>
+                        {usuario.nombre}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              />
+              {errors.usuarioAsignado && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.usuarioAsignado.message}
                 </p>
               )}
             </div>
