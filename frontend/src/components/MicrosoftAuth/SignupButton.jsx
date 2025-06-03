@@ -43,6 +43,8 @@ const MicrosoftSignUp = () => {
         roles: ["ROLE_USER"],
         permisos: [""],
       };
+      console.log(userData);
+      
 
       const loginData = {
         email: graphResponse.userPrincipalName,

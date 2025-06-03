@@ -147,8 +147,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             if (permisos.size() != dto.getPermisos().size()) {
                 Set<String> foundPermisoNames = permisos.stream().map(Permiso::getNombre).collect(Collectors.toSet());
                 dto.getPermisos().removeAll(foundPermisoNames);
-                logger.warn("Algunos permisos no fueron encontrados: {}", dto.getPermisos());
-                throw new ResourceNotFoundException("Uno o más permisos especificados no existen: " + dto.getPermisos());
+                usuario.setPermisos(Collections.emptySet());
             }
             usuario.setPermisos(permisos);
         } else {
