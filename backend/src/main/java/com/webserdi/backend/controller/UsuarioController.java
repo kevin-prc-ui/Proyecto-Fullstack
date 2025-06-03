@@ -124,7 +124,6 @@ public class UsuarioController {
     /**
      * Obtiene los roles de un usuario basado en su email.
      *
-     * @param email Email del usuario.
      * @return Conjunto de nombres de roles.
      */
     @GetMapping("/email/roles") // Endpoint más descriptivo

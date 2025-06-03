@@ -1,4 +1,3 @@
-// c:\react\Proyecto\frontend\src\components\Sidebar\index.jsx
 import { useState, useMemo } from "react";
 import { MdSettings } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";

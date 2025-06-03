@@ -252,7 +252,6 @@ export const ListedUsers = () => {
                     <div className="col-span-2 text-center text-gray-700">
                       {usuario.roles}
                     </div>
-                   
                     <div className="col-span-2 flex justify-center">
                       <button
                         className="text-blue-500 hover:text-blue-700 m-1 bg-blue-50 hover:bg-blue-100 rounded p-2 transition-colors"
