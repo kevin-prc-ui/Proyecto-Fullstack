@@ -22,6 +22,8 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
   });
   const accessToken = localStorage.getItem("authToken");
   const decoded = jwtDecode(accessToken).sub;
+  console.log(decoded);
+  
   useEffect(() => {
     let isMounted = true;
     const fetchAuthData = async () => {

@@ -40,8 +40,11 @@ export const UseLoginHandler = () => {
     const userRoles = roles.data || [];
     console.log(userRoles);
 
-    if (userRoles.includes("ROLE_ADMIN") || userRoles.includes("ROLE_AGENTE")) {
+    if (userRoles.includes("ROLE_ADMIN") || userRoles.includes("ROLE_AGENT")) {
       navigate("/helpdesk/tasks");
+    }
+    if (userRoles.includes("ROLE_USER")) {
+      navigate("/knowledge/home");
     }
     else {
       navigate("/dashboard");

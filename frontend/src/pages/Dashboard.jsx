@@ -13,6 +13,7 @@ import { useState } from "react";
 import CreateTicket from "../components/Ticket/CreateTicket";
 import { getUserRoles } from "../services/UsuarioService";
 import { useUserRoles } from "../hooks/useUserRoles";
+import React from "react";
 
 const Dashboard = () => {
   return (
@@ -89,8 +90,6 @@ const AuthPrompt = () => {
 };
 const ProfileContent = () => {
   const [openDialog, setOpenDialog] = useState(false);
-  
-
   // --- Navigation Handler for Create Ticket ---
 
   const handleCreateTicket = () => {
