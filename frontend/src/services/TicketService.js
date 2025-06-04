@@ -3,9 +3,7 @@ import axios from "axios";
 
 const REST_API_BASE_URL = "http://localhost:8080/api"; //update the base url
 
-// Helper function to get the token from localStorage
 const token = () => localStorage.getItem("authToken");
-// Basic check if token exists and is valid JSON before parsing
 const getAuthToken = () => {
   const storedToken = token();
   if (storedToken) {
@@ -20,7 +18,6 @@ const getAuthToken = () => {
   return null; // Handle case where token doesn't exist
 };
 
-// Function to create headers with the Authorization token
 const getHeaders = () => {
   const accessToken = getAuthToken();
   if (!accessToken) {
@@ -70,6 +67,9 @@ console.log(url);
     throw error; // Re-throw the original error for further handling
   });
 };
+
+export const listTicketsByUser= (userId) =>
+  axios.get(`${REST_API_BASE_URL}/tickets/user/${userId}?page=0&size=20`, getHeaders());
 
 /**
  * Lists tickets filtered by status, optionally filtered by department.

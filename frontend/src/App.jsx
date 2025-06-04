@@ -109,7 +109,6 @@ function App() {
             <Route path="/knowledge/task" element={<Task />} />
             <Route path="/knowledge/people" element={<People />} />
             <Route path="/knowledge/repository" element={<Repository />} />
-            {/* Considera si /knowledge/admintools es solo para admin y muévelo si es así */}
           </Route>
         </Route>
 
