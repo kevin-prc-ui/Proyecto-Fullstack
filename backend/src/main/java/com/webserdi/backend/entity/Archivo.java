@@ -30,9 +30,6 @@ public class Archivo {
     private String tipo; // MIME type o extensión del archivo
     private Long tamaño; // Tamaño en bytes
 
-    @Column(name = "ruta_almacenamiento")
-    private String rutaAlmacenamiento; // Ruta donde se guarda físicamente el archivo
-
     @CreationTimestamp
     @Column(name = "fecha_subida", updatable = false)
     private LocalDateTime fechaSubida;

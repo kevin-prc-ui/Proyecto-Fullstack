@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "sites")
-public class Sites {
+public class Sitio {
 
 
     @Id
@@ -22,4 +22,6 @@ public class Sites {
     private String description;
     private String type;
     private String visibility;
+
+
 }

@@ -56,46 +56,45 @@ public class ArchivoServiceImpl implements ArchivoService {
         return archivoMapper.toDto(archivo);
     }
 
-    @Override
-    public ArchivoDto guardarArchivoConContenido(MultipartFile archivoMultipart, Long carpetaId) {
-        if (archivoMultipart == null || archivoMultipart.isEmpty()) {
-            throw new IllegalArgumentException("El archivo está vacío o es nulo.");
-        }
+// Dentro de ArchivoServiceImpl
 
-        Carpeta carpeta = carpetaRepository.findById(carpetaId)
-                .orElseThrow(() -> new ResourceNotFoundException("Carpeta no encontrada con id: " + carpetaId));
-
+    public ArchivoDto guardarArchivoConContenido(MultipartFile archivo, Long carpetaId) {
         try {
-            // Crear carpeta física si no existe
-            String rutaBase = "uploads/";
-            String rutaCarpeta = rutaBase + "carpeta_" + carpetaId;
-            File directorio = new File(rutaCarpeta);
-            if (!directorio.exists()) {
-                directorio.mkdirs();
+            // Crear ruta física
+            String nombreArchivo = archivo.getOriginalFilename();
+            String tipoArchivo = archivo.getContentType();
+            Long tamañoArchivo = archivo.getSize();
+
+            // Construir la ruta física en el sistema de archivos
+            String subdirectorio = (carpetaId != null) ? "carpeta_" + carpetaId : "sin_carpeta";
+            Path rutaCarpeta = Paths.get("uploads", subdirectorio);
+            Files.createDirectories(rutaCarpeta);
+
+            Path rutaArchivo = rutaCarpeta.resolve(nombreArchivo);
+            archivo.transferTo(rutaArchivo.toFile());
+
+            // Crear entidad Archivo
+            Archivo entidad = new Archivo();
+            entidad.setNombre(nombreArchivo);
+            entidad.setTipo(tipoArchivo);
+            entidad.setTamaño(tamañoArchivo);
+            entidad.setRuta(rutaArchivo.toString()); // Guarda la ruta completa del archivo
+
+            // Si tiene carpeta, buscar la entidad Carpeta
+            if (carpetaId != null) {
+                Carpeta carpeta = carpetaRepository.findById(carpetaId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Carpeta no encontrada"));
+                entidad.setCarpeta(carpeta);
             }
 
-            // Guardar archivo físico
-            String rutaCompleta = rutaCarpeta + "/" + archivoMultipart.getOriginalFilename();
-            Path pathDestino = Paths.get(rutaCompleta);
-            Files.copy(archivoMultipart.getInputStream(), pathDestino, StandardCopyOption.REPLACE_EXISTING);
+            archivoRepository.save(entidad);
 
-            // Guardar metadatos en BD
-            Archivo archivo = new Archivo();
-            archivo.setNombre(archivoMultipart.getOriginalFilename());
-            archivo.setTipo(archivoMultipart.getContentType());
-            archivo.setTamaño(archivoMultipart.getSize());
-            archivo.setFechaSubida(LocalDateTime.now());
-            archivo.setRuta(rutaCompleta); // <-- Agrega este campo en la entidad
-            archivo.setCarpeta(carpeta);
-
-            archivo = archivoRepository.save(archivo);
-
-            return archivoMapper.toDto(archivo);
-
+            return archivoMapper.toDto(entidad); // Devuelve el DTO
         } catch (IOException e) {
-            throw new RuntimeException("Error al guardar el archivo: " + e.getMessage());
+            throw new RuntimeException("Error al guardar el archivo: " + e.getMessage(), e);
         }
     }
+
 
     @Override
     public List<ArchivoDto> getArchivosPorCarpeta(Long carpetaId) {

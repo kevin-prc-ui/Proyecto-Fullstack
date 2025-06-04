@@ -54,6 +54,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/ws/**").permitAll() // Permite conexiones WebSocket
                         .requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
+                        .requestMatchers("/api/archivos/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

@@ -11,6 +11,7 @@ const SiteView = ({ site, onGoBack }) => {
   const [activities, setActivities] = useState([]);
   const [showUserModal, setShowUserModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [usuarioLogueado, setUsuarioLogueado] = useState(null);
 
   // Estado para la lista de usuarios cargados del backend
   const [usersState, setUsersState] = useState({
@@ -25,7 +26,6 @@ const SiteView = ({ site, onGoBack }) => {
       setUsersState({ loading: true, error: null, users: [] });
       listUsers()
         .then(response => {
-          // Suponiendo que los usuarios vienen en response.data
           setUsersState({ loading: false, error: null, users: response.data });
         })
         .catch(error => {
@@ -33,6 +33,14 @@ const SiteView = ({ site, onGoBack }) => {
         });
     }
   }, [showUserModal]);
+
+  // Cargar usuario logueado desde localStorage al montar componente
+  useEffect(() => {
+    const usuario = localStorage.getItem('usuarioLogueado');
+    if (usuario) {
+      setUsuarioLogueado(JSON.parse(usuario));
+    }
+  }, []);
 
   // Filtrar usuarios basado en el término de búsqueda
   const filteredUsers = usersState.users.filter(user =>
@@ -67,7 +75,8 @@ const SiteView = ({ site, onGoBack }) => {
         text: newPost,
         file: selectedFile ? {
           name: selectedFile.name,
-          type: selectedFile.type.includes('image') ? 'image' : 'pdf'
+          type: selectedFile.type.includes('image') ? 'image' : 'pdf',
+          rawFile: selectedFile,  // Guardamos el archivo original para mostrar imagen
         } : null,
         timestamp: new Date().toLocaleString()
       };
@@ -77,14 +86,18 @@ const SiteView = ({ site, onGoBack }) => {
     }
   };
 
-  // Marcar publicación como completada
-  const markAsCompleted = (postId) => {
-    const post = posts.find(p => p.id === postId);
-    if (post) {
-      setActivities(prev => [...prev, post]);
-      setPosts(prev => prev.filter(p => p.id !== postId));
-    }
-  };
+  // Marcar publicación como completada, asignando el usuario logueado
+const markAsCompleted = (postId) => {
+  const post = posts.find(p => p.id === postId);
+  if (post) {
+    const activityWithUser = {
+      ...post,
+      user: usuarioLogueado // Aquí aseguramos que se use el usuario logueado
+    };
+    setActivities(prev => [...prev, activityWithUser]);
+    setPosts(prev => prev.filter(p => p.id !== postId));
+  }
+};
 
   return (
     <Container className="mt-4">
@@ -164,7 +177,7 @@ const SiteView = ({ site, onGoBack }) => {
                       <Card.Text>{post.text}</Card.Text>
                       {post.file && post.file.type === 'image' && (
                         <img
-                          src={URL.createObjectURL(post.file)}
+                          src={URL.createObjectURL(post.file.rawFile)}
                           alt={post.file.name}
                           style={{ maxWidth: '100%', maxHeight: 200 }}
                         />
@@ -191,21 +204,21 @@ const SiteView = ({ site, onGoBack }) => {
           </Card>
         </Col>
 
-        {/* Contenedor Actividades Completadas */}
+        {/* Contenedor Actividades Completadas (más grande) */}
         <Col md={4}>
-          <Card>
+          <Card style={{ minHeight: '600px', overflowY: 'auto' }}>
             <Card.Header>Actividades Completadas</Card.Header>
             <Card.Body>
               {activities.length === 0 ? (
                 <p>No hay actividades completadas.</p>
               ) : (
                 activities.map(activity => (
-                  <Card key={activity.id} className="mb-2 bg-light">
+                  <Card key={activity.id} className="mb-3">
                     <Card.Body>
                       <Card.Text>{activity.text}</Card.Text>
                       {activity.file && activity.file.type === 'image' && (
                         <img
-                          src={URL.createObjectURL(activity.file)}
+                          src={URL.createObjectURL(activity.file.rawFile)}
                           alt={activity.file.name}
                           style={{ maxWidth: '100%', maxHeight: 200 }}
                         />
@@ -215,7 +228,18 @@ const SiteView = ({ site, onGoBack }) => {
                           <FaFilePdf size={30} /> {activity.file.name}
                         </div>
                       )}
-                      <small className="text-muted">{activity.timestamp}</small>
+                      <small className="text-muted d-block mb-2">{activity.timestamp}</small>
+                      <div className="d-flex align-items-center">
+                        <FaUser className="text-primary mr-2" />
+                        {activity.user ? (
+                          <div>
+                            <strong>{activity.user.nombre} {activity.user.apellido}</strong><br />
+                            <small className="text-muted">{activity.user.email}</small>
+                          </div>
+                        ) : (
+                          <small className="text-muted">Usuario desconocido</small>
+                        )}
+                      </div>
                     </Card.Body>
                   </Card>
                 ))

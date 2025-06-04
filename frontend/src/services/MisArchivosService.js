@@ -23,8 +23,8 @@ const getHeaders = () => {
 };
 
 // === Endpoints ===
-export const getArchivoUrl = (id) =>
-  `${REST_API_BASE_URL}/archivos/download/${id}`;
+// ✅ Esta línea es correcta
+export const getArchivoUrl = (id) => `${REST_API_BASE_URL}/archivos/ver/${id}`;
 
 export const getMisArchivos = () =>
   axios.get(`${REST_API_BASE_URL}/mis-archivos/`, getHeaders());
@@ -40,6 +40,7 @@ export const createCarpeta = (carpetaDto) =>
 
 export const getAllCarpetas = () =>
   axios.get(`${REST_API_BASE_URL}/carpetas`, getHeaders());
+
 
 // ✅ Nuevo método para subir archivos binarios
 export const uploadArchivo = (file, carpetaId) => {

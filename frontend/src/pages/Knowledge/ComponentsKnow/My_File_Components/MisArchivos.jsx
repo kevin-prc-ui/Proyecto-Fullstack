@@ -54,22 +54,30 @@ const MisArchivos = () => {
               <div key={item.id} className="uploaded-file mb-3 p-3 border rounded">
                 <div className="d-flex justify-content-between align-items-center">
                   <div className="d-flex align-items-center">
-                    {item.type === 'folder' ? (
-                      <button 
-                        className="btn btn-sm me-2 p-0"
-                        onClick={() => enterFolder(item.id)}
-                      >
-                        <BsFolderFill size={24} color="#4e73df" />
-                      </button>
-                    ) : item.fileType === 'pdf' ? (
-                      <BsFilePdf size={24} color="#e74a3b" className="me-3" />
-                    ) : (
-                      <img 
-                        src={URL.createObjectURL(item.fileObject)} 
-                        alt="Preview" 
-                        className="file-preview-img"
-                      />
-                    )}
+{item.type === 'folder' ? (
+  <button 
+    className="btn btn-sm me-2 p-0"
+    onClick={() => enterFolder(item.id)}
+  >
+    <BsFolderFill size={24} color="#4e73df" />
+  </button>
+) : item.fileType === 'application/pdf' ? (
+  <a href={item.url} target="_blank" rel="noopener noreferrer">
+    <BsFilePdf size={24} color="#e74a3b" className="me-3" />
+  </a>
+) : item.fileType.startsWith('image') ? (
+  <img 
+    src={item.url || URL.createObjectURL(item.fileObject)} 
+    alt="Imagen" 
+    className="file-preview-img me-3"
+    style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+  />
+) : (
+  <a href={item.url} target="_blank" rel="noopener noreferrer">
+    {item.name}
+  </a>
+)}
+
                     
                     <div>
                       <h5 className="mb-1">{item.name}</h5>

@@ -1,7 +1,7 @@
 package com.webserdi.backend.service;
 
-import com.webserdi.backend.dto.SitesDto;
+import com.webserdi.backend.dto.SitioDto;
 
 public interface SiteService {
-    SitesDto saveSites(SitesDto sitesDto);
+    SitioDto saveSites(SitioDto sitesDto);
 }

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import {
   createCarpeta,
   getAllCarpetas,
-  uploadArchivo
+  uploadArchivo,
+  getArchivoUrl
 } from '../../../../services/MisArchivosService';
 
 export const useFileManager = () => {
@@ -36,6 +37,7 @@ export const useFileManager = () => {
         date: new Date(data.fechaSubida).toLocaleDateString(),
         parentId: currentFolder,
         isFavorite: false,
+        url: getArchivoUrl(data.id), // URL del archivo
       };
 
       setItems(prev => [...prev, newItem]);

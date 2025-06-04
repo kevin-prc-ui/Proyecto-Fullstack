@@ -12,7 +12,6 @@ public class ArchivoMapper {
         archivo.setNombre(archivoDto.getNombre());
         archivo.setTipo(archivoDto.getTipo());
         archivo.setTamaño(archivoDto.getTamaño());
-        archivo.setRutaAlmacenamiento(archivoDto.getRutaAlmacenamiento());
         archivo.setFechaSubida(archivoDto.getFechaSubida());
         // La carpeta debe ser manejada por el servicio, no el mapper
         return archivo;
@@ -24,7 +23,6 @@ public class ArchivoMapper {
         archivoDto.setNombre(archivo.getNombre());
         archivoDto.setTipo(archivo.getTipo());
         archivoDto.setTamaño(archivo.getTamaño());
-        archivoDto.setRutaAlmacenamiento(archivo.getRutaAlmacenamiento());
         archivoDto.setFechaSubida(archivo.getFechaSubida());
         if (archivo.getCarpeta() != null) {
             archivoDto.setCarpetaId(archivo.getCarpeta().getId());

@@ -5,6 +5,7 @@ import com.webserdi.backend.entity.Archivo;
 import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.service.ArchivoService;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+@Configuration
 @RestController
 @RequestMapping("/api/archivos")
 @AllArgsConstructor
