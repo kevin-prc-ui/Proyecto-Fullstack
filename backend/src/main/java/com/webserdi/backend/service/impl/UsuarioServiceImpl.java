@@ -18,8 +18,6 @@ import com.webserdi.backend.service.UsuarioService;
 import lombok.RequiredArgsConstructor; // Usar para inyección de dependencias
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-// import org.springframework.beans.factory.annotation.Autowired; // No es necesario con @RequiredArgsConstructor
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +37,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     private static final Logger logger = LoggerFactory.getLogger(UsuarioServiceImpl.class);
 
     private final PermisoRepository permisoRepository;
+    private final UsuarioMapper usuarioMapper;
     private final RolRepository rolRepository;
     private final UsuarioRepository usuarioRepository;
     private final DepartamentoRepository departamentoRepository; // Añadir dependencia
@@ -65,7 +64,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new DuplicateEmailException("El email '" + usuarioDto.getEmail() + "' ya está en uso.");
         }
 
-        Usuario usuario = UsuarioMapper.mapToUsuario(usuarioDto);
+        Usuario usuario = usuarioMapper.mapToUsuario(usuarioDto);
         usuario.setPassword(passwordEncoder.encode(usuarioDto.getPassword()));
         // 'enabled' se toma del DTO, por defecto podría ser true o false según la lógica de negocio
 
@@ -73,7 +72,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         Usuario savedUsuario = usuarioRepository.save(usuario);
         logger.info("Usuario creado exitosamente con ID: {}", savedUsuario.getId());
-        return UsuarioMapper.mapToUsuarioDto(savedUsuario);
+        return usuarioMapper.mapToUsuarioDto(savedUsuario);
     }
 
     /**
@@ -167,7 +166,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         logger.debug("Obteniendo todos los usuarios.");
         List<Usuario> usuarios = usuarioRepository.findAll();
         return usuarios.stream()
-                .map(UsuarioMapper::mapToUsuarioDto)
+                .map(usuarioMapper::mapToUsuarioDto)
                 .toList();
     }
 
@@ -175,7 +174,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public List<UsuarioDto> getUsuarioByDepartamento(Long id) {
         List<Usuario> usuarios = usuarioRepository.findAllByDepartamentoId(id);
         return usuarios.stream()
-                .map(UsuarioMapper::mapToUsuarioDto)
+                .map(usuarioMapper::mapToUsuarioDto)
                 .toList();
     }
 
@@ -195,7 +194,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                     logger.warn("Usuario no encontrado con ID: {}", usuarioId);
                     return new ResourceNotFoundException("No existe el usuario con el ID: " + usuarioId);
                 });
-        return UsuarioMapper.mapToUsuarioDto(usuario);
+        return usuarioMapper.mapToUsuarioDto(usuario);
     }
 
     /**
@@ -245,7 +244,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         Usuario usuarioActualizado = usuarioRepository.save(savedUsuario);
         logger.info("Usuario con ID: {} actualizado exitosamente.", usuarioId);
-        return UsuarioMapper.mapToUsuarioDto(usuarioActualizado);
+        return usuarioMapper.mapToUsuarioDto(usuarioActualizado);
     }
 
     /**

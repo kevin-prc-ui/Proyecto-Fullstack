@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import "../../styles/estilos.css";
 import MySitesComponent from './ComponentsKnow/Sites_Components/MySitesComponent.jsx';
 import SitesFinderComponent from './ComponentsKnow/Sites_Components/SitesFinderComponent.jsx';
-import CreateSitesComponent from './ComponentsKnow/Sites_Components/CreateSitesComponent.jsx';
+import {CreateSitesComponent} from './ComponentsKnow/Sites_Components/CreateSitesComponent.jsx';
 import FavoritesComponent from './ComponentsKnow/Sites_Components/FavoritesComponent.jsx';
 import SiteView from './ComponentsKnow/Sites_Components/SiteView.jsx';
 

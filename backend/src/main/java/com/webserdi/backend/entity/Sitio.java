@@ -9,7 +9,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -54,7 +53,7 @@ public class Sitio {
             joinColumns = @JoinColumn(name = "sitio_id"),
             inverseJoinColumns = @JoinColumn(name = "usuario_id")
     )
-    private List<Usuario> usuarios;
+    private Set<Usuario> usuarios;
 
     @OneToMany(mappedBy = "sitio", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Archivo> archivos;

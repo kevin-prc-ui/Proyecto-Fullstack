@@ -2,6 +2,7 @@ package com.webserdi.backend.dto;
 
 import lombok.Data;
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class SitioDto {
@@ -12,5 +13,5 @@ public class SitioDto {
     private String visibility;
     private String type;
     private Long creadorId;
-    private List<Long> usuariosAsignados;
+    private Set<UsuarioDto> usuariosAsignados; // Opción 2: DTOs de usuarios
 }

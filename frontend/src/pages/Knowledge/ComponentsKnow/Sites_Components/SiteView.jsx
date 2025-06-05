@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, ListGroup, Modal } from 'react-bootstrap';
 import { FaFileUpload, FaImage, FaFilePdf, FaCheckCircle, FaArrowLeft, FaUserPlus, FaUser } from 'react-icons/fa';
 import { listUsers } from '../../../../services/UsuarioService'; // Asegúrate que la ruta es correcta
+import SitioService from '../../../../services/SitioService';
 
 const SiteView = ({ site, onGoBack }) => {
   const [selectedUsers, setSelectedUsers] = useState([]);

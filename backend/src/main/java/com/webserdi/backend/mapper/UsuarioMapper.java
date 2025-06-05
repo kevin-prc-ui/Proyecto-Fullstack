@@ -26,7 +26,7 @@ public class UsuarioMapper {
      * @param usuario La entidad Usuario a convertir.
      * @return El UsuarioDto resultante, o null si la entidad de entrada es null.
      */
-    public static UsuarioDto mapToUsuarioDto(Usuario usuario) {
+    public UsuarioDto mapToUsuarioDto(Usuario usuario) {
         if (usuario == null) {
             return null;
         }
@@ -77,7 +77,7 @@ public class UsuarioMapper {
      * @param usuarioDto El UsuarioDto a convertir.
      * @return La entidad Usuario resultante, o null si el DTO de entrada es null.
      */
-    public static Usuario mapToUsuario(UsuarioDto usuarioDto) {
+    public Usuario mapToUsuario(UsuarioDto usuarioDto) {
         if (usuarioDto == null) {
             return null;
         }
@@ -99,7 +99,7 @@ public class UsuarioMapper {
      * @param usuario La entidad Usuario a convertir.
      * @return El UsuarioSimpleDto resultante, o null si la entidad de entrada es null.
      */
-    public static UsuarioSimpleDto mapToUsuarioSimpleDto(Usuario usuario) {
+    public UsuarioSimpleDto mapToUsuarioSimpleDto(Usuario usuario) {
         if (usuario == null) {
             return null;
         }
