@@ -41,8 +41,6 @@ const TaskDetails = () => {
       setTicketError(null);
       getPermisos().then((response) => {
         setPermisos(response.data);
-        console.log(response.data);
-        
       });
       getTicketById(id)
         .then((response) => {
@@ -117,7 +115,7 @@ const TaskDetails = () => {
 
   // --- Render Main Content (Ticket Details + Chat) ---
   return (
-    <div className="min-h-fit w-fit p-4 md:p-6">
+    <div className="h-1 p-4 md:p-6">
       {/* Contenedor principal que alinea el botón (izquierda) y el contenido principal (derecha) */}
       {/* 'items-center' centrará verticalmente el botón respecto al bloque de contenido de la derecha */}
       <div className="max-w-7x2 mx-auto flex flex-row items-center gap-x-4 md:gap-x-6">
@@ -226,7 +224,7 @@ const TaskDetails = () => {
             </div>
           </div>
           {/* Columna Derecha: Chat */}
-          <div className="flex-1 lg:w-1/2 xl:w-200 min-h-[600px] lg:min-h-0">
+          <div className="flex-1 lg:w-1/2 xl:w-20 min-h-[600px] lg:min-h-0">
             {/* Pass necessary props to ChatComponent */}
             <ChatContainer ticketId={id} chatId={ticket.chatId} />
           </div>

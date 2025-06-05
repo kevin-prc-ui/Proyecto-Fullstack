@@ -43,8 +43,9 @@ public class TicketController {
     @GetMapping("/user/{id}")
     public ResponseEntity<Page<TicketDto>> getTicketsByUsuario(
             @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable,
-            @PathVariable Long id) {
-        return ResponseEntity.ok(ticketService.GetTicketsByUsuario(pageable, id));
+            @PathVariable Long id,
+            @RequestParam(required = false) String departamento) {
+        return ResponseEntity.ok(ticketService.GetTicketsByUsuario(pageable, id, departamento));
     }
 
     /**

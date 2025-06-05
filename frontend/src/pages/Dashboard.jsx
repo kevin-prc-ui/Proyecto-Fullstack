@@ -1,3 +1,4 @@
+import React from "react";
 import "../styles/index.css";
 import {
   AuthenticatedTemplate,
@@ -7,12 +8,18 @@ import {
 import { TbBulb } from "react-icons/tb";
 import { LiaUserAstronautSolid } from "react-icons/lia";
 import { Button, Transition } from "@headlessui/react";
-import { FaRegHandPeace, FaUserPlus, FaSignInAlt, FaSync } from "react-icons/fa";
-import { Link} from "react-router-dom";
+import { 
+  FaRegHandPeace, 
+  FaUserPlus, 
+  FaSignInAlt, 
+  FaSync,
+  FaChevronLeft,
+  FaChevronRight
+} from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { UseLoginHandler } from "../components/MicrosoftAuth/ButtonHandler";
 import { useEffect, useState } from "react";
 import CreateTicket from "../components/Ticket/CreateTicket";
-import React from "react";
 import { getUserId } from "../services/UsuarioService";
 import { listTicketsByUser } from "../services/TicketService";
 
@@ -30,6 +37,7 @@ const Dashboard = () => {
     </>
   );
 };
+
 const AuthPrompt = () => {
   const { handleLogin } = UseLoginHandler();
   return (
@@ -88,27 +96,32 @@ const AuthPrompt = () => {
     </>
   );
 };
+
 const ProfileContent = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  
   const { accounts } = useMsal();
   const userEmail = accounts[0]?.username || '';
 
-  // Función para obtener los tickets del usuario
-  const fetchUserTickets = async () => {
+  // Función para obtener los tickets del usuario con paginación
+  const fetchUserTickets = async (page = currentPage, size = itemsPerPage) => {
     try {
       setLoading(true);
-      // Reemplazar con tu endpoint real de Spring Boot
-      const responseUser = await getUserId(userEmail)
-      const userId=responseUser.data;
-      const response = await listTicketsByUser(userId);
-        // if (!response.ok) {
-        //   throw new Error('Error al obtener tickets');
-        // }
+      const responseUser = await getUserId(userEmail);
+      const userId = responseUser.data;
+      const response = await listTicketsByUser(userId, page, "",size);
+      console.log();
       
-      const data = response.data.content;
-      setTickets(data);
+      
+      setTickets(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setTotalItems(response.data.totalElements);
     } catch (error) {
       console.error("Error fetching tickets:", error);
     } finally {
@@ -118,8 +131,51 @@ const ProfileContent = () => {
 
   // Obtener tickets al cargar el componente
   useEffect(() => {
-      fetchUserTickets();
+    fetchUserTickets();
   }, []);
+
+  // Función para cambiar de página
+  const handlePageChange = (newPage) => {
+    if (newPage >= 0 && newPage < totalPages) {
+      setCurrentPage(newPage);
+      fetchUserTickets(newPage, itemsPerPage);
+    }
+  };
+
+  // Función para cambiar el número de elementos por página
+  const handleItemsPerPageChange = (e) => {
+    const newSize = parseInt(e.target.value);
+    setItemsPerPage(newSize);
+    setCurrentPage(0); // Volver a la primera página
+    fetchUserTickets(0, newSize);
+  };
+
+  // Función para obtener la etiqueta de prioridad
+  const getPriorityLabel = (priority) => {
+    switch(priority) {
+      case 1: return 'Alta';
+      case 2: return 'Media';
+      case 3: return 'Baja';
+      default: return 'Desconocida';
+    }
+  };
+
+  // Función para obtener la etiqueta de estado
+  const getStatusLabel = (status) => {
+    switch(status) {
+      case 'ABIERTO': return 'Abierto';
+      case 'EN_PROGRESO': return 'En Progreso';
+      case 'CERRADO': return 'Cerrado';
+      default: return status;
+    }
+  };
+
+  // Función para formatear la fecha
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
 
   return (
     <>
@@ -166,22 +222,38 @@ const ProfileContent = () => {
         <CreateTicket 
           open={openDialog} 
           setOpen={setOpenDialog} 
-          onTicketCreated={fetchUserTickets} // Actualizar lista después de crear
+          onTicketCreated={() => fetchUserTickets(currentPage, itemsPerPage)} 
         />
       </div>
 
       {/* SECCIÓN DE TICKETS DEL USUARIO */}
       <div className="mx-4">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-bold text-gray-800">Mis Tickets</h3>
-          <button 
-            onClick={fetchUserTickets}
-            className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors"
-            disabled={loading}
-          >
-            <FaSync className={`mr-1 ${loading ? 'animate-spin' : ''}`} />
-            Actualizar
-          </button>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <span className="text-sm text-gray-600 mr-2">Mostrar:</span>
+              <select
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                className="border rounded px-2 py-1 text-sm"
+                disabled={loading}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+            <button 
+              onClick={() => fetchUserTickets(currentPage, itemsPerPage)}
+              className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors"
+              disabled={loading}
+            >
+              <FaSync className={`mr-1 ${loading ? 'animate-spin' : ''}`} />
+              Actualizar
+            </button>
+          </div>
         </div>
         
         {loading ? (
@@ -200,59 +272,124 @@ const ProfileContent = () => {
             </Button>
           </div>
         ) : (
-          <div className="overflow-x-auto shadow-md rounded-lg">
-            <table className="min-w-full bg-white">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">ID</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Título</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Estado</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Fecha de creacion</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Fecha de expiración</th>
-                  <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Prioridad</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tickets.map(ticket => (
-                  <tr key={ticket.id} className="border-b hover:bg-gray-50 transition-colors">
-                    <td className="py-3 px-4 text-sm text-gray-600">#{ticket.id}</td>
-                    <td className="py-3 px-4">
-                      <Link 
-                        to={`/helpdesk/task/${ticket.id}`} 
-                        className="text-blue-600 hover:text-blue-800 hover:underline transition-colors text-decoration-none"
-                      >
-                        {ticket.tema}
-                      </Link>
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        ticket.status === 'ABIERTO' ? 'bg-green-100 text-green-800' :
-                        ticket.status === 'EN_PROGRESO' ? 'bg-yellow-100 text-yellow-800' :
-                        ticket.status === 'CERRADO' ? 'bg-gray-100 text-gray-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
-                        {ticket.estado}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      {new Date(ticket.fechaCreacion).toLocaleDateString()}
-                    </td><td className="py-3 px-4 text-sm text-gray-600">
-                      {ticket.fechaVencimiento}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        ticket.prioridad === 1 ? 'bg-red-100 text-red-800' :
-                        ticket.prioridad === 2 ? 'bg-orange-100 text-orange-800' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
-                        {ticket.prioridad}
-                      </span>
-                    </td>
+          <>
+            <div className="overflow-x-auto shadow-md rounded-lg">
+              <table className="min-w-full bg-white">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">ID</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Título</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Estado</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Fecha de creación</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Fecha de expiración</th>
+                    <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Prioridad</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {tickets.map(ticket => (
+                    <tr key={ticket.id} className="border-b hover:bg-gray-50 transition-colors">
+                      <td className="py-3 px-4 text-sm text-gray-600">#{ticket.id}</td>
+                      <td className="py-3 px-4">
+                        <Link 
+                          to={`/helpdesk/task/${ticket.id}`} 
+                          className="text-blue-600 hover:text-blue-800 hover:underline transition-colors text-decoration-none"
+                        >
+                          {ticket.tema}
+                        </Link>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          ticket.estado === 'ABIERTO' ? 'bg-green-100 text-green-800' :
+                          ticket.estado === 'EN_PROGRESO' ? 'bg-yellow-100 text-yellow-800' :
+                          ticket.estado === 'CERRADO' ? 'bg-gray-100 text-gray-800' :
+                          'bg-blue-100 text-blue-800'
+                        }`}>
+                          {getStatusLabel(ticket.estado)}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-600">
+                        {formatDate(ticket.fechaCreacion)}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-gray-600">
+                        {formatDate(ticket.fechaVencimiento)}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          ticket.prioridad === 1 ? 'bg-red-100 text-red-800' :
+                          ticket.prioridad === 2 ? 'bg-orange-100 text-orange-800' :
+                          'bg-blue-100 text-blue-800'
+                        }`}>
+                          {getPriorityLabel(ticket.prioridad)}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            {/* Paginación */}
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-4 py-3 border-t border-gray-200">
+              <div className="text-sm text-gray-600 mb-2 sm:mb-0">
+                Mostrando {Math.min(itemsPerPage, tickets.length)} de {totalItems} tickets
+              </div>
+              
+              <div className="flex items-center">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 0}
+                  className={`p-2 rounded ${
+                    currentPage === 0 
+                      ? 'text-gray-300 cursor-not-allowed' 
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <FaChevronLeft />
+                </button>
+                
+                <div className="flex space-x-1 mx-2">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    const pageIndex = Math.max(
+                      0, 
+                      Math.min(
+                        totalPages - 5, 
+                        currentPage - 2
+                      )
+                    ) + i;
+                    
+                    if (pageIndex < totalPages) {
+                      return (
+                        <button
+                          key={pageIndex}
+                          onClick={() => handlePageChange(pageIndex)}
+                          className={`px-3 py-1 rounded ${
+                            currentPage === pageIndex
+                              ? 'bg-blue-500 text-white'
+                              : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                        >
+                          {pageIndex + 1}
+                        </button>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+                
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage >= totalPages - 1}
+                  className={`p-2 rounded ${
+                    currentPage >= totalPages - 1
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <FaChevronRight />
+                </button>
+              </div>
+            </div>
+          </>
         )}
         <div className="m-4"></div>
       </div>

@@ -111,11 +111,21 @@ const Tasks = ({ userTicketsOnly = false }) => {
       let response;
       const userId = await getUserId();
       if (userTicketsOnly && userId) {
-        // Obtener tickets específicos del usuario
+        if (filterDepartamento) {
+          // Obtener tickets específicos del usuario en un departamento
         response = await listTicketsByUser(
           userId.data,
           page,
+          filterDepartamento
         );
+        }else{//Obtener tickets específicos del usuario
+          response = await listTicketsByUser(
+            userId.data,
+            page,
+            ""
+          );
+        }
+        // Obtener tickets específicos del usuario
       } else if (filterStatus) {
         // Obtener tickets filtrados por estado
         response = await listFilteredTickets(

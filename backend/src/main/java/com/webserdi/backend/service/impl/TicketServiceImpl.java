@@ -288,19 +288,23 @@ public class TicketServiceImpl implements TicketService {
      */
     @Override
     public Page<TicketDto> getAllTickets(Pageable pageable, String departamentoNombre) {
-        logger.debug("Obteniendo todos los tickets activos. Pageable: {}, Departamento: {}", pageable, departamentoNombre);
         Page<Ticket> ticketsPage;
         if (StringUtils.hasText(departamentoNombre)) {
             ticketsPage = ticketRepository.findAllByDepartamentoNombreAndIsTrashedFalse(departamentoNombre, pageable);
-        } else {
-            ticketsPage = ticketRepository.findAllByIsTrashedFalse(pageable);
+            return ticketsPage.map(ticketMapper::toDto);
         }
+        ticketsPage = ticketRepository.findAllByIsTrashedFalse(pageable);
         return ticketsPage.map(ticketMapper::toDto);
     }
 
     @Override
-    public Page<TicketDto> GetTicketsByUsuario(Pageable pageable,Long id) {
-        Page<Ticket> ticketsPage = ticketRepository.findAllByUsuarioCreadorId(pageable,id);
+    public Page<TicketDto> GetTicketsByUsuario(Pageable pageable,Long id, String departamentoNombre) {
+        Page<Ticket> ticketsPage;
+        if (StringUtils.hasText((departamentoNombre))) {
+            ticketsPage = ticketRepository.findAllByUsuarioCreadorIdAndDepartamentoNombre(pageable,id,departamentoNombre);
+            return ticketsPage.map(ticketMapper::toDto);
+        }
+        ticketsPage = ticketRepository.findAllByUsuarioCreadorId(pageable,id);
         return ticketsPage.map(ticketMapper::toDto);
     }
 
