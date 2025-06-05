@@ -1,19 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
+import { listUsers } from '../../../../services/UsuarioService';
 
-export const CreateSitesComponent = ({ addSite }) => {
+export const CreateSitesComponent = ({ addSite, usuarioId }) => {
+  // Estado para mostrar/ocultar modal
   const [showModal, setShowModal] = useState(false);
+
+  // Estado para lista de usuarios disponibles para asignar
+  const [usuariosDisponibles, setUsuariosDisponibles] = useState([]);
+
+  // Estado que contiene los datos del formulario, incluido usuariosAsignados
   const [siteData, setSiteData] = useState({
     type: 'Collaboration Site',
     name: '',
     siteId: '',
     visibility: 'Public',
-    description: ''
+    description: '',
+    creadorId: usuarioId, // Asignar usuario creador desde props
+    usuariosAsignados: [] // Array de usuarios seleccionados
   });
 
+  // useEffect para cargar la lista de usuarios simulada al montar componente
+
+useEffect(() => {
+  const obtenerUsuarios = async () => {
+    try {
+      const response = await listUsers(); // Sin departamento
+      if (response && response.data) {
+        setUsuariosDisponibles(response.data);
+      } else {
+        console.warn("Respuesta inesperada del servidor", response);
+      }
+    } catch (error) {
+      console.error("Error al obtener usuarios:", error);
+    }
+  };
+
+    
+
+  obtenerUsuarios();
+}, []);
+  // Cargar usuario logueado desde localStorage al montar componente
+  // Función para abrir el modal
   const handleShow = () => setShowModal(true);
+
+  // Función para cerrar el modal
   const handleClose = () => setShowModal(false);
 
+  // Maneja los cambios en inputs normales (texto, radio, textarea)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSiteData({
@@ -22,27 +56,51 @@ export const CreateSitesComponent = ({ addSite }) => {
     });
   };
 
+  // Maneja la selección múltiple de usuarios
+  const handleUserSelection = (e) => {
+    // e.target.selectedOptions es una colección de opciones seleccionadas
+    const options = Array.from(e.target.selectedOptions);
+    // Mapeamos las opciones seleccionadas a objetos con id y nombre
+    const seleccionados = options.map((opt) => ({
+      id: parseInt(opt.value), // Convertimos valor a número
+      nombre: opt.text
+    }));
+    // Actualizamos el estado con el array de usuarios seleccionados
+    setSiteData({
+      ...siteData,
+      usuariosAsignados: seleccionados
+    });
+  };
+
+  // Maneja el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Mostrar en consola el objeto completo que se enviará al backend
+    console.log('Datos a enviar al backend:', siteData);
+
+    // Llamamos la función que pasa los datos al componente padre o backend
     addSite(siteData);
 
+    // Cerramos el modal
     handleClose();
 
+    // Reiniciamos el formulario a valores iniciales
     setSiteData({
       type: 'Collaboration Site',
       name: '',
       siteId: '',
       visibility: 'Public',
-      description: ''
+      description: '',
+      usuariosAsignados: []
     });
   };
 
   return (
     <>
-      {/* No necesitamos botón aquí si abres modal desde arriba */}
-      {/* Pero si quieres mantener botón dentro del componente, mantenlo */}
-      <button 
-        type="button" 
+      {/* Botón para abrir el modal */}
+      <button
+        type="button"
         className="list-group-item list-group-item-action create-site-btn"
         onClick={handleShow}
       >
@@ -50,6 +108,7 @@ export const CreateSitesComponent = ({ addSite }) => {
         Crear Sitio
       </button>
 
+      {/* Modal para crear nuevo sitio */}
       <Modal show={showModal} onHide={handleClose} size="lg" centered>
         <Modal.Header closeButton className="bg-primary text-white">
           <Modal.Title>
@@ -60,6 +119,7 @@ export const CreateSitesComponent = ({ addSite }) => {
         <Form onSubmit={handleSubmit}>
           <Modal.Body className="p-4">
             <Container>
+              {/* Tipo de sitio (solo lectura) */}
               <Row className="mb-1">
                 <Col md={6}>
                   <Form.Group className="mb-3">
@@ -77,6 +137,7 @@ export const CreateSitesComponent = ({ addSite }) => {
                 </Col>
               </Row>
 
+              {/* Nombre del sitio */}
               <Row className="mb-4">
                 <Col>
                   <Form.Group className="mb-3">
@@ -97,6 +158,7 @@ export const CreateSitesComponent = ({ addSite }) => {
                 </Col>
               </Row>
 
+              {/* ID del sitio */}
               <Row className="mb-4">
                 <Col>
                   <Form.Group className="mb-3">
@@ -125,6 +187,7 @@ export const CreateSitesComponent = ({ addSite }) => {
 
               <hr className="my-4 border-primary" />
 
+              {/* Descripción */}
               <Row className="mb-4">
                 <Col>
                   <h5 className="fw-bold text-primary">
@@ -145,6 +208,34 @@ export const CreateSitesComponent = ({ addSite }) => {
                 </Col>
               </Row>
 
+              {/* Selección múltiple de usuarios */}
+              <Row className="mb-4">
+                <Col>
+                  <Form.Group>
+                    <Form.Label className="fw-bold text-primary">
+                      <i className="bi bi-people-fill me-2"></i>
+                      Asignar Usuarios
+                    </Form.Label>
+                    <Form.Select
+                      multiple
+                      className="border-primary"
+                      value={siteData.usuariosAsignados.map(u => u.id.toString())} // Mantener selección actual
+                      onChange={handleUserSelection} // Actualiza usuariosAsignados
+                    >
+                      {usuariosDisponibles.map((usuario) => (
+                        <option key={usuario.id} value={usuario.id}>
+                          {usuario.nombre}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Text className="text-muted">
+                      Mantén presionado Ctrl (o Cmd en Mac) para seleccionar múltiples usuarios.
+                    </Form.Text>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              {/* Configuración de visibilidad */}
               <Row className="mb-4">
                 <Col>
                   <h5 className="fw-bold text-primary">
@@ -169,7 +260,6 @@ export const CreateSitesComponent = ({ addSite }) => {
                       onChange={handleInputChange}
                       className="mb-2"
                     />
-
                     <Form.Check
                       type="radio"
                       id="visibility-moderated"
@@ -188,7 +278,6 @@ export const CreateSitesComponent = ({ addSite }) => {
                       onChange={handleInputChange}
                       className="mb-2"
                     />
-
                     <Form.Check
                       type="radio"
                       id="visibility-private"
@@ -212,13 +301,12 @@ export const CreateSitesComponent = ({ addSite }) => {
               </Row>
             </Container>
           </Modal.Body>
-          <Modal.Footer className="bg-light">
-            <Button variant="outline-secondary" onClick={handleClose}>
-              <i className="bi bi-x-circle me-2"></i>
+
+          <Modal.Footer className="justify-content-center">
+            <Button variant="outline-primary" onClick={handleClose}>
               Cancelar
             </Button>
             <Button variant="primary" type="submit">
-              <i className="bi bi-check-circle me-2"></i>
               Crear Sitio
             </Button>
           </Modal.Footer>
@@ -227,5 +315,3 @@ export const CreateSitesComponent = ({ addSite }) => {
     </>
   );
 };
-
-export default CreateSitesComponent;

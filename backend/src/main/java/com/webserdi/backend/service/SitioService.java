@@ -6,7 +6,7 @@ import java.util.List;
 public interface SitioService {
     SitioDto crearSitio(SitioDto sitioDto);
     List<SitioDto> listarMisSitios(Long usuarioId);
-    SitioDto obtenerPorSlug(String slug);
+    List<SitioDto> obtenerPorSlug(Long id);
     void eliminarSitio(Long id);
     SitioDto actualizarSitio(Long id, SitioDto sitioDto);
 }

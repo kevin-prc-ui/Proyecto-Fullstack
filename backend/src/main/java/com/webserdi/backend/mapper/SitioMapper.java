@@ -2,34 +2,48 @@ package com.webserdi.backend.mapper;
 
 import com.webserdi.backend.dto.SitioDto;
 import com.webserdi.backend.entity.Sitio;
-import com.webserdi.backend.entity.Usuario;
-import com.webserdi.backend.repository.UsuarioRepository;
-
+import org.springframework.stereotype.Component;
 import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class SitioMapper {
 
-    public static Sitio toEntity(SitioDto dto, Usuario creador, UsuarioRepository usuarioRepo) {
+    private final UsuarioMapper usuarioMapper; // Necesitarás un UsuarioMapper
+
+    public SitioMapper(UsuarioMapper usuarioMapper) {
+        this.usuarioMapper = usuarioMapper;
+    }
+
+    public Sitio toEntity(SitioDto dto) {
         Sitio sitio = new Sitio();
+        sitio.setId(dto.getId());
         sitio.setNombre(dto.getName());
         sitio.setDescripcion(dto.getDescription());
         sitio.setTipo(dto.getType());
         sitio.setVisibilidad(dto.getVisibility());
         sitio.setSlug(dto.getSiteId());
-        sitio.setCreador(creador);
 
-        if (dto.getUsuariosAsignados() != null) {
-            List<Usuario> usuarios = usuarioRepo.findAllById(dto.getUsuariosAsignados());
-            sitio.setUsuarios(usuarios);
-        }
+//        if (dto.getUsuariosAsignados() != null && !dto.getUsuariosAsignados().isEmpty()) {
+//            // Convertir UsuarioDto a Usuario (necesitas implementar UsuarioMapper)
+//            Set<Usuario> usuarios = dto.getUsuariosAsignados().stream()
+//                    .map(usuarioDto -> usuarioRepo.findById(usuarioDto.getId())
+//                            .orElseThrow(() -> new RuntimeException("Usuario no encontrado")))
+//                    .collect(Collectors.toSet());
+//            sitio.setUsuarios(usuarios);
+//        } else {
+//            sitio.setUsuarios(new HashSet<>());
+//        }
 
-        sitio.setAdministradores(new HashSet<>()); // opcional: puedes usar dto para asignarlos
+        sitio.setAdministradores(new HashSet<>());
         return sitio;
     }
 
-    public static SitioDto toDto(Sitio sitio) {
+    public SitioDto toDto(Sitio sitio) {
+        if (sitio == null) {
+            return null;
+        }
+
         SitioDto dto = new SitioDto();
         dto.setId(sitio.getId());
         dto.setName(sitio.getNombre());
@@ -37,12 +51,16 @@ public class SitioMapper {
         dto.setType(sitio.getTipo());
         dto.setVisibility(sitio.getVisibilidad());
         dto.setSiteId(sitio.getSlug());
-        dto.setCreadorId(sitio.getCreador().getId());
 
-        if (sitio.getUsuarios() != null) {
+        if (sitio.getCreador() != null) {
+            dto.setCreadorId(sitio.getCreador().getId());
+        }
+
+        if (sitio.getUsuarios() != null && !sitio.getUsuarios().isEmpty()) {
+            // Convertir Usuario a UsuarioDto
             dto.setUsuariosAsignados(sitio.getUsuarios().stream()
-                    .map(Usuario::getId)
-                    .collect(Collectors.toList()));
+                    .map(usuarioMapper::mapToUsuarioDto) // Usar UsuarioMapper
+                    .collect(Collectors.toSet()));
         }
 
         return dto;

@@ -3,31 +3,48 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import "../../styles/estilos.css";
 import MySitesComponent from './ComponentsKnow/Sites_Components/MySitesComponent.jsx';
 import SitesFinderComponent from './ComponentsKnow/Sites_Components/SitesFinderComponent.jsx';
-import CreateSitesComponent from './ComponentsKnow/Sites_Components/CreateSitesComponent.jsx';
+import {CreateSitesComponent} from './ComponentsKnow/Sites_Components/CreateSitesComponent.jsx';
 import FavoritesComponent from './ComponentsKnow/Sites_Components/FavoritesComponent.jsx';
 import SiteView from './ComponentsKnow/Sites_Components/SiteView.jsx';
+import { getSitiosByUser, createSitio } from '../../services/SitioService';
+import { getUserId } from '../../services/UsuarioService.js';
+
 
 const Sites = () => {
+    const [userId, setUserId] = useState(null); // Obtén el usuario actual del contexto
+  
   const [activeTab, setActiveTab] = useState('misSitios');
   const [sites, setSites] = useState([]);
   const [currentSite, setCurrentSite] = useState(null); // Nuevo estado para el sitio actual
 
   // Cargar sitios de localStorage al montar
-  useEffect(() => {
-    const storedSites = JSON.parse(localStorage.getItem('mySites')) || [];
-    setSites(storedSites);
-  }, []);
+useEffect(() => {
+    getUserId().then((response) => {
+          setUserId(response.data);
+        });
 
-  // Guardar sitios en localStorage cada vez que cambian
-  useEffect(() => {
-    localStorage.setItem('mySites', JSON.stringify(sites));
-  }, [sites]);
+  if (userId) {
+    getSitiosByUser(userId)
+      .then(response => {
+        setSites(response.data);
+      })
+      .catch(error => {
+        console.error("Error al obtener los sitios del usuario:", error);
+      });
+  }
+}, []);
 
-  // Agregar nuevo sitio
-  const addSite = (newSite) => {
-    setSites([...sites, {...newSite, favorite: false}]);
-    setActiveTab('misSitios');
-  };
+
+const addSite = (newSite) => {
+  createSitio(newSite)
+    .then(response => {
+      setSites(prevSites => [...prevSites, response.data]);
+    })
+    .catch(error => {
+      console.error("Error al crear el sitio:", error);
+    });
+}
+  
 
   // Función para abrir un sitio
   const openSite = (site) => {
@@ -46,7 +63,7 @@ const Sites = () => {
       case 'buscarSitios':
         return <SitesFinderComponent />;
       case 'crearSitio':
-        return <CreateSitesComponent addSite={addSite} />;
+        return <CreateSitesComponent addSite={addSite} usuarioId={userId}/>;
       case 'favoritos':
         return <FavoritesComponent sites={sites} setSites={setSites} onSiteClick={openSite} />;
       default:
@@ -56,7 +73,7 @@ const Sites = () => {
 
   // Si hay un sitio seleccionado, mostramos la vista detallada
   if (currentSite) {
-    return <SiteView site={currentSite} onGoBack={goBack} />;
+    return <SiteView site={currentSite} onGoBack={goBack} usuarioId={userId}/>;
   }
 
   // Vista normal de pestañas

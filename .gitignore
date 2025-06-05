@@ -34,3 +34,4 @@ build/
 ### VS Code ###
 .vscode/
 /backend/chat-uploads
+/backend/uploads
