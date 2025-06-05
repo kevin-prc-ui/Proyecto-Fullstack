@@ -102,10 +102,7 @@ const ProfileContent = () => {
       // Reemplazar con tu endpoint real de Spring Boot
       const responseUser = await getUserId(userEmail)
       const userId=responseUser.data;
-      console.log(userId);
       const response = await listTicketsByUser(userId);
-      console.log(response.data.content);
-      
         // if (!response.ok) {
         //   throw new Error('Error al obtener tickets');
         // }
@@ -122,8 +119,6 @@ const ProfileContent = () => {
   // Obtener tickets al cargar el componente
   useEffect(() => {
       fetchUserTickets();
-      console.log(tickets);
-      
   }, []);
 
   return (

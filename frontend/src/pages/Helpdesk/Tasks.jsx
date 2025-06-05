@@ -128,7 +128,6 @@ const Tasks = ({ userTicketsOnly = false }) => {
         response = await listTickets(page, filterDepartamento);
       }
 
-      console.log(response.data);
       
       setTickets(response.data.content);
       setTotalPages(response.data.totalPages);

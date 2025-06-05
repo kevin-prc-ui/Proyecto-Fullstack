@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getTicketById } from "../../services/TicketService";
-// Assuming listMessages fetches messages for a TICKET ID and backend links it to chat
 import { toast } from "sonner";
 import {
   FaTicketAlt,
@@ -11,12 +10,13 @@ import {
   FaClock,
   FaExclamationTriangle,
   FaSpinner,
-  FaArrowLeft, // <--- Importar el nuevo ícono
-  FaPencilAlt, // <--- Importar ícono de edición
+  FaArrowLeft,
+  FaPencilAlt,
 } from "react-icons/fa";
 import ChatContainer from "../../components/Chat/ChatContainer";
 import { getVencimiento } from "../../utils/utils";
 import CreateTicket from "../../components/Ticket/CreateTicket";
+import { getPermisos } from "../../services/UsuarioService";
 
 //  * @component TaskDetails
 //  * @description Muestra los detalles completos de un ticket y su chat asociado.
@@ -26,6 +26,7 @@ const TaskDetails = () => {
 
   const id = params?.id || ""; // Ticket ID
   const [openDialog, setOpenDialog] = useState(false);
+  const [permisos, setPermisos] = useState("");
 
   // --- Ticket State ---
   const [loadingTicket, setLoadingTicket] = useState(true);
@@ -35,24 +36,20 @@ const TaskDetails = () => {
   // --- Fetch Ticket Details ---
   useEffect(() => {
     if (id) {
+      setPermisos([]);
       setLoadingTicket(true);
       setTicketError(null);
+      getPermisos().then((response) => {
+        setPermisos(response.data);
+        console.log(response.data);
+        
+      });
       getTicketById(id)
         .then((response) => {
           if (response.data) {
             // *** CRUCIAL: Check for chatId ***
             setTicket(response.data);
-            // Fetch initial messages AFTER getting ticket details (and chatId)
-          } //else if (response.data && !response.data.chatId) {
-          //    setTicketError("Error: No se encontró el ID del chat asociado a este ticket. Contacte al administrador.");
-          //    setTicket(null);
-          //    toast.error("Falta información del chat para este ticket.");
-          // }
-          // else {
-          //   setTicketError("No se encontraron datos para este ticket.");
-          //   setTicket(null);
-          //   toast.warning("Ticket no encontrado.");
-          // }
+          }
         })
         .catch((err) => {
           console.error("Error al cargar el ticket:", err);
@@ -68,14 +65,20 @@ const TaskDetails = () => {
       setLoadingTicket(false);
       toast.error("ID de ticket inválido.");
     }
-    // Cleanup function for component unmount or ID change
-  }, [id]); // Re-run if ticket ID changes
+  }, [id]);
 
   const editarTicket = () => {
-    setOpenDialog(true);
+    console.log();
+    permisos.map((permiso) => {
+      console.log(permiso.nombre);
+      
+      if (permiso.nombre.includes("EDITAR_TICKET")) {
+        setOpenDialog(true);
+      }
+    });
   };
 
-  // --- Render Loading State ---
+  // --- Se renderiza la pantalla de  ---
   if (loadingTicket) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -155,7 +158,7 @@ const TaskDetails = () => {
                 icon={<FaInfoCircle className="text-green-600" />}
                 actionButton={
                   <button
-                    onClick={() => editarTicket()} // Placeholder action
+                    onClick={() => editarTicket()}
                     className="p-1.5 text-gray-500 hover:text-blue-600 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
                     title="Editar Ticket"
                   >
@@ -234,7 +237,6 @@ const TaskDetails = () => {
   );
 };
 
-// --- Componentes Auxiliares (DetailSection, DetailItem - unchanged) ---
 const DetailSection = ({ title, icon, children, actionButton }) => (
   <div className="border border-gray-200 rounded-md m-1 p-3">
     <div className="flex justify-between items-center mb-4 border-b pb-2">

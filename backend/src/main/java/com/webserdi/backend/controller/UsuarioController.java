@@ -101,8 +101,9 @@ public class UsuarioController {
      * @return Lista de DTOs de permisos.
      */
     @GetMapping("/permisos")
-    public ResponseEntity<List<PermisoDto>> getAllPermisos() {
-        List<PermisoDto> permisos = usuarioService.getAllPermisos();
+    public ResponseEntity<List<PermisoDto>> getAllPermisos(Authentication auth) {
+        String email = auth.getName();
+        List<PermisoDto> permisos = usuarioService.getAllPermisos(email);
         return ResponseEntity.ok(permisos);
     }
 

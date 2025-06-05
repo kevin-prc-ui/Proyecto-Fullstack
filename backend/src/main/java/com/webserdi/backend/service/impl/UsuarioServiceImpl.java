@@ -298,11 +298,45 @@ public class UsuarioServiceImpl implements UsuarioService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<PermisoDto> getAllPermisos() {
-        logger.debug("Obteniendo todos los permisos.");
-        List<Permiso> permisos = permisoRepository.findAll();
-        return permisos.stream()
+    public List<PermisoDto> getAllPermisos(String email) {
+        logger.debug("Obteniendo todos los permisos para el usuario con email: {}", email);
+        if (!StringUtils.hasText(email)) {
+            throw new ResourceNotFoundException("El email del usuario no puede estar vacío.");
+        }
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    logger.warn("Usuario no encontrado con email: {}", email);
+                    return new ResourceNotFoundException("No existe el usuario con el email: " + email);
+                });
+
+        // Usar un Set para evitar permisos duplicados si un permiso está asignado directamente Y a través de un rol.
+        Set<Permiso> permisosDelUsuario = new HashSet<>();
+
+        // Añadir permisos directos del usuario
+        if (!CollectionUtils.isEmpty(usuario.getPermisos())) {
+            permisosDelUsuario.addAll(usuario.getPermisos());
+        }
+
+        // Añadir permisos de los roles del usuario
+        // Asumiendo que la entidad Rol tiene un método getPermisos() que devuelve Set<Permiso>
+        // y que los roles y sus permisos se cargan (EAGER o se obtienen aquí)
+        if (!CollectionUtils.isEmpty(usuario.getRoles())) {
+            for (Rol rol : usuario.getRoles()) {
+                if (!CollectionUtils.isEmpty(rol.getPermisos())) { // Asegúrate que Rol tenga getPermisos()
+                    permisosDelUsuario.addAll(rol.getPermisos());
+                }
+            }
+        }
+
+        if (permisosDelUsuario.isEmpty()) {
+            logger.debug("El usuario con email {} no tiene permisos asignados.", email);
+            return Collections.emptyList();
+        }
+
+        return permisosDelUsuario.stream()
                 .map(PermisoMapper::toDto) // Asumiendo que PermisoMapper tiene un método estático toDto
+                .distinct() // Aunque el Set ya maneja duplicados de entidades, por si acaso en el DTO.
                 .collect(Collectors.toList());
     }
 

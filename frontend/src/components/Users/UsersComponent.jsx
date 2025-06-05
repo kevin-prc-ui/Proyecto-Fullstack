@@ -149,6 +149,7 @@ const UsersComponent = () => {
       departamento: departamentoId ? { id: parseInt(departamentoId) } : null, // Enviar objeto departamento con id
     };
     console.log(userData);
+    
 
     // Pass the single rol string for validation
     if (!isFormValid({ nombre, apellido, email, rol, departamentoId })) return;

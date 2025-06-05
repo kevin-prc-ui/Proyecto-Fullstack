@@ -28,7 +28,6 @@ const Task = () => {
   async function listActivities() {
         const response = await getAllActivities();
         setActivities(response.data);
-        console.log(response.data);
     }
 
   // Efecto para cargar usuarios si el usuario está autenticado
