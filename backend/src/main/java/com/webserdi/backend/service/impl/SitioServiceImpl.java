@@ -4,10 +4,12 @@ import com.webserdi.backend.dto.SitioDto;
 import com.webserdi.backend.dto.UsuarioDto;
 import com.webserdi.backend.entity.Sitio;
 import com.webserdi.backend.entity.Usuario;
+import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.mapper.SitioMapper;
 import com.webserdi.backend.repository.SitioRepository;
 import com.webserdi.backend.repository.UsuarioRepository;
 import com.webserdi.backend.service.SitioService;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,10 +75,10 @@ public class SitioServiceImpl implements SitioService {
     }
 
     @Override
-    public SitioDto obtenerPorSlug(String slug) {
-        Sitio sitio = sitioRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("Sitio no encontrado"));
-        return sitioMapper.toDto(sitio);
+    public List<SitioDto> obtenerPorSlug(Long id) {
+        return sitioRepository.findAllByCreadorId(id).stream()
+                .map(sitioMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override

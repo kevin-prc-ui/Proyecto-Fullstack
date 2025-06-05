@@ -26,9 +26,9 @@ public class SitioController {
         return ResponseEntity.ok(sitioService.listarMisSitios(usuarioId));
     }
 
-    @GetMapping("/slug/{slug}")
-    public ResponseEntity<SitioDto> obtenerPorSlug(@PathVariable String slug) {
-        return ResponseEntity.ok(sitioService.obtenerPorSlug(slug));
+    @GetMapping("/slug/{id}")
+    public ResponseEntity<List<SitioDto>> obtenerPorSlug(@PathVariable Long id) {
+        return ResponseEntity.ok(sitioService.obtenerPorSlug(id));
     }
 
     @DeleteMapping("/{id}")
