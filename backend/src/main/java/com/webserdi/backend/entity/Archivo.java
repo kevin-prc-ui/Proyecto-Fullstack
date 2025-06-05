@@ -38,4 +38,9 @@ public class Archivo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carpeta_id")
     private Carpeta carpeta;
+
+    @ManyToOne
+    @JoinColumn(name = "sitio_id")
+    private Sitio sitio;
+
 }

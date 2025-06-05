@@ -4,7 +4,10 @@ import com.webserdi.backend.entity.Sitio;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface SitioRepository extends JpaRepository<Sitio, Integer> {
+import java.util.Optional;
 
+@Repository
+public interface SitioRepository extends JpaRepository<Sitio, Long> {
+    Optional<Sitio> findBySlug(String slug);
+    boolean existsBySlug(String slug);
 }
