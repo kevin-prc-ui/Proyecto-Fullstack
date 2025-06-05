@@ -96,7 +96,7 @@ function App() {
         >
           <Route element={<Layout />}>
             <Route path="/helpdesk/tasks" element={<Tasks />} />
-            <Route path="/helpdesk/mytickets" element={<Tasks />} />
+            <Route path="/helpdesk/mytickets" element={<Tasks userTicketsOnly={true}/>} />
             <Route path="/helpdesk/completados/:estado" element={<Tasks />} />
             <Route path="/helpdesk/en-proceso/:estado" element={<Tasks />} />
             <Route path="/helpdesk/pendientes/:estado" element={<Tasks />} />

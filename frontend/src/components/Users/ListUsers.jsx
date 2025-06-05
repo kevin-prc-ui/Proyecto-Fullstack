@@ -23,7 +23,7 @@ export const ListedUsers = () => {
     try {
       setLoading(true);
       const response = await listUsers();
-      
+
       setUsuarios(response.data);
     } catch (err) {
       setError("Error al cargar usuarios");
@@ -227,10 +227,11 @@ export const ListedUsers = () => {
             <>
               {/* Encabezados de la tabla */}
               <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 rounded mb-3 font-medium text-gray-600 uppercase text-sm">
-                <div className="">Nombre</div>
+                <div className="col-span-2 text-center">Nombre</div>
                 <div className="col-span-2 text-center">Apellido</div>
                 <div className="col-span-2 text-center">Email</div>
                 <div className="col-span-2 text-center">Rol</div>
+                <div className="col-span-2 text-center">Depto.</div>
                 <div className="col-span-2 text-center">Acciones</div>
               </div>
 
@@ -242,7 +243,7 @@ export const ListedUsers = () => {
                     className="grid grid-cols-12 gap-4 items-center px-4 py-3 border-t border-gray-100 hover:bg-gray-50 transition-colors"
                   >
                     {" "}
-                    <div className=" text-gray-700">{usuario.nombre}</div>
+                    <div className="col-span-2 text-center text-gray-700">{usuario.nombre}</div>
                     <div className="col-span-2 text-center text-gray-700">
                       {usuario.apellido}
                     </div>
@@ -251,6 +252,8 @@ export const ListedUsers = () => {
                     </div>
                     <div className="col-span-2 text-center text-gray-700">
                       {usuario.roles}
+                    </div><div className="col-span-2 text-center text-gray-700">
+                      {usuario.departamento?.nombre}
                     </div>
                     <div className="col-span-2 flex justify-center">
                       <button

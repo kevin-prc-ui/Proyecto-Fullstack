@@ -68,8 +68,8 @@ console.log(url);
   });
 };
 
-export const listTicketsByUser= (userId) =>
-  axios.get(`${REST_API_BASE_URL}/tickets/user/${userId}?page=0&size=20`, getHeaders());
+export const listTicketsByUser= (userId, page) =>
+  axios.get(`${REST_API_BASE_URL}/tickets/user/${userId}?page=${page}&size=8`, getHeaders());
 
 /**
  * Lists tickets filtered by status, optionally filtered by department.

@@ -2,6 +2,7 @@ import React from "react";
 import { Button, Alert, Form, Row, Col } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { signUp, getUserById, updateUser } from "../../services/UsuarioService";
+import { listAllDepartamentos } from "../../services/DepartamentoService"; // Importar servicio de departamentos
 import { useNavigate, useParams } from "react-router-dom";
 
 // Importando constantes y funciones de utilidad
@@ -19,6 +20,8 @@ const UsersComponent = () => {
   const [rol, setRol] = useState("");
   const [selectedPermisos, setSelectedPermisos] = useState([]);
   const [permisosDisponibles, setPermisosDisponibles] = useState([]);
+  const [departamentoId, setDepartamentoId] = useState(""); // Estado para el departamento seleccionado (usar "" para no seleccionado)
+  const [departamentosDisponibles, setDepartamentosDisponibles] = useState([]); // Estado para los departamentos disponibles
   const [roles, setRoles] = useState([]); // Esto guarda una lista de los roles disponibles
 
   // Estado para almacenar los errores de validación
@@ -27,6 +30,7 @@ const UsersComponent = () => {
     apellido: "",
     email: "",
     rol: "",
+    departamentoId: "", // Usar "" para consistencia
   });
 
   const { id } = useParams(); // Obtiene el ID del usuario de los parámetros de la URL
@@ -71,6 +75,20 @@ const UsersComponent = () => {
     fetchPermisos();
   }, []);
 
+  useEffect(() => {
+    const fetchDepartamentos = async () => {
+      try {
+        const response = await listAllDepartamentos();
+        setDepartamentosDisponibles(response.data);
+      } catch (error) {
+        toast.error("Error al cargar los departamentos", error);
+        console.error("Error fetching departamentos:", error);
+      }
+    };
+    fetchDepartamentos();
+  }, []);
+
+
   /**
    * Efecto que se ejecuta al montar el componente y cuando cambia el ID.
    * Si hay un ID, obtiene la información del usuario y la carga en el formulario.
@@ -87,6 +105,7 @@ const UsersComponent = () => {
           setRol(
             userData.roles && userData.roles.length > 0 ? userData.roles[0] : ""
           );
+          setDepartamentoId(userData.departamento?.id ? String(userData.departamento.id) : ""); // Convertir a string o "" si es null/undefined
           setSelectedPermisos(userData.permisos || []);
         })
         .catch((error) => {
@@ -99,7 +118,8 @@ const UsersComponent = () => {
       setEmail("");
       setRol("");
       setSelectedPermisos([]);
-      setErrors({ nombre: "", apellido: "", email: "", rol: "" });
+      setDepartamentoId("");
+      setErrors({ nombre: "", apellido: "", email: "", rol: "", departamentoId: "" });
     }
   }, [id]);
 
@@ -118,6 +138,7 @@ const UsersComponent = () => {
    */
   const saveOrUpdateUser = async (e) => {
     e.preventDefault(); // Evita el comportamiento por defecto del formulario
+    
     const userData = {
       nombre,
       enabled: true,
@@ -125,10 +146,12 @@ const UsersComponent = () => {
       email,
       roles: rol ? [rol] : [],
       permisos: selectedPermisos,
+      departamento: departamentoId ? { id: parseInt(departamentoId) } : null, // Enviar objeto departamento con id
     };
+    console.log(userData);
 
     // Pass the single rol string for validation
-    if (!isFormValid({ nombre, apellido, email, rol })) return;
+    if (!isFormValid({ nombre, apellido, email, rol, departamentoId })) return;
 
     setLoading(true);
     try {
@@ -162,6 +185,7 @@ const UsersComponent = () => {
       apellido: "",
       email: "",
       rol: "",
+      departamentoId: "",
     };
 
     // Validaciones
@@ -185,6 +209,11 @@ const UsersComponent = () => {
 
     if (!formData.rol || formData.rol.trim() === "") {
       newErrors.rol = "El Rol es obligatorio";
+      valid = false;
+    }
+
+    if (!formData.departamentoId || String(formData.departamentoId).trim() === "") {
+      newErrors.departamentoId = "El departamento es obligatorio";
       valid = false;
     }
 
@@ -284,6 +313,28 @@ const UsersComponent = () => {
                   </Form.Select>
                   <Form.Control.Feedback type="invalid">
                     {errors.rol}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                {/* Departamento */}
+                <Form.Group className="mb-3" controlId="formDepartamento">
+                  <Form.Label>Departamento:</Form.Label>
+                  <Form.Select
+                    required
+                    name="departamentoId"
+                    value={departamentoId}
+                    onChange={(e) => setDepartamentoId(e.target.value)}
+                    isInvalid={!!errors.departamentoId}
+                  >
+                    <option value="">Seleccione un departamento</option>
+                    {departamentosDisponibles.map((depto) => (
+                      <option key={depto.id} value={depto.id}>
+                        {depto.nombre}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.departamentoId}
                   </Form.Control.Feedback>
                 </Form.Group>
 
