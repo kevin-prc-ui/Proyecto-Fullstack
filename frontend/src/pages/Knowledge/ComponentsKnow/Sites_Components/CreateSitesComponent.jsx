@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
 import { listUsers } from '../../../../services/UsuarioService';
 
-export const CreateSitesComponent = ({ addSite }) => {
+export const CreateSitesComponent = ({ addSite, usuarioId }) => {
   // Estado para mostrar/ocultar modal
   const [showModal, setShowModal] = useState(false);
 
@@ -16,6 +16,7 @@ export const CreateSitesComponent = ({ addSite }) => {
     siteId: '',
     visibility: 'Public',
     description: '',
+    creadorId: usuarioId, // Asignar usuario creador desde props
     usuariosAsignados: [] // Array de usuarios seleccionados
   });
 
@@ -35,9 +36,11 @@ useEffect(() => {
     }
   };
 
+    
+
   obtenerUsuarios();
 }, []);
-
+  // Cargar usuario logueado desde localStorage al montar componente
   // Función para abrir el modal
   const handleShow = () => setShowModal(true);
 

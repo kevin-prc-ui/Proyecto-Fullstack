@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, ListGroup, Modal } from 'react-bootstrap';
 import { FaFileUpload, FaImage, FaFilePdf, FaCheckCircle, FaArrowLeft, FaUserPlus, FaUser } from 'react-icons/fa';
-import { listUsers } from '../../../../services/UsuarioService'; // Asegúrate que la ruta es correcta
-import SitioService from '../../../../services/SitioService';
+import { getUserId, listUsers } from '../../../../services/UsuarioService'; // Asegúrate que la ruta es correcta
 
-const SiteView = ({ site, onGoBack }) => {
+
+const SiteView = ({ site, onGoBack, usuarioId}) => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
@@ -23,6 +23,7 @@ const SiteView = ({ site, onGoBack }) => {
 
   // Carga usuarios desde backend cuando se abre el modal
   useEffect(() => {
+
     if (showUserModal) {
       setUsersState({ loading: true, error: null, users: [] });
       listUsers()
@@ -37,10 +38,10 @@ const SiteView = ({ site, onGoBack }) => {
 
   // Cargar usuario logueado desde localStorage al montar componente
   useEffect(() => {
-    const usuario = localStorage.getItem('usuarioLogueado');
-    if (usuario) {
-      setUsuarioLogueado(JSON.parse(usuario));
-    }
+  getUserId().then((response)=> {
+    setUsuarioLogueado(response.data);
+  }); // Asegúrate que esta función obtiene el ID del usuario logueado
+    
   }, []);
 
   // Filtrar usuarios basado en el término de búsqueda
