@@ -24,7 +24,7 @@ public class JwtTokenProvider {
     @Value("${app-jwt-expiration-milliseconds}")
     private long jwtExpirationMs; // Fixed type to long
 
-    private Set<String> blacklistedTokens = new HashSet<>();
+    private final Set<String> blacklistedTokens = new HashSet<>();
 
     private Key key() {
         // Para un `jwtSecret` que esta en Base64-encoded:

@@ -3,12 +3,12 @@ import {
   getUserRoles,
   login,
   logout,
-  postIp,
 } from "../../services/UsuarioService";
 import { callMsGraph } from "../../graph";
 import { loginRequest } from "../../services/authConfig";
 import { useNavigate } from "react-router-dom";
 import { useMsal } from "@azure/msal-react";
+import { postIp } from "../../services/IpService";
 
 export const UseLoginHandler = () => {
   const navigate = useNavigate();

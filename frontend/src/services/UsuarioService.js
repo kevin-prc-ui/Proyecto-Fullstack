@@ -112,9 +112,6 @@ export const getUserRoles = () => {
     });
 };
 
-export const postIp = (ip) =>
-  axios.post(`${REST_API_BASE_URL}/ip`, ip, getHeaders());
-
 export const getUserId = () =>
   axios.get(`${REST_API_BASE_URL}/users/me/id`, getHeaders());
 

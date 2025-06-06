@@ -36,9 +36,12 @@ const getHeaders = () => {
   };
 };
 
-export const listIp = () =>
+export const listAllIps = () =>
   axios.get(`${REST_API_BASE_URL}/ip`, getHeaders());
 
 
 export const postIp = (ip) =>
   axios.post(`${REST_API_BASE_URL}/ip`, ip, getHeaders());
+
+export const getIpByUserId = (userId) =>
+  axios.get(`${REST_API_BASE_URL}/ip/${userId}`, getHeaders());

@@ -28,7 +28,7 @@ public class IpController {
         return ResponseEntity.ok(createdIp);
     }
 
-    @GetMapping("/{IpId}")
+    @GetMapping("/usuario")
     public ResponseEntity<List<IpDto>> ObtenerIpsPorUsuario(Authentication authentication) {
         String usuarioEmail = authentication.getName();
         List<IpDto> ipDto = ipService.obtenerIpsPorUsuario(usuarioEmail);

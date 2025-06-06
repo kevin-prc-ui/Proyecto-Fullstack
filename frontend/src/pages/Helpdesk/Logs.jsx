@@ -1,34 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner"; // Importar toast
-import { FaSearch } from "react-icons/fa"; // Importar icono de búsqueda
-import {
-  listAllIncidencias,
-  deleteIncidencia,
-} from "../../services/IncidenciaService"; // Asegúrate de tener deleteIncidencia
+import { FaSearch, FaCalendarAlt, FaUser, FaEnvelope } from "react-icons/fa";
+import { listAllIps } from "../../services/IpService";
 
-export const Incidencias = () => {
-  const [incidencias, setIncidencias] = useState([]);
+export const Logs = () => {
+  const [ips, setIps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState(""); // Estado para el término de búsqueda
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchType, setSearchType] = useState("nombre"); // 'nombre' o 'email'
   const itemsPerPage = 8;
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchIncidencias();
-  }, []); // El console.log aquí mostrará el estado inicial (array vacío)
+    fetchIps();
+  }, []);
 
-  const fetchIncidencias = async () => {
+  const fetchIps = async () => {
     try {
       setLoading(true);
-      const response = await listAllIncidencias();
-      setIncidencias(response.data);
+      const response = await listAllIps();
+      setIps(response.data);
     } catch (err) {
-      setError("Error al cargar incidencias");
+      setError("Error al cargar registros de acceso");
       console.error(err);
     } finally {
       setLoading(false);
@@ -41,34 +38,73 @@ export const Incidencias = () => {
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
-    setCurrentPage(1); // Resetear a la primera página con nueva búsqueda
+    setCurrentPage(1);
   };
 
-  // Filtrar incidencias basado en el término de búsqueda
-  const filteredIncidencias = incidencias.filter((incidencia) => {
-    const term = searchTerm.toLowerCase();
-    const nombre = incidencia.nombre
-      ? String(incidencia.nombre).toLowerCase()
-      : "";
-    const departamentoNombre = incidencia.departamento?.nombre
-      ? String(incidencia.departamento.nombre).toLowerCase()
-      : "";
+  const handleSearchTypeChange = (type) => {
+    setSearchType(type);
+    setCurrentPage(1);
+  };
 
-    return nombre.includes(term) || departamentoNombre.includes(term);
+  // Función para formatear fechas de forma amigable
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const today = new Date();
+    
+    // Comprobar si es hoy
+    if (date.toDateString() === today.toDateString()) {
+      return `Hoy a las ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    
+    // Comprobar si es ayer
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (date.toDateString() === yesterday.toDateString()) {
+      return `Ayer a las ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    
+    // Formato para fechas anteriores
+    return date.toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short',
+      year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined,
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Filtrar ips basado en el término de búsqueda y tipo
+  const filteredIps = ips.filter((ip) => {
+    const term = searchTerm.toLowerCase();
+    
+    if (searchType === "email") {
+      const usuarioEmail = ip.usuarioEmail ? String(ip.usuarioEmail).toLowerCase() : "";
+      return usuarioEmail.includes(term);
+    } else {
+      const nombreUsuario = ip.nombreUsuario ? String(ip.nombreUsuario).toLowerCase() : "";
+      return nombreUsuario.includes(term);
+    }
   });
 
-  // Calcular incidencias para la página actual
+  // Calcular ips para la página actual
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredIncidencias.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  ); // Usar incidencias filtradas
-  const totalPages = Math.ceil(filteredIncidencias.length / itemsPerPage); // Usar longitud de incidencias filtradas
+  const currentItems = filteredIps.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredIps.length / itemsPerPage);
 
   // Generar paginación
   const renderPagination = () => {
+    if (totalPages <= 1) return null;
+    
     let items = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
 
     // Botón "Anterior"
     items.push(
@@ -86,19 +122,67 @@ export const Incidencias = () => {
       </button>
     );
 
-    // Números de página
-    for (let number = 1; number <= totalPages; number++) {
+    // Primera página
+    if (startPage > 1) {
+      items.push(
+        <button
+          key={1}
+          onClick={() => handlePageChange(1)}
+          className={`px-3 py-1 ${
+            1 === currentPage
+              ? "bg-blue-500 text-white rounded"
+              : "bg-white text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          1
+        </button>
+      );
+      if (startPage > 2) {
+        items.push(
+          <span key="dots-start" className="px-2 py-1">
+            ...
+          </span>
+        );
+      }
+    }
+
+    // Páginas visibles
+    for (let number = startPage; number <= endPage; number++) {
       items.push(
         <button
           key={number}
           onClick={() => handlePageChange(number)}
           className={`px-3 py-1 ${
-            currentPage === number
+            number === currentPage
               ? "bg-blue-500 text-white rounded"
               : "bg-white text-gray-700 hover:bg-gray-100"
           }`}
         >
           {number}
+        </button>
+      );
+    }
+
+    // Última página
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        items.push(
+          <span key="dots-end" className="px-2 py-1">
+            ...
+          </span>
+        );
+      }
+      items.push(
+        <button
+          key={totalPages}
+          onClick={() => handlePageChange(totalPages)}
+          className={`px-3 py-1 ${
+            totalPages === currentPage
+              ? "bg-blue-500 text-white rounded"
+              : "bg-white text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          {totalPages}
         </button>
       );
     }
@@ -122,32 +206,13 @@ export const Incidencias = () => {
     return items;
   };
 
-  const deleteHandler = async (incidenciaId) => {
-    if (
-      window.confirm("¿Estás seguro de que deseas eliminar esta incidencia?")
-    ) {
-      try {
-        setLoading(true);
-        await deleteIncidencia(incidenciaId); // Llamar al servicio de eliminación
-        toast.success("Incidencia eliminada correctamente");
-        fetchIncidencias(); // Recargar la lista
-      } catch (err) {
-        setError("Error al eliminar incidencia");
-        toast.error("Error al eliminar la incidencia");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
   if (error) {
     return (
       <div className="bg-white rounded shadow-md p-6 mt-4">
         <div className="text-red-500 font-medium">{error}</div>
         <button
           className="mt-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded transition-colors"
-          onClick={fetchIncidencias}
+          onClick={fetchIps}
         >
           Reintentar
         </button>
@@ -165,51 +230,58 @@ export const Incidencias = () => {
       enterTo="opacity-100"
     >
       <div className="flex justify-between items-center p-6 border-b border-gray-100">
-        <h2 className="text-xl font-bold text-gray-800">Incidencias</h2>
-        <button
-          className="bg-blue-500 rounded hover:bg-blue-600 text-white font-medium py-2 px-4 transition-colors flex items-center"
-          onClick={() => navigate("/admin/helpdesk/incidencias/nuevo")}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-1"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Nuevo Incidencia
-        </button>
+        <h2 className="text-xl font-bold text-gray-800">Registros de Acceso</h2>
       </div>
       <div className="bg-white rounded shadow-md overflow-hidden">
-        {/* Header de la tarjeta */}
-
-        {/* Contenido */}
         <div className="p-6">
-          {/* Recuadro de búsqueda */}
-          <div className="m-2">
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaSearch
-                  className="h-5 w-5 text-gray-400"
-                  aria-hidden="true"
+          {/* Recuadro de búsqueda mejorado */}
+          <div className="mb-6">
+            <div className="flex flex-col md:flex-row gap-3">
+              <div className="relative flex-grow">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaSearch
+                    className="h-5 w-5 text-gray-400"
+                    aria-hidden="true"
+                  />
+                </div>
+                <input
+                  type="text"
+                  name="searchIp"
+                  id="searchIp"
+                  className="p-4 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2"
+                  placeholder={searchType === "email" ? "Buscar por correo..." : "Buscar por nombre..."}
+                  value={searchTerm}
+                  onChange={handleSearchChange}
                 />
               </div>
-              <input
-                type="text"
-                name="searchIncidencia"
-                id="searchIncidencia"
-                className="p-4 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2"
-                placeholder="Buscar por nombre o departamento..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-              />
+              
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleSearchTypeChange("nombre")}
+                  className={`px-4 py-2 rounded-md flex items-center ${
+                    searchType === "nombre"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  <FaUser className="mr-2" />
+                  Nombre
+                </button>
+                <button
+                  onClick={() => handleSearchTypeChange("email")}
+                  className={`px-4 py-2 rounded-md flex items-center ${
+                    searchType === "email"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  <FaEnvelope className="mr-2" />
+                  Correo
+                </button>
+              </div>
             </div>
           </div>
+          
           {loading ? (
             <div className="flex justify-center py-10">
               <div className="animate-spin rounded h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
@@ -218,65 +290,39 @@ export const Incidencias = () => {
             <>
               {/* Encabezados de la tabla */}
               <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 rounded mb-3 font-medium text-gray-600 uppercase text-sm">
-                <div className="col-span-6">Nombre</div>
-                <div className="col-span-2">Departamento</div>
-                <div className="col-span-4 text-center">Acciones</div>
+                <div className="col-span-2">Dirección IP</div>
+                <div className="col-span-3">Nombre</div>
+                <div className="col-span-3">Email</div>
+                <div className="col-span-2">Fecha de acceso</div>
               </div>
 
-              {/* Lista de incidencias */}
+              {/* Lista de registros */}
               {currentItems.length > 0 ? (
-                currentItems.map((incidencia) => (
+                currentItems.map((ip) => (
                   <div
-                    key={incidencia.id}
-                    className="grid grid-cols-12 gap-4 items-center px-4 py-2 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                    key={ip.id}
+                    className="grid grid-cols-12 gap-4 items-center px-4 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors"
                   >
-                    {" "}
-                    <div className="col-span-6 text-gray-700">
-                      {incidencia.nombre}
+                    <div className="col-span-2 text-gray-700 font-mono">{ip.ip}</div>
+                    <div className="col-span-3 text-gray-700 font-medium">
+                      {ip.nombreUsuario}
+                    </div>
+                    <div className="col-span-3 text-gray-700">
+                      <div className="flex items-center">
+                        <FaEnvelope className="mr-2 text-gray-400" />
+                        {ip.usuarioEmail}
+                      </div>
                     </div>
                     <div className="col-span-2 text-gray-700">
-                      {incidencia.departamento.nombre}
-                    </div>
-                    <div className="col-span-4 flex justify-center">
-                      <button
-                        className="text-blue-500 hover:text-blue-700 m-1 bg-blue-50 hover:bg-blue-100 rounded p-2 transition-colors"
-                        onClick={() =>
-                          navigate(`/incidencias/editar/${incidencia.id}`)
-                        }
-                        title="Editar"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                      </button>
-                      <button
-                        className="text-red-500 hover:text-red-700 m-1 bg-red-50 hover:bg-red-100 rounded p-2 transition-colors"
-                        onClick={() => deleteHandler(incidencia.id)} // Pasar el id de la incidencia
-                        title="Eliminar"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
+                      <div className="flex items-center">
+                        <FaCalendarAlt className="mr-2 text-gray-400" />
+                        {formatDate(ip.fechaRegistro)}
+                      </div>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-10 text-gray-500">
+                <div className="text-center py-10 text-gray-500 bg-gray-50 rounded-lg">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-16 w-16 mx-auto text-gray-300 mb-3"
@@ -291,13 +337,19 @@ export const Incidencias = () => {
                       d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  No se encontraron incidencias
+                  {searchTerm 
+                    ? `No se encontraron registros para "${searchTerm}"` 
+                    : "No hay registros de acceso disponibles"}
                 </div>
               )}
 
-              {/* Paginación */}
+              {/* Paginación mejorada */}
               {totalPages > 1 && (
-                <div className="mt-8 flex justify-center">
+                <div className="mt-8 flex flex-col sm:flex-row justify-between items-center">
+                  <div className="text-sm text-gray-600 mb-4 sm:mb-0">
+                    Mostrando {indexOfFirstItem + 1} - {Math.min(indexOfFirstItem + itemsPerPage, filteredIps.length)} de {filteredIps.length} registros
+                  </div>
+                  
                   <div className="inline-flex rounded shadow-sm" role="group">
                     {renderPagination()}
                   </div>
