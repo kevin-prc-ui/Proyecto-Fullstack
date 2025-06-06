@@ -47,6 +47,9 @@ export const getArchivosPorCarpeta = (carpetaId) =>
 export const getArchivosSinCarpeta = () =>
   axios.get(`${REST_API_BASE_URL}/archivos/sin-carpeta`, getHeaders());
 
+export const desactivarArchivo = (archivoId) =>
+  axios.put(`${REST_API_BASE_URL}/archivos/desactivar/${archivoId}`, {}, getHeaders());
+
 // ✅ Nuevo método para subir archivos binarios
 export const uploadArchivo = (file, carpetaId) => {
   const formData = new FormData();

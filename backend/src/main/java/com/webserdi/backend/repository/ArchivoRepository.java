@@ -6,8 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ArchivoRepository extends JpaRepository<Archivo, Long> {
-    List<Archivo> findByCarpetaId(Long carpetaId);
-    List<Archivo> findByCarpetaIsNull();
-
+    List<Archivo> findByCarpetaIdAndActivoTrue(Long carpetaId);
+    List<Archivo> findByCarpetaIsNullAndActivoTrue();
 
 }

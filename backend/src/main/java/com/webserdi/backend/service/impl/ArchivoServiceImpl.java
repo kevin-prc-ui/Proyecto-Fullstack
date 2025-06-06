@@ -111,6 +111,14 @@ public class ArchivoServiceImpl implements ArchivoService {
         }
     }
 
+    @Override
+    public void desactivarArchivo(Long archivoId) {
+        Archivo archivo = archivoRepository.findById(archivoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Archivo no encontrado"));
+
+        archivo.setActivo(false);
+        archivoRepository.save(archivo);
+    }
 
 
     @Override
@@ -118,9 +126,9 @@ public class ArchivoServiceImpl implements ArchivoService {
         List<Archivo> archivos;
 
         if (carpetaId == null) {
-            archivos = archivoRepository.findByCarpetaIsNull();
+            archivos = archivoRepository.findByCarpetaIsNullAndActivoTrue();
         } else {
-            archivos = archivoRepository.findByCarpetaId(carpetaId);
+            archivos = archivoRepository.findByCarpetaIdAndActivoTrue(carpetaId);
         }
 
         return archivos.stream()

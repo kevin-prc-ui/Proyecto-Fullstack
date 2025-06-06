@@ -82,6 +82,12 @@ public class ArchivoController {
         return ResponseEntity.ok(archivos);
     }
 
+    @PutMapping("/desactivar/{archivoId}")
+    public ResponseEntity<Void> desactivarArchivo(@PathVariable Long archivoId) {
+        archivoService.desactivarArchivo(archivoId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/ver/{id}")
     public ResponseEntity<Resource> verArchivo(@PathVariable Long id) {
         Archivo archivo = archivoRepository
