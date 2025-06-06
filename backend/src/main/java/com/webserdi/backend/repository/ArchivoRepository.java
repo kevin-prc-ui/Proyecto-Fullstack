@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface ArchivoRepository extends JpaRepository<Archivo, Long> {
     List<Archivo> findByCarpetaId(Long carpetaId);
+    List<Archivo> findByCarpetaIsNull();
+
+
 }

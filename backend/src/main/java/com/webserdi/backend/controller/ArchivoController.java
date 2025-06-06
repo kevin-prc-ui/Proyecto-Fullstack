@@ -76,6 +76,11 @@ public class ArchivoController {
         archivoService.deleteArchivo(archivoId);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/sin-carpeta")
+    public ResponseEntity<List<ArchivoDto>> listarArchivosSinCarpeta() {
+        List<ArchivoDto> archivos = archivoService.getArchivosPorCarpeta(null);
+        return ResponseEntity.ok(archivos);
+    }
 
     @GetMapping("/ver/{id}")
     public ResponseEntity<Resource> verArchivo(@PathVariable Long id) {
@@ -95,7 +100,7 @@ public class ArchivoController {
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + archivo.getNombre() + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + archivo.getNombre() + "\"")
                     .body(recurso);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Error al leer el archivo: " + e.getMessage());
