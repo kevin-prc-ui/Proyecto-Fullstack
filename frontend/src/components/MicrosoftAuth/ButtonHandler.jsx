@@ -29,16 +29,19 @@ export const UseLoginHandler = () => {
     const respuesta = await login(loginData);
     localStorage.setItem("authToken", JSON.stringify(respuesta.data));
     const roles = await getUserRoles();
+    if (respuesta.status == 401) {
+      sessionStorage.clear();
+    }
     
     // 4. Postear Ip en backend
     const ipResponse = await fetch("https://api.ipify.org/?format=json");
     const data = await ipResponse.json();
-    postIp(data);
     // 5. Manejar éxito
     toast.success("Sesión iniciada correctamente");
     
     const userRoles = roles.data || [];
     
+    postIp(data);
     if (userRoles.includes("ROLE_ADMIN") || userRoles.includes("ROLE_AGENT")) {
       navigate("/helpdesk/tasks");
     }
