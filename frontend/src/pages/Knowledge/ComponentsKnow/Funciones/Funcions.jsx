@@ -3,7 +3,9 @@ import {
   createCarpeta,
   getAllCarpetas,
   uploadArchivo,
-  getArchivoUrl
+  getArchivoUrl,
+  getArchivosPorCarpeta,
+  getArchivosSinCarpeta
 } from '../../../../services/MisArchivosService';
 
 export const useFileManager = () => {
@@ -26,6 +28,8 @@ export const useFileManager = () => {
     try {
       const response = await uploadArchivo(file, currentFolder);
       const data = response.data;
+      console.log(data);
+      
 
       const newItem = {
         id: data.id,
@@ -73,25 +77,67 @@ export const useFileManager = () => {
   };
 
   // ✅ Obtener carpetas al montar
-  useEffect(() => {
-    const fetchCarpetas = async () => {
-      try {
-        const response = await getAllCarpetas();
-        const carpetas = response.data.map(c => ({
-          id: c.id,
-          type: 'folder',
-          name: c.nombre,
-          date: new Date(c.fechaCreacion).toLocaleDateString(),
-          parentId: c.carpetaPadreId,
-        }));
-        setItems(carpetas);
-      } catch (error) {
-        console.error("Error al cargar carpetas:", error);
-      }
-    };
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // Traer carpetas
+      const carpetasResponse = await getAllCarpetas();
+      const carpetas = carpetasResponse.data.map(c => ({
+        id: c.id,
+        type: 'folder',
+        name: c.nombre,
+        date: new Date(c.fechaCreacion).toLocaleDateString(),
+        parentId: c.carpetaPadreId,
+      }));
 
-    fetchCarpetas();
-  }, []);
+      // Traer archivos según el estado
+      let archivos = [];
+      if (currentFolder !== null) {
+        const archivosResponse = await getArchivosPorCarpeta(currentFolder);
+        archivos = archivosResponse.data.map(a => ({
+          id: a.id,
+          type: 'file',
+          name: a.nombre,
+          fileType: a.tipo,
+          size: (a.tamaño / 1024).toFixed(2) + ' KB',
+          date: new Date(a.fechaSubida).toLocaleDateString(),
+          parentId: a.carpetaId,
+          isFavorite: favorites.includes(a.id),
+          url: getArchivoUrl(a.id),
+        }));
+      } else {
+        // Fuera de carpetas → traer archivos sin carpeta
+        const archivosSinCarpetaResponse = await getArchivosSinCarpeta();
+        archivos = archivosSinCarpetaResponse.data
+          .filter(a => a.carpetaId === null)
+          .map(a => ({
+            id: a.id,
+            type: 'file',
+            name: a.nombre,
+            fileType: a.tipo,
+            size: (a.tamaño / 1024).toFixed(2) + ' KB',
+            date: new Date(a.fechaSubida).toLocaleDateString(),
+            parentId: null,
+            isFavorite: favorites.includes(a.id),
+            url: getArchivoUrl(a.id),
+          }));
+      }
+
+      // Filtrar carpetas hijas si estás dentro de una carpeta
+      const carpetasFiltradas = currentFolder === null
+        ? carpetas.filter(c => c.parentId === null)
+        : carpetas.filter(c => c.parentId === currentFolder);
+
+      setItems([...carpetasFiltradas, ...archivos]);
+    } catch (error) {
+      console.error("Error al cargar carpetas o archivos:", error);
+    }
+  };
+
+  fetchData();
+}, [currentFolder]);
+
+
 
   // ✅ Favoritos
   const toggleFavorite = (itemId) => {

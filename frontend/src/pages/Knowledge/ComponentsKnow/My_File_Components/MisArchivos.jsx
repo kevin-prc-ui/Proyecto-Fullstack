@@ -5,6 +5,7 @@ import Etiquetas from './Etiquetas';
 import { SubMenu } from '../SubMenu/SubMenu';
 import { useFileManager } from '../Funciones/Funcions';
 import { BsFolderFill, BsFilePdf, BsImage, BsTrash, BsStar, BsStarFill } from 'react-icons/bs';
+import { get } from 'react-hook-form';
 
 const MisArchivos = () => {
 
@@ -22,6 +23,8 @@ const MisArchivos = () => {
     goBack,
     getFilteredItems
   } = useFileManager();
+  
+  console.log(items);
   
 
   return (

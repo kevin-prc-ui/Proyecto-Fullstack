@@ -76,6 +76,11 @@ public class ArchivoController {
         archivoService.deleteArchivo(archivoId);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/sin-carpeta")
+    public ResponseEntity<List<ArchivoDto>> listarArchivosSinCarpeta() {
+        List<ArchivoDto> archivos = archivoService.getArchivosPorCarpeta(null);
+        return ResponseEntity.ok(archivos);
+    }
 
     @GetMapping("/ver/{id}")
     public ResponseEntity<Resource> verArchivo(@PathVariable Long id) {

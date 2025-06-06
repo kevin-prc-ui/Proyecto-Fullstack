@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Value;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +26,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 @Transactional
 public class ArchivoServiceImpl implements ArchivoService {
 
@@ -32,7 +33,17 @@ public class ArchivoServiceImpl implements ArchivoService {
     private final ArchivoMapper archivoMapper;
     private final CarpetaRepository carpetaRepository;
 
-    private static final String UPLOAD_DIR = "uploads/";
+    @Value("${file.upload-dir}")
+    private String baseUploadDir;
+
+
+    public ArchivoServiceImpl(ArchivoRepository archivoRepository,
+                              ArchivoMapper archivoMapper,
+                              CarpetaRepository carpetaRepository) {
+        this.archivoRepository = archivoRepository;
+        this.archivoMapper = archivoMapper;
+        this.carpetaRepository = carpetaRepository;
+    }
 
     @Override
     public ArchivoDto createArchivo(ArchivoDto archivoDto) {
@@ -58,29 +69,34 @@ public class ArchivoServiceImpl implements ArchivoService {
 
 // Dentro de ArchivoServiceImpl
 
+    @Override
     public ArchivoDto guardarArchivoConContenido(MultipartFile archivo, Long carpetaId) {
         try {
-            // Crear ruta física
             String nombreArchivo = archivo.getOriginalFilename();
             String tipoArchivo = archivo.getContentType();
             Long tamañoArchivo = archivo.getSize();
 
-            // Construir la ruta física en el sistema de archivos
+            // Subcarpeta según carpetaId
             String subdirectorio = (carpetaId != null) ? "carpeta_" + carpetaId : "sin_carpeta";
-            Path rutaCarpeta = Paths.get("uploads", subdirectorio);
+
+            // Ruta absoluta: ./uploads/carpeta_#
+            Path rutaCarpeta = Paths.get(baseUploadDir).toAbsolutePath().normalize().resolve(subdirectorio);
             Files.createDirectories(rutaCarpeta);
 
+            // Ruta final del archivo
             Path rutaArchivo = rutaCarpeta.resolve(nombreArchivo);
             archivo.transferTo(rutaArchivo.toFile());
 
-            // Crear entidad Archivo
+            // Crear entidad
             Archivo entidad = new Archivo();
             entidad.setNombre(nombreArchivo);
             entidad.setTipo(tipoArchivo);
             entidad.setTamaño(tamañoArchivo);
-            entidad.setRuta(rutaArchivo.toString()); // Guarda la ruta completa del archivo
 
-            // Si tiene carpeta, buscar la entidad Carpeta
+            // Guardar la ruta relativa (para usarla luego al ver el archivo)
+            String rutaRelativa = Paths.get("uploads", subdirectorio, nombreArchivo).toString();
+            entidad.setRuta(rutaRelativa);
+
             if (carpetaId != null) {
                 Carpeta carpeta = carpetaRepository.findById(carpetaId)
                         .orElseThrow(() -> new ResourceNotFoundException("Carpeta no encontrada"));
@@ -88,21 +104,30 @@ public class ArchivoServiceImpl implements ArchivoService {
             }
 
             archivoRepository.save(entidad);
+            return archivoMapper.toDto(entidad);
 
-            return archivoMapper.toDto(entidad); // Devuelve el DTO
         } catch (IOException e) {
             throw new RuntimeException("Error al guardar el archivo: " + e.getMessage(), e);
         }
     }
 
 
+
     @Override
     public List<ArchivoDto> getArchivosPorCarpeta(Long carpetaId) {
-        List<Archivo> archivos = archivoRepository.findByCarpetaId(carpetaId);
+        List<Archivo> archivos;
+
+        if (carpetaId == null) {
+            archivos = archivoRepository.findByCarpetaIsNull();
+        } else {
+            archivos = archivoRepository.findByCarpetaId(carpetaId);
+        }
+
         return archivos.stream()
                 .map(archivoMapper::toDto)
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public ArchivoDto getArchivoById(Long archivoId) {
@@ -110,6 +135,7 @@ public class ArchivoServiceImpl implements ArchivoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Archivo no encontrado con id: " + archivoId));
         return archivoMapper.toDto(archivo);
     }
+
 
     @Override
     public List<ArchivoDto> getAllArchivos() {
