@@ -13,8 +13,6 @@ export const Logs = () => {
   const [searchType, setSearchType] = useState("nombre"); // 'nombre' o 'email'
   const itemsPerPage = 8;
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     fetchIps();
   }, []);
