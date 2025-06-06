@@ -1,9 +1,5 @@
 import { toast } from "sonner";
-import {
-  getUserRoles,
-  login,
-  logout,
-} from "../../services/UsuarioService";
+import { getUserRoles, login, logout } from "../../services/UsuarioService";
 import { callMsGraph } from "../../graph";
 import { loginRequest } from "../../services/authConfig";
 import { useNavigate } from "react-router-dom";
@@ -26,32 +22,33 @@ export const UseLoginHandler = () => {
     };
 
     // 3. Login en tu backend
-    const respuesta = await login(loginData);
-    localStorage.setItem("authToken", JSON.stringify(respuesta.data));
-    const roles = await getUserRoles();
-    console.log(respuesta);
-    
-    if (respuesta.status !== 200) {
+    try {
+      const respuesta = await login(loginData);
+      localStorage.setItem("authToken", JSON.stringify(respuesta.data));
+      const roles = await getUserRoles();
+      // 4. Postear Ip en backend
+      const ipResponse = await fetch("https://api.ipify.org/?format=json");
+      const data = await ipResponse.json();
+      // 5. Manejar éxito
+      toast.success("Sesión iniciada correctamente");
+
+      const userRoles = roles.data || [];
+
+      postIp(data);
+      if (
+        userRoles.includes("ROLE_ADMIN") ||
+        userRoles.includes("ROLE_AGENT")
+      ) {
+        navigate("/helpdesk/tasks");
+      } else if (userRoles.includes("ROLE_USER")) {
+        navigate("/knowledge/home");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      toast.error("Error al iniciar sesion");
+      console.error("Error al iniciar sesion: ", error);
       sessionStorage.clear();
-    }
-    
-    // 4. Postear Ip en backend
-    const ipResponse = await fetch("https://api.ipify.org/?format=json");
-    const data = await ipResponse.json();
-    // 5. Manejar éxito
-    toast.success("Sesión iniciada correctamente");
-    
-    const userRoles = roles.data || [];
-    
-    postIp(data);
-    if (userRoles.includes("ROLE_ADMIN") || userRoles.includes("ROLE_AGENT")) {
-      navigate("/helpdesk/tasks");
-    }
-    else if (userRoles.includes("ROLE_USER")) {
-      navigate("/knowledge/home");
-    }
-    else {
-      navigate("/dashboard");
     }
   };
 

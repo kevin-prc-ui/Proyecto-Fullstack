@@ -13,7 +13,7 @@ import React from "react";
  * @returns {JSX.Element} Elemento JSX que renderiza la ruta protegida o redirección
  */
 const ProtectedRoute = ({ allowedRoles = [] }) => {
-  const isAuthenticated = localStorage.getItem("authToken");
+  const isAuthenticated = localStorage?.getItem("authToken");
   const location = useLocation();
   const [state, setState] = useState({
     isLoading: true,
