@@ -9,10 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize; // Asegúrate que las anotaciones de seguridad sean correctas
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Set;
-
 /**
  * Controlador REST para la gestión de Usuarios.
  */
@@ -147,5 +145,14 @@ public class UsuarioController {
         }
         Long id = usuarioService.getIdByEmail(auth.getName());
         return ResponseEntity.ok(id.toString());
+    }
+
+    @GetMapping("/me/email")
+    public ResponseEntity<UsuarioDto>getCurrentUserByEmail(Authentication auth){
+        if (!auth.isAuthenticated()) {
+            return null;
+        }
+        UsuarioDto usuario = usuarioService.getUsuarioByEmail(auth.getName());
+        return ResponseEntity.ok(usuario);
     }
 }

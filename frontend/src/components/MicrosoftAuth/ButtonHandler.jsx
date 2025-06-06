@@ -29,7 +29,9 @@ export const UseLoginHandler = () => {
     const respuesta = await login(loginData);
     localStorage.setItem("authToken", JSON.stringify(respuesta.data));
     const roles = await getUserRoles();
-    if (respuesta.status == 401) {
+    console.log(respuesta);
+    
+    if (respuesta.status !== 200) {
       sessionStorage.clear();
     }
     

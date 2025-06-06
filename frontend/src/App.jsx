@@ -32,6 +32,7 @@ import { AddDepartamento } from "./components/Generic/AddDepartamento";
 import { AddPrioridad } from "./components/Generic/AddPrioridades";
 import { AddMotivo } from "./components/Generic/AddMotivos";
 import { AddIncidencia } from "./components/Generic/AddIncidencias";
+import Perfil from "./components/Users/Perfil";
 
 function Layout() {
   const isAuthenticated = localStorage.getItem("authToken");
@@ -95,6 +96,7 @@ function App() {
           }
         >
           <Route element={<Layout />}>
+            <Route path="/perfil" element={<Perfil />} />
             <Route path="/helpdesk/tasks" element={<Tasks />} />
             <Route path="/helpdesk/mytickets" element={<Tasks userTicketsOnly={true}/>} />
             <Route path="/helpdesk/completados/:estado" element={<Tasks />} />

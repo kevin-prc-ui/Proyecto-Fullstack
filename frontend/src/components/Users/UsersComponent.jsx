@@ -105,7 +105,6 @@ const UsersComponent = () => {
           setSelectedPermisos(userData.permisos || []);
           setIsEnabled(userData.enabled); // Cargar estado de activación del perfil
           console.log(userData);
-          
         })
         .catch((error) => {
           toast.error("Error al cargar el usuario", error);

@@ -70,6 +70,9 @@ export const signUp = (userData) =>
 export const getUserById = (userId) =>
   axios.get(`${REST_API_BASE_URL}/users/${userId}`, getHeaders());
 
+export const getUserByEmail = () =>
+  axios.get(`${REST_API_BASE_URL}/users/me/email`, getHeaders());
+
 export const updateUser = (userId, user) =>
   axios.put(`${REST_API_BASE_URL}/users/edit/${userId}`, user, getHeaders());
 

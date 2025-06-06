@@ -18,4 +18,5 @@ public interface UsuarioService {
     Set<String> getRole (String email);
     Long getIdByEmail(String email);
     List<UsuarioDto> getUsuarioByDepartamento (Long id);
+    UsuarioDto getUsuarioByEmail(String email);
 }

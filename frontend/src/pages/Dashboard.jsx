@@ -118,7 +118,6 @@ const ProfileContent = () => {
       const response = await listTicketsByUser(userId, page, "",size);
       console.log();
       
-      
       setTickets(response.data.content);
       setTotalPages(response.data.totalPages);
       setTotalItems(response.data.totalElements);

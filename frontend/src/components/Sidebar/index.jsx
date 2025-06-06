@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import linkData from "../../assets/routes";
 import { useUserRoles } from "../../hooks/useUserRoles";
 import React from 'react'
+import { FaUser } from "react-icons/fa";
 
 
 const Sidebar = () => {
@@ -167,7 +168,7 @@ const Sidebar = () => {
           ))}
 
           <div className="w-100 border-top pt-3 mt-auto">
-            <SettingsButton isActive={location.pathname.startsWith('/settings')} />
+            <SettingsButton isActive={location.pathname.startsWith('/perfil')} />
           </div>
         </Nav>
       </Navbar>
@@ -186,10 +187,10 @@ const SettingsButton = ({ isActive }) => (
       isActive && "active"
     )}
     as={Link}
-    to="/helpdesk/tasks"
+    to="/perfil"
   >
-    <MdSettings className="fs-5" />
-    <span className="fs-6 fw-medium">Configuración</span>
+    <FaUser className="fs-5" />
+    <span className="fs-6 fw-medium">Perfil</span>
   </Button>
 );
 

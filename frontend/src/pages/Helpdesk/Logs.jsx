@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
-import { useNavigate } from "react-router-dom";
 import { FaSearch, FaCalendarAlt, FaUser, FaEnvelope } from "react-icons/fa";
 import { listAllIps } from "../../services/IpService";
 

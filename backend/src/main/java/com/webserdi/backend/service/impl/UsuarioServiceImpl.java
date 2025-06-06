@@ -178,6 +178,14 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .toList();
     }
 
+    @Override
+    public UsuarioDto getUsuarioByEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow();
+
+        return usuarioMapper.mapToUsuarioDto(usuario);
+    }
+
     /**
      * Obtiene un usuario por su ID.
      *
