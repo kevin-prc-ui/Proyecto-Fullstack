@@ -100,7 +100,7 @@ public class ArchivoController {
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + archivo.getNombre() + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + archivo.getNombre() + "\"")
                     .body(recurso);
         } catch (MalformedURLException e) {
             throw new RuntimeException("Error al leer el archivo: " + e.getMessage());
