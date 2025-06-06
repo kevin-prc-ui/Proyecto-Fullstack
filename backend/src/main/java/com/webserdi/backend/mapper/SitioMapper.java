@@ -23,6 +23,8 @@ public class SitioMapper {
         sitio.setTipo(dto.getType());
         sitio.setVisibilidad(dto.getVisibility());
         sitio.setSlug(dto.getSiteId());
+        sitio.setFavorito(dto.getFavorito() != null ? dto.getFavorito() : false);
+
 
 //        if (dto.getUsuariosAsignados() != null && !dto.getUsuariosAsignados().isEmpty()) {
 //            // Convertir UsuarioDto a Usuario (necesitas implementar UsuarioMapper)
@@ -51,6 +53,7 @@ public class SitioMapper {
         dto.setType(sitio.getTipo());
         dto.setVisibility(sitio.getVisibilidad());
         dto.setSiteId(sitio.getSlug());
+        dto.setFavorito(sitio.getFavorito());
 
         if (sitio.getCreador() != null) {
             dto.setCreadorId(sitio.getCreador().getId());

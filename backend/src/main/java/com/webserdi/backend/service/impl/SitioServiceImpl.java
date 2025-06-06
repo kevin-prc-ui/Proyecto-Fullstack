@@ -100,10 +100,26 @@ public class SitioServiceImpl implements SitioService {
         Sitio sitio = sitioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sitio no encontrado"));
 
-        sitio.setNombre(sitioDto.getName());
-        sitio.setDescripcion(sitioDto.getDescription());
-        sitio.setVisibilidad(sitioDto.getVisibility());
-        sitio.setTipo(sitioDto.getType());
+        if (sitioDto.getName() != null) {
+            sitio.setNombre(sitioDto.getName());
+        }
+        if (sitioDto.getDescription() != null) {
+            sitio.setDescripcion(sitioDto.getDescription());
+        }
+        if (sitioDto.getVisibility() != null) {
+            sitio.setVisibilidad(sitioDto.getVisibility());
+        }
+        if (sitioDto.getType() != null) {
+            sitio.setTipo(sitioDto.getType());
+        }
+        if (sitioDto.getFavorito() != null) {
+            sitio.setFavorito(sitioDto.getFavorito());
+        }
+
+
+        if (sitioDto.getFavorito() != null) {
+            sitio.setFavorito(sitioDto.getFavorito());
+        }
 
         Sitio actualizado = sitioRepository.save(sitio);
         return sitioMapper.toDto(actualizado);

@@ -14,4 +14,6 @@ public class SitioDto {
     private String type;
     private Long creadorId;
     private Set<UsuarioDto> usuariosAsignados; // Opción 2: DTOs de usuarios
+    private Boolean favorito;
+
 }

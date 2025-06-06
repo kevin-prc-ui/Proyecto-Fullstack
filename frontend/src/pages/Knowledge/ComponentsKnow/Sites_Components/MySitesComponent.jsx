@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Button, ListGroup, Spinner, Alert } from 'react-bootstrap';
 import { FaTrash, FaStar, FaRegStar, FaExternalLinkAlt } from 'react-icons/fa';
-import { getSitios, deleteSitio } from '../../../../services/SitioService';
+import { getSitios, deleteSitio, updateSitio } from '../../../../services/SitioService';
 import { getSitiosByUser } from '../../../../services/SitioService';
 import { getUserId } from '../../../../services/UsuarioService';
+
 
 
 const MySitesComponent = ({ onSiteClick, userId }) => {
@@ -40,23 +41,41 @@ useEffect(() => {
   }
 }, []);
 
-  const toggleFavorite = async (siteId) => {
-    try {
-      // Actualización optimista
-      const updatedSites = sites.map(site =>
-        site.id === siteId ? {...site, favorite: !site.favorite} : site
-      );
-      setSites(updatedSites);
-      
-      // Llamada al backend para actualizar
-      await updateSitio(siteId, { favorite: !sites.find(s => s.id === siteId).favorite });
-    } catch (err) {
-      console.error("Error al actualizar favorito:", err);
-      // Revertir cambios si hay error
-      setSites(sites);
-      setError("Error al actualizar favorito");
+const toggleFavorite = async (siteId) => {
+  try {
+    const siteToUpdate = sites.find(s => s.id === siteId);
+
+    if (!siteToUpdate) {
+      console.warn("Sitio no encontrado en el estado.");
+      return;
     }
-  };
+
+    const nuevoEstado = !siteToUpdate.favorito;
+
+    // Actualización optimista en frontend
+    const updatedSites = sites.map(site =>
+      site.id === siteId ? { ...site, favorito: nuevoEstado } : site
+    );
+    setSites(updatedSites);
+
+    // Payload completo para evitar errores 500
+    const fullPayload = {
+      name: siteToUpdate.nombre || siteToUpdate.name,
+      description: siteToUpdate.descripcion || siteToUpdate.description || '',
+      type: siteToUpdate.tipo || siteToUpdate.type || 'Collaboration Site',
+      visibility: siteToUpdate.visibilidad || siteToUpdate.visibility || 'Public',
+      siteId: siteToUpdate.slug || siteToUpdate.siteId,
+      favorito: nuevoEstado
+    };
+
+    await updateSitio(siteId, fullPayload);
+  } catch (err) {
+    console.error("Error al actualizar favorito:", err);
+    alert("No se pudo actualizar el favorito. Verifica tu conexión o sesión.");
+  }
+};
+
+
 
   const handleDeleteSite = async (siteId) => {
     if(window.confirm('¿Seguro que deseas eliminar este sitio?')) {
@@ -111,11 +130,12 @@ useEffect(() => {
               <div>
                 <Button
                   variant="link"
-                  title={site.favorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                  title={site.favorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
                   onClick={() => toggleFavorite(site.id)}
                 >
-                  {site.favorite ? <FaStar color="#ffc107" /> : <FaRegStar />}
+                  {site.favorito ? <FaStar color="#ffc107" /> : <FaRegStar />}
                 </Button>
+
                 <Button
                   variant="link"
                   title="Abrir sitio"

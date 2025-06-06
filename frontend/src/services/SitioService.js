@@ -6,7 +6,7 @@ const REST_API_BASE_URL = "http://localhost:8080/api";
 const token = () => localStorage.getItem("authToken");
 
 const getAuthToken = () => {
-  const storedToken = token();
+  const storedToken = token(); // token = localStorage.getItem("authToken")
   try {
     return storedToken ? JSON.parse(storedToken)?.accessToken : null;
   } catch (e) {
@@ -15,12 +15,14 @@ const getAuthToken = () => {
   }
 };
 
+
 const getHeaders = () => {
   const accessToken = getAuthToken();
   return accessToken
     ? { headers: { Authorization: `Bearer ${accessToken}` } }
-    : {};
+    : { headers: {} }; // para evitar enviar undefined
 };
+
 
 // === Endpoints ===
 export const getSitios = () =>
@@ -37,3 +39,5 @@ export const getSitiosByUser = (userId) =>
   axios.get(`${REST_API_BASE_URL}/sitios/usuario/${userId}`, getHeaders());
 export const getSitiosVisibles = () =>
   axios.get(`${REST_API_BASE_URL}/sitios/visibles`, getHeaders());
+
+

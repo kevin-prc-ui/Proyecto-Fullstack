@@ -1,17 +1,25 @@
 import React from 'react';
 import { Button, ListGroup } from 'react-bootstrap';
 import { FaTrash, FaStar } from 'react-icons/fa';
+import { updateSitio } from '../../../../services/SitioService';
 
 const FavoritesComponent = ({ sites, setSites }) => {
 
-  const favoriteSites = sites.filter(site => site.favorite);
+const favoriteSites = sites.filter(site => site.favorito);
 
-  const removeFavorite = (siteId) => {
-    const updatedSites = sites.map(site =>
-      site.siteId === siteId ? {...site, favorite: false} : site
-    );
-    setSites(updatedSites);
-  };
+
+const removeFavorite = (siteId) => {
+  const updatedSites = sites.map(site =>
+    site.id === siteId ? { ...site, favorito: false } : site
+  );
+  setSites(updatedSites);
+
+  updateSitio(siteId, { favorito: false })
+    .catch(error => {
+      console.error("Error al quitar favorito:", error);
+    });
+};
+
 
   const deleteSite = (siteId) => {
     if(window.confirm('¿Seguro que deseas eliminar este sitio?')) {
@@ -32,7 +40,7 @@ const FavoritesComponent = ({ sites, setSites }) => {
               className="d-flex justify-content-between align-items-center"
             >
               <div>
-                <strong>{site.nombre}</strong> <br />
+                <strong>{site.nombre}</strong>
                 <small className="text-muted">ID: {site.siteId}</small>
               </div>
               <div>

@@ -38,6 +38,9 @@ public class Sitio {
     @Column(nullable = false, unique = true, length = 50)
     private String slug;
 
+    @Column(name = "favorito")
+    private Boolean favorito = false;
+
     @CreationTimestamp
     @Column(name = "fecha_creacion", updatable = false)
     private LocalDateTime fechaCreacion;
@@ -45,6 +48,7 @@ public class Sitio {
     @UpdateTimestamp
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
+
 
     // ✅ Relación corregida con usuarios asignados al sitio
     @ManyToMany
@@ -68,5 +72,6 @@ public class Sitio {
             joinColumns = @JoinColumn(name = "sitio_id"),
             inverseJoinColumns = @JoinColumn(name = "usuario_id")
     )
+
     private Set<Usuario> administradores;
 }
