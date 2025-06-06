@@ -1,7 +1,10 @@
 package com.webserdi.backend.service;
 
 import com.webserdi.backend.dto.SitioDto;
+import com.webserdi.backend.dto.UsuarioDto;
+
 import java.util.List;
+import java.util.Set;
 
 public interface SitioService {
     SitioDto crearSitio(SitioDto sitioDto);
@@ -10,5 +13,7 @@ public interface SitioService {
     void eliminarSitio(Long id);
     SitioDto actualizarSitio(Long id, SitioDto sitioDto);
     List<SitioDto> listarSitiosPublicosYModerados();
+    Set<UsuarioDto> obtenerUsuariosAsignados(Long sitioId);
+    SitioDto agregarUsuarios(Long sitioId, Set<Long> usuariosNuevosIds);
 
 }

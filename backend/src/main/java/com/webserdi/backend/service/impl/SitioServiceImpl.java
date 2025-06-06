@@ -6,6 +6,7 @@ import com.webserdi.backend.entity.Sitio;
 import com.webserdi.backend.entity.Usuario;
 import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.mapper.SitioMapper;
+import com.webserdi.backend.mapper.UsuarioMapper;
 import com.webserdi.backend.repository.SitioRepository;
 import com.webserdi.backend.repository.UsuarioRepository;
 import com.webserdi.backend.service.SitioService;
@@ -25,6 +26,7 @@ public class SitioServiceImpl implements SitioService {
     private final SitioMapper sitioMapper;
     private final SitioRepository sitioRepository;
     private final UsuarioRepository usuarioRepository;
+    private final UsuarioMapper usuarioMapper;
 
     @Override
     @Transactional
@@ -124,4 +126,28 @@ public class SitioServiceImpl implements SitioService {
         Sitio actualizado = sitioRepository.save(sitio);
         return sitioMapper.toDto(actualizado);
     }
+
+    @Override
+    public Set<UsuarioDto> obtenerUsuariosAsignados(Long sitioId) {
+        Sitio sitio = sitioRepository.findById(sitioId)
+                .orElseThrow(() -> new RuntimeException("Sitio no encontrado"));
+
+        return sitio.getUsuarios().stream()
+                .map(usuarioMapper::mapToUsuarioDto)
+                .collect(Collectors.toSet());
+    }
+    @Override
+    @Transactional
+    public SitioDto agregarUsuarios(Long sitioId, Set<Long> usuariosNuevosIds) {
+        Sitio sitio = sitioRepository.findById(sitioId)
+                .orElseThrow(() -> new RuntimeException("Sitio no encontrado"));
+
+        Set<Usuario> nuevosUsuarios = new HashSet<>(usuarioRepository.findAllById(usuariosNuevosIds));
+        sitio.getUsuarios().addAll(nuevosUsuarios);
+
+        Sitio actualizado = sitioRepository.save(sitio);
+        return sitioMapper.toDto(actualizado);
+    }
+
+
 }

@@ -41,3 +41,8 @@ export const getSitiosVisibles = () =>
   axios.get(`${REST_API_BASE_URL}/sitios/visibles`, getHeaders());
 
 
+export const getUsuariosAsignados = (sitioId) =>
+  axios.get(`${REST_API_BASE_URL}/sitios/${sitioId}/usuarios`, getHeaders());
+
+export const agregarUsuariosAsignados = (sitioId, userIds) =>
+  axios.post(`${REST_API_BASE_URL}/sitios/${sitioId}/usuarios`, userIds, getHeaders());

@@ -1,12 +1,14 @@
 package com.webserdi.backend.controller;
 
 import com.webserdi.backend.dto.SitioDto;
+import com.webserdi.backend.dto.UsuarioDto;
 import com.webserdi.backend.service.SitioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/sitios")
@@ -35,6 +37,16 @@ public class SitioController {
     public ResponseEntity<List<SitioDto>> obtenerPorSlug(@PathVariable Long id) {
         return ResponseEntity.ok(sitioService.obtenerPorSlug(id));
     }
+
+    @GetMapping("/{id}/usuarios")
+    public ResponseEntity<Set<UsuarioDto>> obtenerUsuariosAsignados(@PathVariable Long id) {
+        return ResponseEntity.ok(sitioService.obtenerUsuariosAsignados(id));
+    }
+    @PostMapping("/{id}/usuarios")
+    public ResponseEntity<SitioDto> agregarUsuarios(@PathVariable Long id, @RequestBody Set<Long> nuevosIds) {
+        return ResponseEntity.ok(sitioService.agregarUsuarios(id, nuevosIds));
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarSitio(@PathVariable Long id) {

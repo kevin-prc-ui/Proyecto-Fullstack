@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, ListGroup, Modal } from 'react-bootstrap';
 import { FaFileUpload, FaImage, FaFilePdf, FaCheckCircle, FaArrowLeft, FaUserPlus, FaUser } from 'react-icons/fa';
 import { getUserId, listUsers } from '../../../../services/UsuarioService'; // Asegúrate que la ruta es correcta
+import { getUsuariosAsignados, agregarUsuariosAsignados } from '../../../../services/SitioService';
 
 
 const SiteView = ({ site, onGoBack, usuarioId}) => {
@@ -22,27 +23,18 @@ const SiteView = ({ site, onGoBack, usuarioId}) => {
   });
 
   // Carga usuarios desde backend cuando se abre el modal
-  useEffect(() => {
+useEffect(() => {
+  if (site?.id) {
+    // Cargar usuario logueado
+    getUserId().then((res) => setUsuarioLogueado(res.data));
 
-    if (showUserModal) {
-      setUsersState({ loading: true, error: null, users: [] });
-      listUsers()
-        .then(response => {
-          setUsersState({ loading: false, error: null, users: response.data });
-        })
-        .catch(error => {
-          setUsersState({ loading: false, error: error.message || 'Error al cargar usuarios', users: [] });
-        });
-    }
-  }, [showUserModal]);
+    // Cargar usuarios asignados al sitio
+    getUsuariosAsignados(site.id)
+      .then(res => setSelectedUsers(res.data))
+      .catch(err => console.error("Error al cargar usuarios asignados:", err));
+  }
+}, [site]);
 
-  // Cargar usuario logueado desde localStorage al montar componente
-  useEffect(() => {
-  getUserId().then((response)=> {
-    setUsuarioLogueado(response.data);
-  }); // Asegúrate que esta función obtiene el ID del usuario logueado
-    
-  }, []);
 
   // Filtrar usuarios basado en el término de búsqueda
   const filteredUsers = usersState.users.filter(user =>
@@ -63,10 +55,31 @@ const SiteView = ({ site, onGoBack, usuarioId}) => {
   };
 
   // Cuando se confirma agregar usuarios seleccionados
-  const handleAddUsers = () => {
-    setShowUserModal(false);
-    setSearchTerm('');
-  };
+const handleAddUsers = () => {
+  const idsYaAsignados = selectedUsers.map(u => u.id);
+  const idsNuevos = usersState.users
+    .filter(user => selectedUsers.some(s => s.id === user.id) && !idsYaAsignados.includes(user.id))
+    .map(user => user.id);
+
+  if (idsNuevos.length === 0) {
+    alert("No hay usuarios nuevos para agregar.");
+    return;
+  }
+
+  agregarUsuariosAsignados(site.id, idsNuevos)
+    .then(() => {
+      setShowUserModal(false);
+      setSearchTerm('');
+      // Opcional: recargar lista desde backend
+      getUsuariosAsignados(site.id).then(res => setSelectedUsers(res.data));
+    })
+    .catch(err => {
+      console.error("Error al agregar usuarios:", err);
+      alert("Error al agregar usuarios al sitio");
+    });
+};
+
+
 
   // Manejo de envío de publicación (post)
   const handlePostSubmit = (e) => {
