@@ -20,7 +20,7 @@ const getHeaders = () => {
   return accessToken
     ? { headers: { Authorization: `Bearer ${accessToken}` } }
     : {};
-};  
+};
 
 // === Endpoints ===
 export const getSitios = () =>
@@ -34,4 +34,4 @@ export const updateSitio = (id, sitioDto) =>
 export const deleteSitio = (id) =>
   axios.delete(`${REST_API_BASE_URL}/sitios/${id}`, getHeaders());
 export const getSitiosByUser = (userId) =>
-  axios.get(`${REST_API_BASE_URL}/sitios/user/${userId}`, getHeaders());
+  axios.get(`${REST_API_BASE_URL}/sitios/usuario/${userId}`, getHeaders());

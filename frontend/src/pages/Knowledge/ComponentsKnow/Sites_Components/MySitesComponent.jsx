@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, ListGroup, Spinner, Alert } from 'react-bootstrap';
 import { FaTrash, FaStar, FaRegStar, FaExternalLinkAlt } from 'react-icons/fa';
 import { getSitios, deleteSitio } from '../../../../services/SitioService';
+import { getSitiosByUser } from '../../../../services/SitioService';
+
 
 const MySitesComponent = ({ onSiteClick, userId }) => {
   const [sites, setSites] = useState([]);

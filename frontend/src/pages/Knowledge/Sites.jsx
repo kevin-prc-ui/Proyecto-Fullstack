@@ -18,11 +18,15 @@ const Sites = () => {
   const [currentSite, setCurrentSite] = useState(null); // Nuevo estado para el sitio actual
 
   // Cargar sitios de localStorage al montar
+// Obtener userId UNA SOLA VEZ
 useEffect(() => {
-    getUserId().then((response) => {
-          setUserId(response.data);
-        });
+  getUserId().then((response) => {
+    setUserId(response.data);
+  });
+}, []);
 
+// Cuando ya tengas userId, carga sitios del backend
+useEffect(() => {
   if (userId) {
     getSitiosByUser(userId)
       .then(response => {
@@ -32,7 +36,15 @@ useEffect(() => {
         console.error("Error al obtener los sitios del usuario:", error);
       });
   }
+}, [userId]); // 👈 Reaccionamos al cambio en userId
+
+
+useEffect(() => {
+  getUserId().then((response) => {
+    setUserId(response.data);
+  });
 }, []);
+
 
 
 const addSite = (newSite) => {
@@ -59,7 +71,7 @@ const addSite = (newSite) => {
   const renderComponent = () => {
     switch (activeTab) {
       case 'misSitios':
-        return <MySitesComponent sites={sites} setSites={setSites} onSiteClick={openSite} />;
+        return <MySitesComponent sites={sites} setSites={setSites} onSiteClick={openSite} userId={userId} />
       case 'buscarSitios':
         return <SitesFinderComponent />;
       case 'crearSitio':

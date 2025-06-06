@@ -32,7 +32,7 @@ const FavoritesComponent = ({ sites, setSites }) => {
               className="d-flex justify-content-between align-items-center"
             >
               <div>
-                <strong>{site.name}</strong> <br />
+                <strong>{site.nombre}</strong> <br />
                 <small className="text-muted">ID: {site.siteId}</small>
               </div>
               <div>

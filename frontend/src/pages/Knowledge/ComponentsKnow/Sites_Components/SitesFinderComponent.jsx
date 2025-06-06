@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Form, InputGroup, ListGroup } from 'react-bootstrap';
+import { getSitios } from '../../../../services/SitioService';
 
 export const SitesFinderComponent = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [allSites, setAllSites] = useState([]);
 
-  useEffect(() => {
-    const storedSites = JSON.parse(localStorage.getItem('mySites')) || [];
-    setAllSites(storedSites);
-  }, []);
+ // Asegúrate de que esta ruta es correcta
+
+useEffect(() => {
+  getSitios()
+    .then(response => {
+      setAllSites(response.data);
+    })
+    .catch(error => {
+      console.error("Error al obtener todos los sitios:", error);
+    });
+}, []);
+
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
