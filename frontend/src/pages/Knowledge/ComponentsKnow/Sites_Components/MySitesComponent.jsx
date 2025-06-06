@@ -3,6 +3,7 @@ import { Button, ListGroup, Spinner, Alert } from 'react-bootstrap';
 import { FaTrash, FaStar, FaRegStar, FaExternalLinkAlt } from 'react-icons/fa';
 import { getSitios, deleteSitio } from '../../../../services/SitioService';
 import { getSitiosByUser } from '../../../../services/SitioService';
+import { getUserId } from '../../../../services/UsuarioService';
 
 
 const MySitesComponent = ({ onSiteClick, userId }) => {
@@ -11,28 +12,33 @@ const MySitesComponent = ({ onSiteClick, userId }) => {
   const [error, setError] = useState(null);
 
   // Cargar sitios al montar el componente o cuando cambie el userId
-  useEffect(() => {
-    const fetchSites = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // Si hay userId, cargar sitios del usuario, sino cargar todos
-        const response = userId 
-          ? await getSitiosByUser(userId)
-          : await getSitios();
-        
-        setSites(response.data);
-      } catch (err) {
-        console.error("Error al cargar sitios:", err);
-        setError("Error al cargar los sitios. Por favor, inténtalo de nuevo.");
-      } finally {
-        setLoading(false);
-      }
-    };
+useEffect(() => {
+  const fetchSites = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
+      const userIdResponse = await getUserId();
+      const userId = userIdResponse.data;
+
+      const response = await getSitiosByUser(userId);
+      setSites(response.data);
+    } catch (err) {
+      console.error("Error al cargar sitios:", err);
+      setError("Error al cargar los sitios. Verifica tu sesión.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const token = localStorage.getItem("authToken");
+
+  if (token) {
     fetchSites();
-  }, [userId]);
+  } else {
+    console.warn("Token no disponible aún.");
+  }
+}, []);
 
   const toggleFavorite = async (siteId) => {
     try {
