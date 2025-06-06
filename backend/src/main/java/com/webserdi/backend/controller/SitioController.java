@@ -26,6 +26,11 @@ public class SitioController {
         return ResponseEntity.ok(sitioService.listarMisSitios(usuarioId));
     }
 
+    @GetMapping("/visibles")
+    public ResponseEntity<List<SitioDto>> listarSitiosVisibles() {
+        return ResponseEntity.ok(sitioService.listarSitiosPublicosYModerados());
+    }
+
     @GetMapping("/slug/{id}")
     public ResponseEntity<List<SitioDto>> obtenerPorSlug(@PathVariable Long id) {
         return ResponseEntity.ok(sitioService.obtenerPorSlug(id));

@@ -67,6 +67,15 @@ public class SitioServiceImpl implements SitioService {
     }
 
     @Override
+    public List<SitioDto> listarSitiosPublicosYModerados() {
+        return sitioRepository.findAll().stream()
+                .filter(sitio -> sitio.getVisibilidad().equalsIgnoreCase("Public") ||
+                        sitio.getVisibilidad().equalsIgnoreCase("Moderated"))
+                .map(sitioMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<SitioDto> listarMisSitios(Long usuarioId) {
         return sitioRepository.findAll().stream()
                 .filter(s -> s.getCreador().getId().equals(usuarioId))

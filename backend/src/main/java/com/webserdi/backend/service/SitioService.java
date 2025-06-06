@@ -9,4 +9,6 @@ public interface SitioService {
     List<SitioDto> obtenerPorSlug(Long id);
     void eliminarSitio(Long id);
     SitioDto actualizarSitio(Long id, SitioDto sitioDto);
+    List<SitioDto> listarSitiosPublicosYModerados();
+
 }

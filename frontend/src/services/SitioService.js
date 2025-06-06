@@ -35,3 +35,5 @@ export const deleteSitio = (id) =>
   axios.delete(`${REST_API_BASE_URL}/sitios/${id}`, getHeaders());
 export const getSitiosByUser = (userId) =>
   axios.get(`${REST_API_BASE_URL}/sitios/usuario/${userId}`, getHeaders());
+export const getSitiosVisibles = () =>
+  axios.get(`${REST_API_BASE_URL}/sitios/visibles`, getHeaders());

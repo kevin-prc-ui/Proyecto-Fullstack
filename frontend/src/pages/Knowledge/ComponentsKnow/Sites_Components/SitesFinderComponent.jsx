@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, InputGroup, ListGroup } from 'react-bootstrap';
 import { getSitios } from '../../../../services/SitioService';
+import { getSitiosVisibles } from '../../../../services/SitioService';
 
 export const SitesFinderComponent = () => {
   const [query, setQuery] = useState('');
@@ -9,27 +10,34 @@ export const SitesFinderComponent = () => {
 
  // Asegúrate de que esta ruta es correcta
 
+
 useEffect(() => {
-  getSitios()
+  getSitiosVisibles()
     .then(response => {
       setAllSites(response.data);
     })
     .catch(error => {
-      console.error("Error al obtener todos los sitios:", error);
+      console.error("Error al cargar sitios públicos/moderados:", error);
     });
 }, []);
 
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setQuery(value);
+const handleSearchChange = (e) => {
+  const value = e.target.value;
+  setQuery(value);
 
-    const filtered = allSites.filter(site =>
-      site.name.toLowerCase().includes(value.toLowerCase()) ||
-      site.siteId.toLowerCase().includes(value.toLowerCase())
+  const filtered = allSites.filter(site => {
+    const nombre = site.nombre || "";
+    const siteId = site.siteId || "";
+    return (
+      nombre.toLowerCase().includes(value.toLowerCase()) ||
+      siteId.toLowerCase().includes(value.toLowerCase())
     );
-    setResults(filtered);
-  };
+  });
+
+  setResults(filtered);
+};
+
 
   return (
     <div className="sites-search-container">
@@ -53,8 +61,9 @@ useEffect(() => {
         <ListGroup>
           {results.map((site, index) => (
             <ListGroup.Item key={index}>
-              <strong>{site.name}</strong> <br />
-              <span className="site-id-text">ID: {site.siteId}</span>
+<strong>{site.nombre}</strong> <br />
+<span className="site-id-text">ID: {site.siteId}</span>
+
             </ListGroup.Item>
           ))}
         </ListGroup>
