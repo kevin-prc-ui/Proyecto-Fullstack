@@ -6,6 +6,7 @@ import {
   getArchivoUrl,
   getArchivosPorCarpeta,
   getArchivosSinCarpeta,
+  desactivarArchivo,
 } from "../../../../services/MisArchivosService";
 
 export const useFileManager = () => {
@@ -152,10 +153,15 @@ export const useFileManager = () => {
     );
   };
 
-  const handleRemoveItem = (id) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-    setFavorites((prev) => prev.filter((favId) => favId !== id));
-  };
+const handleRemoveItem = async (id) => {
+  try {
+    await desactivarArchivo(id);
+    setItems(prev => prev.filter(item => item.id !== id));
+  } catch (error) {
+    console.error("Error al desactivar archivo:", error);
+  }
+};
+
 
   const enterFolder = (folderId) => {
     setCurrentFolder(folderId);
