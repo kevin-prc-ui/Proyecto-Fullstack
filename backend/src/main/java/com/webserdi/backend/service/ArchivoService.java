@@ -11,7 +11,8 @@ public interface ArchivoService {
     List<ArchivoDto> getAllArchivos();         // no carpetas, sino archivos
     ArchivoDto updateArchivo(Long archivoId, ArchivoDto archivoDto);
     void deleteArchivo(Long archivoId);        // minúscula en el parámetro
-    List<ArchivoDto> getArchivosPorCarpeta(Long carpetaId);
-    ArchivoDto guardarArchivoConContenido(MultipartFile archivo, Long carpetaId);
+    List<ArchivoDto> getArchivosPorCarpeta(Long carpetaId, Long usuarioId);
+    ArchivoDto guardarArchivoConContenido(MultipartFile archivo, Long carpetaId, Long usuarioId);
     void desactivarArchivo(Long archivoId);
+
 }

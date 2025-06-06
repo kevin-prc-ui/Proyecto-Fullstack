@@ -30,6 +30,10 @@ public class Archivo {
     @Column(nullable = false)
     private Boolean activo = true;
 
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
     private String tipo; // MIME type o extensión del archivo
     private Long tamaño; // Tamaño en bytes
 
@@ -45,7 +49,6 @@ public class Archivo {
     @ManyToOne
     @JoinColumn(name = "sitio_id")
     private Sitio sitio;
-
 
 
 }

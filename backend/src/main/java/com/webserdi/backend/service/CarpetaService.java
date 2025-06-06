@@ -5,7 +5,7 @@ import com.webserdi.backend.dto.CarpetaDto;
 import java.util.List;
 
 public interface CarpetaService {
-    CarpetaDto createCarpeta(CarpetaDto carpetaDto);
+    CarpetaDto createCarpeta(CarpetaDto carpetaDto, Long usuarioId);
     CarpetaDto getCarpetaById(Long carpetaId);
     List<CarpetaDto> getAllCarpetas();
     CarpetaDto updateCarpeta(Long carpetaId, CarpetaDto carpetaDto);

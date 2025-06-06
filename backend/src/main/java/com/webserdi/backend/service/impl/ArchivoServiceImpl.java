@@ -3,10 +3,12 @@ package com.webserdi.backend.service.impl;
 import com.webserdi.backend.dto.ArchivoDto;
 import com.webserdi.backend.entity.Archivo;
 import com.webserdi.backend.entity.Carpeta;
+import com.webserdi.backend.entity.Usuario;
 import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.mapper.ArchivoMapper;
 import com.webserdi.backend.repository.ArchivoRepository;
 import com.webserdi.backend.repository.CarpetaRepository;
+import com.webserdi.backend.repository.UsuarioRepository;
 import com.webserdi.backend.service.ArchivoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,8 @@ public class ArchivoServiceImpl implements ArchivoService {
     private final ArchivoRepository archivoRepository;
     private final ArchivoMapper archivoMapper;
     private final CarpetaRepository carpetaRepository;
+    private final UsuarioRepository usuarioRepository;
+
 
     @Value("${file.upload-dir}")
     private String baseUploadDir;
@@ -39,10 +43,11 @@ public class ArchivoServiceImpl implements ArchivoService {
 
     public ArchivoServiceImpl(ArchivoRepository archivoRepository,
                               ArchivoMapper archivoMapper,
-                              CarpetaRepository carpetaRepository) {
+                              CarpetaRepository carpetaRepository, UsuarioRepository usuarioRepository) {
         this.archivoRepository = archivoRepository;
         this.archivoMapper = archivoMapper;
         this.carpetaRepository = carpetaRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -70,7 +75,7 @@ public class ArchivoServiceImpl implements ArchivoService {
 // Dentro de ArchivoServiceImpl
 
     @Override
-    public ArchivoDto guardarArchivoConContenido(MultipartFile archivo, Long carpetaId) {
+    public ArchivoDto guardarArchivoConContenido(MultipartFile archivo, Long carpetaId, Long usuarioId) {
         try {
             String nombreArchivo = archivo.getOriginalFilename();
             String tipoArchivo = archivo.getContentType();
@@ -87,11 +92,16 @@ public class ArchivoServiceImpl implements ArchivoService {
             Path rutaArchivo = rutaCarpeta.resolve(nombreArchivo);
             archivo.transferTo(rutaArchivo.toFile());
 
+
             // Crear entidad
             Archivo entidad = new Archivo();
             entidad.setNombre(nombreArchivo);
             entidad.setTipo(tipoArchivo);
             entidad.setTamaño(tamañoArchivo);
+
+            Usuario usuario = usuarioRepository.findById(usuarioId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+            entidad.setUsuario(usuario);
 
             // Guardar la ruta relativa (para usarla luego al ver el archivo)
             String rutaRelativa = Paths.get("uploads", subdirectorio, nombreArchivo).toString();
@@ -122,13 +132,13 @@ public class ArchivoServiceImpl implements ArchivoService {
 
 
     @Override
-    public List<ArchivoDto> getArchivosPorCarpeta(Long carpetaId) {
+    public List<ArchivoDto> getArchivosPorCarpeta(Long carpetaId, Long usuarioId) {
         List<Archivo> archivos;
 
         if (carpetaId == null) {
-            archivos = archivoRepository.findByCarpetaIsNullAndActivoTrue();
+            archivos = archivoRepository.findByCarpetaIsNullAndUsuarioIdAndActivoTrue(usuarioId);
         } else {
-            archivos = archivoRepository.findByCarpetaIdAndActivoTrue(carpetaId);
+            archivos = archivoRepository.findByCarpetaIdAndUsuarioIdAndActivoTrue(carpetaId, usuarioId);
         }
 
         return archivos.stream()

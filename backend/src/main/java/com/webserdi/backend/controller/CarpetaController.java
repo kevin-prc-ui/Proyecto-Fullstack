@@ -18,9 +18,11 @@ public class CarpetaController {
     private final CarpetaService carpetaService;
 
     @PostMapping
-    public ResponseEntity<CarpetaDto> createCarpeta(@RequestBody CarpetaDto carpetaDto) {
-        CarpetaDto createdCarpeta = carpetaService.createCarpeta(carpetaDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdCarpeta);
+    public ResponseEntity<CarpetaDto> createCarpeta(
+            @RequestBody CarpetaDto carpetaDto,
+            @RequestParam("usuarioId") Long usuarioId) {
+        CarpetaDto nueva = carpetaService.createCarpeta(carpetaDto, usuarioId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
     }
 
     @GetMapping("/{carpetaId}")

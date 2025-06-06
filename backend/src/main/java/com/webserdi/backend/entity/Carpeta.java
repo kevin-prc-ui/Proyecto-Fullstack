@@ -35,6 +35,11 @@ public class Carpeta {
     @JoinColumn(name = "carpeta_padre_id")
     private Carpeta carpetaPadre;
 
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
+
     // Relación con las subcarpetas (hijas)
     @OneToMany(mappedBy = "carpetaPadre", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Carpeta> subcarpetas = new ArrayList<>();

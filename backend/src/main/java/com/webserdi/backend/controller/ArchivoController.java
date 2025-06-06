@@ -38,12 +38,13 @@ public class ArchivoController {
     }
 
     // Subir archivo físico + metadatos
-    @PostMapping("/upload")
+    @PostMapping("/uploads")
     public ResponseEntity<ArchivoDto> subirArchivoConContenido(
             @RequestParam("archivo") MultipartFile archivo,
-            @RequestParam(value = "carpetaId", required = false) Long carpetaId) {
+            @RequestParam(value = "carpetaId", required = false) Long carpetaId,
+            @RequestParam("usuarioId") Long usuarioId) {
 
-        ArchivoDto archivoDto = archivoService.guardarArchivoConContenido(archivo, carpetaId);
+        ArchivoDto archivoDto = archivoService.guardarArchivoConContenido(archivo, carpetaId, usuarioId);
         return new ResponseEntity<>(archivoDto, HttpStatus.CREATED);
     }
 
@@ -53,8 +54,11 @@ public class ArchivoController {
         return ResponseEntity.ok(archivoDto);
     }
     @GetMapping("/carpeta/{carpetaId}")
-    public ResponseEntity<List<ArchivoDto>> listarArchivosPorCarpeta(@PathVariable Long carpetaId) {
-        List<ArchivoDto> archivos = archivoService.getArchivosPorCarpeta(carpetaId);
+    public ResponseEntity<List<ArchivoDto>> listarArchivosPorCarpeta(
+            @PathVariable Long carpetaId,
+            @RequestParam("usuarioId") Long usuarioId) {
+
+        List<ArchivoDto> archivos = archivoService.getArchivosPorCarpeta(carpetaId, usuarioId);
         return ResponseEntity.ok(archivos);
     }
 
@@ -77,8 +81,9 @@ public class ArchivoController {
         return ResponseEntity.noContent().build();
     }
     @GetMapping("/sin-carpeta")
-    public ResponseEntity<List<ArchivoDto>> listarArchivosSinCarpeta() {
-        List<ArchivoDto> archivos = archivoService.getArchivosPorCarpeta(null);
+    public ResponseEntity<List<ArchivoDto>> listarArchivosSinCarpeta(
+            @RequestParam("usuarioId") Long usuarioId) {
+        List<ArchivoDto> archivos = archivoService.getArchivosPorCarpeta(null, usuarioId);
         return ResponseEntity.ok(archivos);
     }
 

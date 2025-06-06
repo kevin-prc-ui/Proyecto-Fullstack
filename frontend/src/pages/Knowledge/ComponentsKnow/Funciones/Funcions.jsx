@@ -8,8 +8,10 @@ import {
   getArchivosSinCarpeta,
   desactivarArchivo,
 } from "../../../../services/MisArchivosService";
+import { getUserId } from "../../../../services/UsuarioService";  
 
 export const useFileManager = () => {
+  const [usuarioId, setUsuarioId] = useState(null);
   const [items, setItems] = useState([]);
   const [currentFolder, setCurrentFolder] = useState(null);
   const [currentFilter, setCurrentFilter] = useState("all");
@@ -27,7 +29,9 @@ export const useFileManager = () => {
   // ✅ Subida de archivo usando servicio
   const handleFileUpload = async (file) => {
     try {
-      const response = await uploadArchivo(file, currentFolder);
+      const usuarioId = await getUserId();
+      setUsuarioId(usuarioId.data); // Guardar el usuarioId una vez que se obtiene      
+      const response = await uploadArchivo(file, currentFolder, usuarioId);
       const data = response.data;
       console.log(data);
 
@@ -93,7 +97,7 @@ export const useFileManager = () => {
         // Traer archivos según el estado
         let archivos = [];
         if (currentFolder !== null) {
-          const archivosResponse = await getArchivosPorCarpeta(currentFolder);
+          const archivosResponse = await getArchivosPorCarpeta(currentFolder, usuarioId);
           archivos = archivosResponse.data.map((a) => ({
             id: a.id,
             type: "file",

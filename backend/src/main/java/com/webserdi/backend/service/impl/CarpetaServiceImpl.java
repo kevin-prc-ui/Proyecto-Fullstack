@@ -2,14 +2,17 @@ package com.webserdi.backend.service.impl;
 
 import com.webserdi.backend.dto.CarpetaDto;
 import com.webserdi.backend.entity.Carpeta;
+import com.webserdi.backend.entity.Usuario;
 import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.mapper.CarpetaMapper;
 import com.webserdi.backend.repository.CarpetaRepository;
+import com.webserdi.backend.repository.UsuarioRepository;
 import com.webserdi.backend.service.CarpetaService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,21 +23,27 @@ public class CarpetaServiceImpl implements CarpetaService {
 
     private final CarpetaRepository carpetaRepository;
     private final CarpetaMapper carpetaMapper;
+    private final UsuarioRepository usuarioRepository;
 
     @Override
-    public CarpetaDto createCarpeta(CarpetaDto carpetaDto) {
+    public CarpetaDto createCarpeta(CarpetaDto carpetaDto, Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
         Carpeta carpeta = carpetaMapper.toEntity(carpetaDto);
+        carpeta.setUsuario(usuario); // 👈 Aquí asignas el usuario
 
-        // Aquí se resuelve la carpeta padre si se proporcionó el ID
         if (carpetaDto.getCarpetaPadreId() != null) {
-            Carpeta carpetaPadre = carpetaRepository.findById(carpetaDto.getCarpetaPadreId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Carpeta padre no encontrada con ID: " + carpetaDto.getCarpetaPadreId()));
-            carpeta.setCarpetaPadre(carpetaPadre);
+            Carpeta padre = carpetaRepository.findById(carpetaDto.getCarpetaPadreId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Carpeta padre no encontrada"));
+            carpeta.setCarpetaPadre(padre);
         }
+        carpeta.setFechaCreacion(LocalDateTime.now());
 
-        carpeta = carpetaRepository.save(carpeta);
+        carpetaRepository.save(carpeta);
         return carpetaMapper.toDto(carpeta);
     }
+
 
     @Override
     public CarpetaDto getCarpetaById(Long carpetaId) {

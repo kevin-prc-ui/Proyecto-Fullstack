@@ -41,8 +41,8 @@ export const createCarpeta = (carpetaDto) =>
 export const getAllCarpetas = () =>
   axios.get(`${REST_API_BASE_URL}/carpetas`, getHeaders());
 
-export const getArchivosPorCarpeta = (carpetaId) =>
-  axios.get(`${REST_API_BASE_URL}/archivos/carpeta/${carpetaId}`, getHeaders());
+export const getArchivosPorCarpeta = (carpetaId, usuarioId) =>
+  axios.get(`${REST_API_BASE_URL}/archivos/carpeta/${carpetaId}?usuarioId=${usuarioId}`, getHeaders());
 
 export const getArchivosSinCarpeta = () =>
   axios.get(`${REST_API_BASE_URL}/archivos/sin-carpeta`, getHeaders());
@@ -51,15 +51,13 @@ export const desactivarArchivo = (archivoId) =>
   axios.put(`${REST_API_BASE_URL}/archivos/desactivar/${archivoId}`, {}, getHeaders());
 
 // ✅ Nuevo método para subir archivos binarios
-export const uploadArchivo = (file, carpetaId) => {
+export const uploadArchivo = (file, carpetaId, usuarioId) => {
   const formData = new FormData();
   formData.append("archivo", file);
-  if (carpetaId) {
-    formData.append("carpetaId", carpetaId);
-  }
+  if (carpetaId) formData.append("carpetaId", carpetaId);
+  formData.append("usuarioId", usuarioId);
 
-  
-  return axios.post(`${REST_API_BASE_URL}/archivos/upload`, formData, {
+  return axios.post(`${REST_API_BASE_URL}/archivos/uploads`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
       Authorization: `Bearer ${getAuthToken()}`
