@@ -1,5 +1,6 @@
 import axios from "axios";
 
+
 const REST_API_BASE_URL = "http://localhost:8080/api";
 
 // Obtener token del localStorage
@@ -35,8 +36,9 @@ export const getMisArchivosById = (id) =>
 export const createMisArchivo = (archivoDto) =>
   axios.post(`${REST_API_BASE_URL}/mis-archivos/save`, archivoDto, getHeaders());
 
-export const createCarpeta = (carpetaDto) =>
-  axios.post(`${REST_API_BASE_URL}/carpetas`, carpetaDto, getHeaders());
+export const createCarpeta = (carpetaDto, usuarioId) =>
+  axios.post(`${REST_API_BASE_URL}/carpetas?usuarioId=${usuarioId}`, carpetaDto, getHeaders());
+
 
 export const getAllCarpetas = () =>
   axios.get(`${REST_API_BASE_URL}/carpetas`, getHeaders());
@@ -44,11 +46,15 @@ export const getAllCarpetas = () =>
 export const getArchivosPorCarpeta = (carpetaId, usuarioId) =>
   axios.get(`${REST_API_BASE_URL}/archivos/carpeta/${carpetaId}?usuarioId=${usuarioId}`, getHeaders());
 
-export const getArchivosSinCarpeta = () =>
-  axios.get(`${REST_API_BASE_URL}/archivos/sin-carpeta`, getHeaders());
+export const getArchivosSinCarpeta = (usuarioId) =>
+  axios.get(`${REST_API_BASE_URL}/archivos/sin-carpeta?usuarioId=${usuarioId}`, getHeaders());
 
 export const desactivarArchivo = (archivoId) =>
   axios.put(`${REST_API_BASE_URL}/archivos/desactivar/${archivoId}`, {}, getHeaders());
+
+export const getUserId = () =>
+  axios.get(`${REST_API_BASE_URL}/users/me/id`, getHeaders());
+
 
 // ✅ Nuevo método para subir archivos binarios
 export const uploadArchivo = (file, carpetaId, usuarioId) => {

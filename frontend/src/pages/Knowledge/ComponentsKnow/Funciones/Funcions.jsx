@@ -8,7 +8,8 @@ import {
   getArchivosSinCarpeta,
   desactivarArchivo,
 } from "../../../../services/MisArchivosService";
-import { getUserId } from "../../../../services/UsuarioService";  
+import { getUserId } from "../../../../services/MisArchivosService"; // ya está en tu txt
+
 
 export const useFileManager = () => {
   const [usuarioId, setUsuarioId] = useState(null);
@@ -21,70 +22,29 @@ export const useFileManager = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Guardar favoritos en localStorage
-  useEffect(() => {
-    localStorage.setItem("favorites", JSON.stringify(favorites));
-  }, [favorites]);
+  // ✅ Obtener el ID del usuario al iniciar
 
-  // ✅ Subida de archivo usando servicio
-  const handleFileUpload = async (file) => {
+useEffect(() => {
+  const obtenerUsuarioId = async () => {
     try {
-      const usuarioId = await getUserId();
-      setUsuarioId(usuarioId.data); // Guardar el usuarioId una vez que se obtiene      
-      const response = await uploadArchivo(file, currentFolder, usuarioId);
-      const data = response.data;
-      console.log(data);
-
-      const newItem = {
-        id: data.id,
-        type: "file",
-        fileObject: file,
-        name: data.nombre,
-        fileType: data.tipo,
-        size: (file.size / 1024).toFixed(2) + " KB",
-        date: new Date(data.fechaSubida).toLocaleDateString(),
-        parentId: currentFolder,
-        isFavorite: false,
-        url: getArchivoUrl(data.id), // URL del archivo
-      };
-
-      setItems((prev) => [...prev, newItem]);
+      const response = await getUserId();
+      const id = response.data;
+      setUsuarioId(id);
+      localStorage.setItem("user", JSON.stringify({ id })); // opcional, para futuras cargas
     } catch (error) {
-      console.error("Error al subir archivo:", error);
+      console.error("❌ No se pudo obtener el ID del usuario:", error);
     }
   };
 
-  // ✅ Crear carpeta
-  const handleCreateFolder = async (folderName) => {
-    const carpetaDto = {
-      nombre: folderName,
-      carpetaPadreId: currentFolder,
-    };
+  obtenerUsuarioId();
+}, []);
 
-    try {
-      const response = await createCarpeta(carpetaDto);
-      const nuevaCarpeta = response.data;
-
-      setItems((prev) => [
-        ...prev,
-        {
-          id: nuevaCarpeta.id,
-          type: "folder",
-          name: nuevaCarpeta.nombre,
-          date: new Date(nuevaCarpeta.fechaCreacion).toLocaleDateString(),
-          parentId: nuevaCarpeta.carpetaPadreId,
-        },
-      ]);
-    } catch (error) {
-      console.error("Error al crear carpeta:", error);
-    }
-  };
-
-  // ✅ Obtener carpetas al montar
+  // ✅ Obtener carpetas y archivos cada vez que cambia currentFolder o usuarioId
   useEffect(() => {
     const fetchData = async () => {
+      if (!usuarioId) return;
+
       try {
-        // Traer carpetas
         const carpetasResponse = await getAllCarpetas();
         const carpetas = carpetasResponse.data.map((c) => ({
           id: c.id,
@@ -94,8 +54,8 @@ export const useFileManager = () => {
           parentId: c.carpetaPadreId,
         }));
 
-        // Traer archivos según el estado
         let archivos = [];
+
         if (currentFolder !== null) {
           const archivosResponse = await getArchivosPorCarpeta(currentFolder, usuarioId);
           archivos = archivosResponse.data.map((a) => ({
@@ -110,9 +70,8 @@ export const useFileManager = () => {
             url: getArchivoUrl(a.id),
           }));
         } else {
-          // Fuera de carpetas → traer archivos sin carpeta
-          const archivosSinCarpetaResponse = await getArchivosSinCarpeta();
-          archivos = archivosSinCarpetaResponse.data
+          const response = await getArchivosSinCarpeta(usuarioId);
+          archivos = response.data
             .filter((a) => a.carpetaId === null)
             .map((a) => ({
               id: a.id,
@@ -127,7 +86,6 @@ export const useFileManager = () => {
             }));
         }
 
-        // Filtrar carpetas hijas si estás dentro de una carpeta
         const carpetasFiltradas =
           currentFolder === null
             ? carpetas.filter((c) => c.parentId === null)
@@ -135,14 +93,74 @@ export const useFileManager = () => {
 
         setItems([...carpetasFiltradas, ...archivos]);
       } catch (error) {
-        console.error("Error al cargar carpetas o archivos:", error);
+        console.error("❌ Error al cargar carpetas o archivos:", error);
       }
     };
 
     fetchData();
-  }, [currentFolder]);
+  }, [currentFolder, usuarioId]);
 
-  // ✅ Favoritos
+  // ✅ Subir archivo
+  const handleFileUpload = async (file) => {
+    if (!usuarioId) {
+      console.warn("⏳ usuarioId no definido aún, no se puede subir archivo");
+      return;
+    }
+
+    try {
+      const response = await uploadArchivo(file, currentFolder, usuarioId);
+      const data = response.data;
+
+      const newItem = {
+        id: data.id,
+        type: "file",
+        fileObject: file,
+        name: data.nombre,
+        fileType: data.tipo,
+        size: (file.size / 1024).toFixed(2) + " KB",
+        date: new Date(data.fechaSubida).toLocaleDateString(),
+        parentId: currentFolder,
+        isFavorite: false,
+        url: getArchivoUrl(data.id),
+      };
+
+      setItems((prev) => [...prev, newItem]);
+    } catch (error) {
+      console.error("❌ Error al subir archivo:", error);
+    }
+  };
+
+  // ✅ Crear carpeta
+  const handleCreateFolder = async (folderName) => {
+    if (!usuarioId) {
+      console.warn("⏳ usuarioId no definido aún, no se puede crear carpeta");
+      return;
+    }
+
+    const carpetaDto = {
+      nombre: folderName,
+      carpetaPadreId: currentFolder,
+    };
+
+    try {
+      const response = await createCarpeta(carpetaDto, usuarioId);
+      const nuevaCarpeta = response.data;
+
+      setItems((prev) => [
+        ...prev,
+        {
+          id: nuevaCarpeta.id,
+          type: "folder",
+          name: nuevaCarpeta.nombre,
+          date: new Date(nuevaCarpeta.fechaCreacion).toLocaleDateString(),
+          parentId: nuevaCarpeta.carpetaPadreId,
+        },
+      ]);
+    } catch (error) {
+      console.error("❌ Error al crear carpeta:", error);
+    }
+  };
+
   const toggleFavorite = (itemId) => {
     setFavorites((prev) =>
       prev.includes(itemId)
@@ -157,25 +175,18 @@ export const useFileManager = () => {
     );
   };
 
-const handleRemoveItem = async (id) => {
-  try {
-    await desactivarArchivo(id);
-    setItems(prev => prev.filter(item => item.id !== id));
-  } catch (error) {
-    console.error("Error al desactivar archivo:", error);
-  }
-};
-
-
-  const enterFolder = (folderId) => {
-    setCurrentFolder(folderId);
+  const handleRemoveItem = async (id) => {
+    try {
+      await desactivarArchivo(id);
+      setItems((prev) => prev.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error("❌ Error al desactivar archivo:", error);
+    }
   };
 
-  const goBack = () => {
-    setCurrentFolder(null);
-  };
+  const enterFolder = (folderId) => setCurrentFolder(folderId);
+  const goBack = () => setCurrentFolder(null);
 
-  // ✅ Filtrado
   const getFilteredItems = () => {
     const currentItems = items.filter((item) =>
       currentFolder === null
@@ -187,9 +198,7 @@ const handleRemoveItem = async (id) => {
       case "favorites":
         return currentItems.filter((item) => favorites.includes(item.id));
       case "recent":
-        return [...currentItems].sort(
-          (a, b) => new Date(b.date) - new Date(a.date)
-        );
+        return [...currentItems].sort((a, b) => new Date(b.date) - new Date(a.date));
       default:
         return currentItems;
     }
