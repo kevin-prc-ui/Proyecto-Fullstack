@@ -3,6 +3,8 @@ import { Container, Row, Col, Card, Form, Button, ListGroup, Modal } from 'react
 import { FaFileUpload, FaImage, FaFilePdf, FaCheckCircle, FaArrowLeft, FaUserPlus, FaUser } from 'react-icons/fa';
 import { getUserId, listUsers } from '../../../../services/UsuarioService'; // Asegúrate que la ruta es correcta
 import { getUsuariosAsignados, agregarUsuariosAsignados } from '../../../../services/SitioService';
+import { uploadArchivo } from '../../../../services/MisArchivosService';
+import { getArchivosPorSitio } from "../../../../services/MisArchivosService"; // debes crear esta función
 
 
 const SiteView = ({ site, onGoBack, usuarioId}) => {
@@ -14,6 +16,7 @@ const SiteView = ({ site, onGoBack, usuarioId}) => {
   const [showUserModal, setShowUserModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [usuarioLogueado, setUsuarioLogueado] = useState(null);
+  const [usuariosSeleccionadosModal, setUsuariosSeleccionadosModal] = useState([]);
 
   // Estado para la lista de usuarios cargados del backend
   const [usersState, setUsersState] = useState({
@@ -32,8 +35,35 @@ useEffect(() => {
     getUsuariosAsignados(site.id)
       .then(res => setSelectedUsers(res.data))
       .catch(err => console.error("Error al cargar usuarios asignados:", err));
+          getArchivosPorSitio(site.id).then(res => {
+
+     // Cargar archivos ya subidos          
+      const actividadesCargadas = res.data.map(archivo => ({
+        id: archivo.id,
+        text: "Archivo publicado anteriormente", // si no tienes texto, puedes usar esto como mensaje genérico
+        file: {
+          name: archivo.nombre,
+          type: archivo.tipo.includes("image") ? "image" : "pdf",
+          url: `/api/archivos/ver/${archivo.id}`
+        },
+        user: selectedUsers.find(u => u.id === archivo.usuarioId),
+        timestamp: new Date(archivo.fechaSubida).toLocaleString()
+      }));
+
+      setActivities(actividadesCargadas);
+    });
   }
 }, [site]);
+
+useEffect(() => {
+  if (showUserModal) {
+    setUsersState({ ...usersState, loading: true });
+    listUsers()
+      .then((res) => setUsersState({ users: res.data, loading: false, error: null }))
+      .catch((err) => setUsersState({ ...usersState, error: err.message, loading: false }));
+  }
+}, [showUserModal]);
+
 
 
   // Filtrar usuarios basado en el término de búsqueda
@@ -43,22 +73,23 @@ useEffect(() => {
   );
 
   // Toggle usuario seleccionado en el modal
-  const toggleUserSelection = (user) => {
-    setSelectedUsers(prev => {
-      const exists = prev.some(u => u.id === user.id);
-      if (exists) {
-        return prev.filter(u => u.id !== user.id);
-      } else {
-        return [...prev, user];
-      }
-    });
-  };
+const toggleUserSelection = (user) => {
+  setUsuariosSeleccionadosModal(prev => {
+    const exists = prev.some(u => u.id === user.id);
+    if (exists) {
+      return prev.filter(u => u.id !== user.id);
+    } else {
+      return [...prev, user];
+    }
+  });
+};
+
 
   // Cuando se confirma agregar usuarios seleccionados
 const handleAddUsers = () => {
   const idsYaAsignados = selectedUsers.map(u => u.id);
-  const idsNuevos = usersState.users
-    .filter(user => selectedUsers.some(s => s.id === user.id) && !idsYaAsignados.includes(user.id))
+  const idsNuevos = usuariosSeleccionadosModal
+    .filter(user => !idsYaAsignados.includes(user.id))
     .map(user => user.id);
 
   if (idsNuevos.length === 0) {
@@ -70,7 +101,7 @@ const handleAddUsers = () => {
     .then(() => {
       setShowUserModal(false);
       setSearchTerm('');
-      // Opcional: recargar lista desde backend
+      setUsuariosSeleccionadosModal([]);
       getUsuariosAsignados(site.id).then(res => setSelectedUsers(res.data));
     })
     .catch(err => {
@@ -81,25 +112,44 @@ const handleAddUsers = () => {
 
 
 
+
   // Manejo de envío de publicación (post)
-  const handlePostSubmit = (e) => {
-    e.preventDefault();
-    if (newPost.trim() || selectedFile) {
-      const newPostObj = {
-        id: Date.now(),
-        text: newPost,
-        file: selectedFile ? {
-          name: selectedFile.name,
-          type: selectedFile.type.includes('image') ? 'image' : 'pdf',
-          rawFile: selectedFile,  // Guardamos el archivo original para mostrar imagen
-        } : null,
-        timestamp: new Date().toLocaleString()
-      };
-      setPosts(prev => [...prev, newPostObj]);
-      setNewPost('');
-      setSelectedFile(null);
-    }
-  };
+const handlePostSubmit = async (e) => {
+  e.preventDefault();
+  if (!newPost.trim() && !selectedFile) return;
+
+  try {
+    const uploadResponse = await uploadArchivo(
+      selectedFile,
+      null, // carpetaId si aplica
+      usuarioLogueado,
+      site.id
+    );
+
+    const archivoSubido = uploadResponse.data;
+
+    const nuevaPublicacion = {
+      id: Date.now(),
+      text: newPost,
+      file: {
+        name: archivoSubido.nombre,
+        type: archivoSubido.tipo.includes("image") ? "image" : "pdf",
+        url: `/api/archivos/ver/${archivoSubido.id}`
+      },
+      user: selectedUsers.find(u => u.id === usuarioLogueado),
+      timestamp: new Date().toLocaleString()
+    };
+
+    setPosts(prev => [...prev, nuevaPublicacion]);
+    setNewPost('');
+    setSelectedFile(null);
+  } catch (err) {
+    console.error("Error al subir publicación:", err);
+    alert("No se pudo subir el archivo. Verifica tu sesión.");
+  }
+};
+
+
 
   // Marcar publicación como completada, asignando el usuario logueado
 const markAsCompleted = (postId) => {
@@ -190,18 +240,23 @@ const markAsCompleted = (postId) => {
                   <Card key={post.id} className="mb-2">
                     <Card.Body>
                       <Card.Text>{post.text}</Card.Text>
-                      {post.file && post.file.type === 'image' && (
-                        <img
-                          src={URL.createObjectURL(post.file.rawFile)}
-                          alt={post.file.name}
-                          style={{ maxWidth: '100%', maxHeight: 200 }}
-                        />
-                      )}
-                      {post.file && post.file.type === 'pdf' && (
-                        <div>
-                          <FaFilePdf size={30} /> {post.file.name}
-                        </div>
-                      )}
+{post.file && post.file.type === 'image' && (
+  <img
+    src={post.file.url}
+    alt={post.file.name}
+    style={{ maxWidth: '100%', maxHeight: 200 }}
+  />
+)}
+
+{post.file && post.file.type === 'pdf' && (
+  <div>
+    <a href={post.file.url} target="_blank" rel="noopener noreferrer">
+      <FaFilePdf size={30} className="me-2" />
+      {post.file.name}
+    </a>
+  </div>
+)}
+
                       <small className="text-muted">{post.timestamp}</small>
                       <Button
                         variant="success"
@@ -222,27 +277,48 @@ const markAsCompleted = (postId) => {
         {/* Contenedor Actividades Completadas (más grande) */}
         <Col md={4}>
           <Card style={{ minHeight: '600px', overflowY: 'auto' }}>
-            <Card.Header>Actividades Completadas</Card.Header>
+            <Card.Header>archivo subidos</Card.Header>
             <Card.Body>
               {activities.length === 0 ? (
-                <p>No hay actividades completadas.</p>
+                <p>No hay archivos subidos</p>
               ) : (
                 activities.map(activity => (
                   <Card key={activity.id} className="mb-3">
                     <Card.Body>
                       <Card.Text>{activity.text}</Card.Text>
-                      {activity.file && activity.file.type === 'image' && (
-                        <img
-                          src={URL.createObjectURL(activity.file.rawFile)}
-                          alt={activity.file.name}
-                          style={{ maxWidth: '100%', maxHeight: 200 }}
-                        />
-                      )}
-                      {activity.file && activity.file.type === 'pdf' && (
-                        <div>
-                          <FaFilePdf size={30} /> {activity.file.name}
-                        </div>
-                      )}
+<img
+  src={activity.file.url}
+  alt={activity.file.name}
+  style={{ maxWidth: '100%', maxHeight: 200 }}
+/>
+<a
+  href={activity.file.url}
+  download
+  className="btn btn-sm btn-outline-primary mt-1"
+>
+  Descargar imagen
+</a>
+
+
+{activity.file && activity.file.type === 'pdf' && (
+  <div>
+    <a href={activity.file.url} target="_blank" rel="noopener noreferrer">
+<a href={activity.file.url} target="_blank" rel="noopener noreferrer">
+  <FaFilePdf size={30} className="me-2" />
+  {activity.file.name}
+</a>
+<a
+  href={activity.file.url}
+  download
+  className="btn btn-sm btn-outline-primary ms-2"
+>
+  Descargar
+</a>
+
+    </a>
+  </div>
+)}
+
                       <small className="text-muted d-block mb-2">{activity.timestamp}</small>
                       <div className="d-flex align-items-center">
                         <FaUser className="text-primary mr-2" />

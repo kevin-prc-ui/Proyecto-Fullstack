@@ -130,6 +130,16 @@ public class ArchivoServiceImpl implements ArchivoService {
         archivoRepository.save(archivo);
     }
 
+    @Override
+    public List<ArchivoDto> getArchivosPorSitio(Long sitioId) {
+        List<Archivo> archivos = archivoRepository.findBySitioIdAndActivoTrue(sitioId);
+        return archivos.stream()
+                .map(archivoMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+
 
     @Override
     public List<ArchivoDto> getArchivosPorCarpeta(Long carpetaId, Long usuarioId) {

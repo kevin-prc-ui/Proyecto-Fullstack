@@ -55,18 +55,32 @@ export const desactivarArchivo = (archivoId) =>
 export const getUserId = () =>
   axios.get(`${REST_API_BASE_URL}/users/me/id`, getHeaders());
 
+export const getArchivosPorSitio = (sitioId) =>
+  axios.get(`${REST_API_BASE_URL}/archivos/sitio/${sitioId}`, getHeaders());
+
 
 // ✅ Nuevo método para subir archivos binarios
-export const uploadArchivo = (file, carpetaId, usuarioId) => {
+export const uploadArchivo = (file, carpetaId, usuarioId, sitioId) => {
+  const storedToken = localStorage.getItem("authToken");
+
+  let headers = { "Content-Type": "multipart/form-data" };
+
+  try {
+    const accessToken = JSON.parse(storedToken)?.accessToken;
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
+  } catch (e) {
+    console.error("Token inválido");
+  }
+
   const formData = new FormData();
   formData.append("archivo", file);
   if (carpetaId) formData.append("carpetaId", carpetaId);
   formData.append("usuarioId", usuarioId);
+  if (sitioId) formData.append("sitioId", sitioId);
 
-  return axios.post(`${REST_API_BASE_URL}/archivos/uploads`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      Authorization: `Bearer ${getAuthToken()}`
-    }
-  });
+  return axios.post(`${REST_API_BASE_URL}/archivos/uploads`, formData, { headers });
 };
+
+

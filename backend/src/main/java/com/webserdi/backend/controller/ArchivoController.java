@@ -48,6 +48,7 @@ public class ArchivoController {
         return new ResponseEntity<>(archivoDto, HttpStatus.CREATED);
     }
 
+
     @GetMapping("/{archivoId}")
     public ResponseEntity<ArchivoDto> getArchivoById(@PathVariable Long archivoId) {
         ArchivoDto archivoDto = archivoService.getArchivoById(archivoId);
@@ -117,5 +118,13 @@ public class ArchivoController {
             throw new RuntimeException("Error al leer el archivo: " + e.getMessage());
         }
     }
+
+    @GetMapping("/sitio/{sitioId}")
+    public ResponseEntity<List<ArchivoDto>> getArchivosPorSitio(@PathVariable Long sitioId) {
+        List<ArchivoDto> archivos = archivoService.getArchivosPorSitio(sitioId);
+        return ResponseEntity.ok(archivos);
+    }
+
+
 
 }

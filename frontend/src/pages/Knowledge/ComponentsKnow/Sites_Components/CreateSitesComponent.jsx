@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
+import { getUserId, listUsers } from '../../../../services/UsuarioService';
 
 export const CreateSitesComponent = ({ addSite }) => {
   const [showModal, setShowModal] = useState(false);
@@ -10,6 +11,13 @@ export const CreateSitesComponent = ({ addSite }) => {
     visibility: 'Public',
     description: ''
   });
+  const [usuarios, setUsuarios] = useState([]);
+
+useEffect(() => {
+  listUsers()
+    .then((res) => setUsuarios(res.data))
+    .catch((err) => console.error("Error al cargar usuarios:", err));
+}, []);
 
   const handleShow = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
@@ -22,20 +30,23 @@ export const CreateSitesComponent = ({ addSite }) => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    addSite(siteData);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const creadorId = await getUserId().then(res => res.data);
 
-    handleClose();
-
-    setSiteData({
-      type: 'Collaboration Site',
-      name: '',
-      siteId: '',
-      visibility: 'Public',
-      description: ''
-    });
+  const nuevoSitio = {
+    ...siteData,
+    creadorId,
+    usuariosAsignados: usuarios
+      .filter(u => siteData.usuariosAsignados?.includes(u.id))
+      .map(u => ({ id: u.id }))
   };
+
+  addSite(nuevoSitio);
+  handleClose();
+  // limpiar
+};
+
 
   return (
     <>
@@ -58,6 +69,25 @@ export const CreateSitesComponent = ({ addSite }) => {
           </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSubmit}>
+  {/* Añade selector de usuarios aquí */}
+  <Form.Group className="mb-3">
+    <Form.Label>Usuarios asignados</Form.Label>
+    <Form.Select
+      multiple
+      value={siteData.usuariosAsignados || []}
+      onChange={(e) => {
+        const selected = Array.from(e.target.selectedOptions).map(option => parseInt(option.value));
+        setSiteData({...siteData, usuariosAsignados: selected});
+      }}
+    >
+      {usuarios.map(usuario => (
+        <option key={usuario.id} value={usuario.id}>
+          {usuario.nombre} {usuario.apellido} - {usuario.email}
+        </option>
+      ))}
+    </Form.Select>
+  </Form.Group>
+
           <Modal.Body className="p-4">
             <Container>
               <Row className="mb-1">
