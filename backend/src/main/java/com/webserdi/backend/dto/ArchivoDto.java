@@ -11,5 +11,5 @@ public class ArchivoDto {
     private String rutaAlmacenamiento;
     private java.time.LocalDateTime fechaSubida;
     private Long carpetaId; // ID de la carpeta a la que pertenece
-
+    private Long usuarioId;
 }

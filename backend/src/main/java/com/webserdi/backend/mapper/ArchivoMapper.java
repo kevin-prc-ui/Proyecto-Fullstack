@@ -24,10 +24,15 @@ public class ArchivoMapper {
         archivoDto.setTipo(archivo.getTipo());
         archivoDto.setTamaño(archivo.getTamaño());
         archivoDto.setFechaSubida(archivo.getFechaSubida());
+
         if (archivo.getCarpeta() != null) {
             archivoDto.setCarpetaId(archivo.getCarpeta().getId());
         }
+
+        if (archivo.getUsuario() != null) {
+            archivoDto.setUsuarioId(archivo.getUsuario().getId());
+        }
+
         return archivoDto;
     }
-
 }
