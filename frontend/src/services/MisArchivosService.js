@@ -60,18 +60,22 @@ export const getArchivosPorSitio = (sitioId) =>
 
 
 // ✅ Nuevo método para subir archivos binarios
+// Modifica la función uploadArchivo para asegurar el envío del token
 export const uploadArchivo = (file, carpetaId, usuarioId, sitioId) => {
-  const accessToken = getAuthToken();
-
-  if (!accessToken) {
-    console.error("⛔ No hay token JWT disponible. ¿Iniciaste sesión?");
-    return Promise.reject(new Error("No autenticado"));
+  // Obtener el token directamente del localStorage
+  const rawToken = localStorage.getItem("authToken");
+  let accessToken = null;
+  
+  try {
+    accessToken = rawToken ? JSON.parse(rawToken).accessToken : null;
+  } catch (e) {
+    console.error("Error parsing token:", e);
+    return Promise.reject("Token inválido");
   }
 
-  const headers = {
-    "Content-Type": "multipart/form-data",
-    Authorization: `Bearer ${accessToken}`
-  };
+  if (!accessToken) {
+    return Promise.reject("No hay token de autenticación disponible");
+  }
 
   const formData = new FormData();
   formData.append("archivo", file);
@@ -79,7 +83,12 @@ export const uploadArchivo = (file, carpetaId, usuarioId, sitioId) => {
   formData.append("usuarioId", usuarioId);
   if (sitioId) formData.append("sitioId", sitioId);
 
-  return axios.post(`${REST_API_BASE_URL}/archivos/uploads`, formData, { headers });
+  return axios.post(`${REST_API_BASE_URL}/archivos/uploads`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      "Authorization": `Bearer ${accessToken}`
+    }
+  });
 };
 
 
