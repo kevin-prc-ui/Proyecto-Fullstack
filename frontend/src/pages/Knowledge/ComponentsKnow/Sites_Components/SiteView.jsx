@@ -1,29 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, ListGroup, Modal } from 'react-bootstrap';
-import { FaFileUpload, FaImage, FaFilePdf, FaCheckCircle, FaArrowLeft, FaUserPlus, FaUser } from 'react-icons/fa';
-import { getUserId, listUsers } from '../../../../services/UsuarioService'; // Asegúrate que la ruta es correcta
-import { getUsuariosAsignados, agregarUsuariosAsignados } from '../../../../services/SitioService';
-import { uploadArchivo, getArchivosPorSitio, getArchivoUrl } from "../../../../services/MisArchivosService";
-
-
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Form,
+  Button,
+  ListGroup,
+  Modal,
+} from "react-bootstrap";
+import {
+  FaFileUpload,
+  FaImage,
+  FaFilePdf,
+  FaCheckCircle,
+  FaArrowLeft,
+  FaUserPlus,
+  FaUser,
+} from "react-icons/fa";
+import { getUserId, listUsers } from "../../../../services/UsuarioService"; // Asegúrate que la ruta es correcta
+import {
+  getUsuariosAsignados,
+  agregarUsuariosAsignados,
+} from "../../../../services/SitioService";
+import {
+  uploadArchivo,
+  getArchivosPorSitio,
+  getArchivoUrl,
+} from "../../../../services/MisArchivosService";
 
 const SiteView = ({ site, onGoBack, usuarioId }) => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [posts, setPosts] = useState([]);
-  const [newPost, setNewPost] = useState('');
+  const [newPost, setNewPost] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [activities, setActivities] = useState([]);
   const [showUserModal, setShowUserModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [usuarioLogueado, setUsuarioLogueado] = useState(null);
-  const [usuariosSeleccionadosModal, setUsuariosSeleccionadosModal] = useState([]);
+  const [usuariosSeleccionadosModal, setUsuariosSeleccionadosModal] = useState(
+    []
+  );
   const [archivosSitio, setArchivosSitio] = useState([]);
 
   // Estado para la lista de usuarios cargados del backend
   const [usersState, setUsersState] = useState({
     loading: false,
     error: null,
-    users: []
+    users: [],
   });
 
   // Carga usuarios desde backend cuando se abre el modal
@@ -31,82 +55,89 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
     if (site?.id) {
       getArchivosPorSitio(site.id)
         .then((res) => {
-const archivos = res.data.map((a) => ({
-  id: a.id,
-  name: a.nombre,
-  type: "file",
-  size: (a.tamaño / 1024).toFixed(2) + " KB",
-  date: new Date(a.fechaSubida).toLocaleString(), // Incluye fecha y hora
-  url: getArchivoUrl(a.id),
-  fileType: a.tipo,
-  usuario: a.usuario, // Agrega el objeto completo
-}));
+          const archivos = res.data.map((a) => ({
+            id: a.id,
+            name: a.nombre,
+            type: "file",
+            size: (a.tamaño / 1024).toFixed(2) + " KB",
+            date: new Date(a.fechaSubida).toLocaleString(), // Incluye fecha y hora
+            url: getArchivoUrl(a.id),
+            fileType: a.tipo,
+            usuario: a.usuario, // Agrega el objeto completo
+          }));
 
           setArchivosSitio(archivos); // ✔️ guarda la lista
           console.log("✅ Archivos recibidos:", archivos);
         })
-        .catch((err) => console.error("❌ Error al cargar archivos del sitio:", err));
+        .catch((err) =>
+          console.error("❌ Error al cargar archivos del sitio:", err)
+        );
     }
   }, [site]);
-
 
   useEffect(() => {
     if (showUserModal) {
       setUsersState({ ...usersState, loading: true });
       listUsers()
-        .then((res) => setUsersState({ users: res.data, loading: false, error: null }))
-        .catch((err) => setUsersState({ ...usersState, error: err.message, loading: false }));
+        .then((res) =>
+          setUsersState({ users: res.data, loading: false, error: null })
+        )
+        .catch((err) =>
+          setUsersState({ ...usersState, error: err.message, loading: false })
+        );
     }
   }, [showUserModal]);
 
-useEffect(() => {
-  const fetchUserId = async () => {
-    try {
-      const response = await getUserId();
-      setUsuarioLogueado(response.data);
-    } catch (error) {
-      console.error("Error al obtener ID de usuario:", error);
-    }
-  };
-  
-  fetchUserId();
-}, []);
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const response = await getUserId();
+        setUsuarioLogueado(response.data);
+      } catch (error) {
+        console.error("Error al obtener ID de usuario:", error);
+      }
+    };
 
-useEffect(() => {
-  if (site?.id) {
-    getUsuariosAsignados(site.id)
-      .then(res => setSelectedUsers(res.data))
-      .catch(err => {
-        console.error("Error al obtener usuarios asignados:", err);
-      });
-  }
-}, [site]);
+    fetchUserId();
+  }, []);
+
+  useEffect(() => {
+    if (site?.id) {
+      getUsuariosAsignados(site.id)
+        .then((res) => setSelectedUsers(res.data))
+        .catch((err) => {
+          console.error("Error al obtener usuarios asignados:", err);
+        });
+    }
+  }, [site]);
 
   // Filtrar usuarios basado en el término de búsqueda
-  const filteredUsers = usersState.users.filter(user =>
-    `${user.nombre} ${user.apellido}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = usersState.users.filter(
+    (user) =>
+      `${user.nombre} ${user.apellido}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Toggle usuario seleccionado en el modal
   const toggleUserSelection = (user) => {
-    setUsuariosSeleccionadosModal(prev => {
-      const exists = prev.some(u => u.id === user.id);
+    setUsuariosSeleccionadosModal((prev) => {
+      const exists = prev.some((u) => u.id === user.id);
       if (exists) {
-        return prev.filter(u => u.id !== user.id);
+        return prev.filter((u) => u.id !== user.id);
       } else {
         return [...prev, user];
       }
     });
   };
 
-
   // Cuando se confirma agregar usuarios seleccionados
   const handleAddUsers = () => {
-    const idsYaAsignados = selectedUsers.map(u => u.id);
+    const idsYaAsignados = selectedUsers.map((u) => u.id);
     const idsNuevos = usuariosSeleccionadosModal
-      .filter(user => !idsYaAsignados.includes(user.id))
-      .map(user => user.id);
+      .filter((user) => !idsYaAsignados.includes(user.id))
+      .map((user) => user.id);
 
     if (idsNuevos.length === 0) {
       alert("No hay usuarios nuevos para agregar.");
@@ -116,73 +147,68 @@ useEffect(() => {
     agregarUsuariosAsignados(site.id, idsNuevos)
       .then(() => {
         setShowUserModal(false);
-        setSearchTerm('');
+        setSearchTerm("");
         setUsuariosSeleccionadosModal([]);
-        getUsuariosAsignados(site.id).then(res => setSelectedUsers(res.data));
+        getUsuariosAsignados(site.id).then((res) => setSelectedUsers(res.data));
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Error al agregar usuarios:", err);
         alert("Error al agregar usuarios al sitio");
       });
   };
 
-
-
-
   // Manejo de envío de publicación (post)
-const handlePostSubmit = async (e) => {
-  e.preventDefault();
-  if (!newPost.trim() && !selectedFile) return;
+  const handlePostSubmit = async (e) => {
+    e.preventDefault();
+    if (!newPost.trim() && !selectedFile) return;
 
-  try {
-    // Asegurarnos de que tenemos el ID del usuario logueado
-    if (!usuarioLogueado) {
-      const userIdResponse = await getUserId();
-      setUsuarioLogueado(userIdResponse.data);
+    try {
+      // Asegurarnos de que tenemos el ID del usuario logueado
+      if (!usuarioLogueado) {
+        const userIdResponse = await getUserId();
+        setUsuarioLogueado(userIdResponse.data);
+      }
+
+      const uploadResponse = await uploadArchivo(
+        selectedFile,
+        null, // carpetaId si aplica
+        usuarioLogueado,
+        site.id
+      );
+
+      const archivoSubido = uploadResponse.data;
+
+      const nuevaPublicacion = {
+        id: Date.now(),
+        text: newPost,
+        file: {
+          name: archivoSubido.nombre,
+          type: archivoSubido.tipo.includes("image") ? "image" : "pdf",
+          url: `/api/archivos/ver/${archivoSubido.id}`,
+        },
+        user: selectedUsers.find((u) => u.id === usuarioLogueado),
+        timestamp: new Date().toLocaleString(),
+      };
+
+      setPosts((prev) => [...prev, nuevaPublicacion]);
+      setNewPost("");
+      setSelectedFile(null);
+    } catch (err) {
+      console.error("Error al subir publicación:", err);
+      alert("No se pudo subir el archivo. Verifica tu sesión.");
     }
-
-    const uploadResponse = await uploadArchivo(
-      selectedFile,
-      null, // carpetaId si aplica
-      usuarioLogueado,
-      site.id
-    );
-
-    const archivoSubido = uploadResponse.data;
-
-    const nuevaPublicacion = {
-      id: Date.now(),
-      text: newPost,
-      file: {
-        name: archivoSubido.nombre,
-        type: archivoSubido.tipo.includes("image") ? "image" : "pdf",
-        url: `/api/archivos/ver/${archivoSubido.id}`
-      },
-      user: selectedUsers.find(u => u.id === usuarioLogueado),
-      timestamp: new Date().toLocaleString()
-    };
-
-    setPosts(prev => [...prev, nuevaPublicacion]);
-    setNewPost('');
-    setSelectedFile(null);
-  } catch (err) {
-    console.error("Error al subir publicación:", err);
-    alert("No se pudo subir el archivo. Verifica tu sesión.");
-  }
-};
-
-
+  };
 
   // Marcar publicación como completada, asignando el usuario logueado
   const markAsCompleted = (postId) => {
-    const post = posts.find(p => p.id === postId);
+    const post = posts.find((p) => p.id === postId);
     if (post) {
       const activityWithUser = {
         ...post,
-        user: usuarioLogueado // Aquí aseguramos que se use el usuario logueado
+        user: usuarioLogueado, // Aquí aseguramos que se use el usuario logueado
       };
-      setActivities(prev => [...prev, activityWithUser]);
-      setPosts(prev => prev.filter(p => p.id !== postId));
+      setActivities((prev) => [...prev, activityWithUser]);
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
     }
   };
 
@@ -192,7 +218,9 @@ const handlePostSubmit = async (e) => {
         <FaArrowLeft /> Volver a mis sitios
       </Button>
 
-      <h2 className="mb-4">{site.name} <small className="text-muted">(ID: {site.siteId})</small></h2>
+      <h2 className="mb-4">
+        {site.name} <small className="text-muted">(ID: {site.siteId})</small>
+      </h2>
 
       <Row className="mt-3">
         {/* Contenedor Usuarios */}
@@ -200,7 +228,11 @@ const handlePostSubmit = async (e) => {
           <Card>
             <Card.Header className="d-flex justify-content-between align-items-center">
               <span>Usuarios ({selectedUsers.length})</span>
-              <Button variant="primary" size="sm" onClick={() => setShowUserModal(true)}>
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setShowUserModal(true)}
+              >
                 <FaUserPlus /> Agregar
               </Button>
             </Card.Header>
@@ -209,12 +241,14 @@ const handlePostSubmit = async (e) => {
                 <p>No hay usuarios agregados aún.</p>
               ) : (
                 <ListGroup>
-                  {selectedUsers.map(user => (
+                  {selectedUsers.map((user) => (
                     <ListGroup.Item key={user.id}>
                       <div className="d-flex align-items-center">
                         <FaUser size={16} className="text-primary mr-2" />
                         <div>
-                          <h6 className="mb-1">{user.nombre} {user.apellido}</h6>
+                          <h6 className="mb-1">
+                            {user.nombre} {user.apellido}
+                          </h6>
                           <small className="text-muted">{user.email}</small>
                         </div>
                       </div>
@@ -238,14 +272,14 @@ const handlePostSubmit = async (e) => {
                     rows={3}
                     placeholder="Escribe algo..."
                     value={newPost}
-                    onChange={e => setNewPost(e.target.value)}
+                    onChange={(e) => setNewPost(e.target.value)}
                   />
                 </Form.Group>
                 <Form.Group controlId="fileUpload" className="mt-2">
                   <Form.Control
                     type="file"
                     accept="image/*,application/pdf"
-                    onChange={e => setSelectedFile(e.target.files[0])}
+                    onChange={(e) => setSelectedFile(e.target.files[0])}
                   />
                 </Form.Group>
                 <Button type="submit" variant="primary" className="mt-2">
@@ -258,21 +292,25 @@ const handlePostSubmit = async (e) => {
               {posts.length === 0 ? (
                 <p>No hay publicaciones.</p>
               ) : (
-                posts.map(post => (
+                posts.map((post) => (
                   <Card key={post.id} className="mb-2">
                     <Card.Body>
                       <Card.Text>{post.text}</Card.Text>
-                      {post.file && post.file.type === 'image' && (
+                      {post.file && post.file.type === "image" && (
                         <img
                           src={post.file.url}
                           alt={post.file.name}
-                          style={{ maxWidth: '100%', maxHeight: 200 }}
+                          style={{ maxWidth: "100%", maxHeight: 200 }}
                         />
                       )}
 
-                      {post.file && post.file.type === 'pdf' && (
+                      {post.file && post.file.type === "pdf" && (
                         <div>
-                          <a href={post.file.url} target="_blank" rel="noopener noreferrer">
+                          <a
+                            href={post.file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             <FaFilePdf size={30} className="me-2" />
                             {post.file.name}
                           </a>
@@ -298,94 +336,73 @@ const handlePostSubmit = async (e) => {
 
         {/* Contenedor Actividades Completadas (más grande) */}
         <Col md={4}>
-
-          <Card style={{ minHeight: "600px", overflowY: "auto" }}>
-            <Card.Header>Archivos subidos</Card.Header>
-            <Card.Body>
+          <Card style={{ height: "600px", overflowY: "auto" }}>
+            <Card.Header className="fw-bold">Archivos subidos</Card.Header>
+            <Card.Body className="p-2">
               {archivosSitio.length === 0 ? (
-                <p className="text-muted">No hay archivos subidos a este sitio.</p>
+                <p className="text-muted">
+                  No hay archivos subidos a este sitio.
+                </p>
               ) : (
-                archivosSitio.map((archivo) => (
-                  <Card key={archivo.id} className="mb-3">
-                    <Card.Body>
-                      {/* Texto descriptivo si aplica */}
-                      {archivo.descripcion && (
-                        <Card.Text>{archivo.descripcion}</Card.Text>
-                      )}
-
-                      {/* Mostrar imagen o PDF */}
-                      {archivo.fileType.startsWith("image") ? (
-                        <img
-                          src={archivo.url}
-                          alt={archivo.name}
-                          style={{ maxWidth: "100%", maxHeight: 200 }}
-                          className="mb-2"
-                        />
-                      ) : archivo.fileType === "application/pdf" ? (
-                        <div className="mb-2">
-                          <a
-                            href={archivo.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="d-flex align-items-center text-decoration-none"
-                          >
-                            <FaFilePdf size={30} className="me-2 text-danger" />
-                            <span>{archivo.name}</span>
-                          </a>
-                        </div>
-                      ) : (
-                        <span>{archivo.name}</span>
-                      )}
-
-                      {/* Botón de descarga */}
-                      <a
-                        href={archivo.url}
-                        download
-                        className="btn btn-sm btn-outline-primary mt-2"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Descargar
-                      </a>
-
-                      {/* Timestamp */}
-<small className="text-muted d-block mt-2">
-  Subido el {archivo.date}
-</small>
-
-<div className="d-flex align-items-center mt-2">
-  <FaUser className="text-primary me-2" />
-  {archivo.usuario ? (
-    <div>
-      <strong>{archivo.usuario.nombre} {archivo.usuario.apellido}</strong><br />
-      <small className="text-muted">{archivo.usuario.email}</small>
-    </div>
-  ) : (
-    <small className="text-muted">Usuario desconocido</small>
-  )}
-</div>
-
-
-                      {/* Info del usuario */}
-                      <div className="d-flex align-items-center mt-2">
-                        <FaUser className="text-primary me-2" />
-                        {archivo.usuario ? (
-                          <div>
-                            <strong>
-                              {archivo.usuario.nombre} {archivo.usuario.apellido}
-                            </strong>
-                            <br />
-                            <small className="text-muted">
-                              {archivo.usuario.email}
-                            </small>
-                          </div>
+                [...archivosSitio]
+                  .sort((a, b) => new Date(b.date) - new Date(a.date)) // 🔁 ordena más nuevo arriba
+                  .map((archivo) => (
+                    <div
+                      key={archivo.id}
+                      className="d-flex align-items-start mb-2 p-2 border rounded bg-light"
+                      style={{ fontSize: "0.85rem" }}
+                    >
+                      {/* Icono / vista previa */}
+                      <div className="me-2">
+                        {archivo.fileType?.startsWith("image") ? (
+                          <img
+                            src={archivo.url}
+                            alt={archivo.name}
+                            style={{
+                              width: 60,
+                              height: 60,
+                              objectFit: "cover",
+                              borderRadius: 4,
+                            }}
+                          />
                         ) : (
-                          <small className="text-muted">Usuario desconocido</small>
+                          <FaFilePdf size={30} className="text-danger" />
                         )}
                       </div>
-                    </Card.Body>
-                  </Card>
-                ))
+
+                      {/* Info de archivo */}
+                      <div className="flex-grow-1">
+                        <div className="fw-semibold">{archivo.name}</div>
+                        <div className="text-muted">{archivo.size}</div>
+                        <small className="text-muted">
+                          Subido: {archivo.date}
+                        </small>
+
+                        {/* Usuario */}
+                        {archivo.usuario && (
+                          <div
+                            className="mt-1 text-muted"
+                            style={{ fontSize: "0.75rem" }}
+                          >
+                            <FaUser className="me-1" />
+                            {archivo.usuario.nombre} {archivo.usuario.apellido}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Botón de descarga */}
+                      <div className="ms-2">
+                        <a
+                          href={archivo.url}
+                          download
+                          title="Descargar"
+                          className="btn btn-sm btn-outline-primary"
+                        >
+                          Descargar
+                        </a>
+                      </div>
+                    </div>
+                  ))
               )}
             </Card.Body>
           </Card>
@@ -393,7 +410,12 @@ const handlePostSubmit = async (e) => {
       </Row>
 
       {/* Modal para agregar usuarios */}
-      <Modal show={showUserModal} onHide={() => setShowUserModal(false)} size="lg" scrollable>
+      <Modal
+        show={showUserModal}
+        onHide={() => setShowUserModal(false)}
+        size="lg"
+        scrollable
+      >
         <Modal.Header closeButton>
           <Modal.Title>Agregar usuarios al sitio</Modal.Title>
         </Modal.Header>
@@ -403,32 +425,46 @@ const handlePostSubmit = async (e) => {
               type="text"
               placeholder="Buscar usuarios por nombre o email..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               autoFocus
             />
           </Form.Group>
 
           {usersState.loading && <p>Cargando usuarios...</p>}
-          {usersState.error && <p className="text-danger">Error al cargar usuarios: {usersState.error}</p>}
-
-          {!usersState.loading && !usersState.error && filteredUsers.length === 0 && (
-            <p>No se encontraron usuarios.</p>
+          {usersState.error && (
+            <p className="text-danger">
+              Error al cargar usuarios: {usersState.error}
+            </p>
           )}
 
-          <div className="list-group mt-3" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {filteredUsers.map(user => {
-              const isSelected = selectedUsers.some(u => u.id === user.id);
+          {!usersState.loading &&
+            !usersState.error &&
+            filteredUsers.length === 0 && <p>No se encontraron usuarios.</p>}
+
+          <div
+            className="list-group mt-3"
+            style={{ maxHeight: "300px", overflowY: "auto" }}
+          >
+            {filteredUsers.map((user) => {
+              const isSelected = selectedUsers.some((u) => u.id === user.id);
               return (
                 <div
                   key={user.id}
-                  className={`list-group-item list-group-item-action ${isSelected ? 'active' : ''}`}
-                  style={{ cursor: 'pointer' }}
+                  className={`list-group-item list-group-item-action ${
+                    isSelected ? "active" : ""
+                  }`}
+                  style={{ cursor: "pointer" }}
                   onClick={() => toggleUserSelection(user)}
                 >
                   <div className="d-flex align-items-center">
-                    <FaUser size={20} className={isSelected ? 'text-white' : 'text-primary'} />
+                    <FaUser
+                      size={20}
+                      className={isSelected ? "text-white" : "text-primary"}
+                    />
                     <div className="flex-grow-1 ml-3">
-                      <h5 className="mb-1">{user.nombre} {user.apellido}</h5>
+                      <h5 className="mb-1">
+                        {user.nombre} {user.apellido}
+                      </h5>
                       <p className="mb-1 small">{user.email}</p>
                     </div>
                     <small>ID: {user.id}</small>
@@ -442,7 +478,11 @@ const handlePostSubmit = async (e) => {
           <Button variant="secondary" onClick={() => setShowUserModal(false)}>
             Cancelar
           </Button>
-          <Button variant="primary" onClick={handleAddUsers} disabled={selectedUsers.length === 0}>
+          <Button
+            variant="primary"
+            onClick={handleAddUsers}
+            disabled={selectedUsers.length === 0}
+          >
             Agregar usuarios seleccionados
           </Button>
         </Modal.Footer>
