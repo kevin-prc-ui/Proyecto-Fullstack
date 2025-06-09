@@ -1,62 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useState, useEffect } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/estilos.css";
-import MySitesComponent from './ComponentsKnow/Sites_Components/MySitesComponent.jsx';
-import SitesFinderComponent from './ComponentsKnow/Sites_Components/SitesFinderComponent.jsx';
-import {CreateSitesComponent} from './ComponentsKnow/Sites_Components/CreateSitesComponent.jsx';
-import FavoritesComponent from './ComponentsKnow/Sites_Components/FavoritesComponent.jsx';
-import SiteView from './ComponentsKnow/Sites_Components/SiteView.jsx';
-import { getSitiosByUser, createSitio } from '../../services/SitioService';
-import { getUserId } from '../../services/UsuarioService.js';
-
+import MySitesComponent from "./ComponentsKnow/Sites_Components/MySitesComponent.jsx";
+import SitesFinderComponent from "./ComponentsKnow/Sites_Components/SitesFinderComponent.jsx";
+import { CreateSitesComponent } from "./ComponentsKnow/Sites_Components/CreateSitesComponent.jsx";
+import FavoritesComponent from "./ComponentsKnow/Sites_Components/FavoritesComponent.jsx";
+import SiteView from "./ComponentsKnow/Sites_Components/SiteView.jsx";
+import { getSitiosByUser, createSitio } from "../../services/SitioService";
+import { getUserId } from "../../services/UsuarioService.js";
 
 const Sites = () => {
-    const [userId, setUserId] = useState(null); // Obtén el usuario actual del contexto
-  
-  const [activeTab, setActiveTab] = useState('misSitios');
+  const [userId, setUserId] = useState(null); // Obtén el usuario actual del contexto
+
+  const [activeTab, setActiveTab] = useState("misSitios");
   const [sites, setSites] = useState([]);
   const [currentSite, setCurrentSite] = useState(null); // Nuevo estado para el sitio actual
 
   // Cargar sitios de localStorage al montar
-// Obtener userId UNA SOLA VEZ
-useEffect(() => {
-  getUserId().then((response) => {
-    setUserId(response.data);
-  });
-}, []);
-
-// Cuando ya tengas userId, carga sitios del backend
-useEffect(() => {
-  if (userId) {
-    getSitiosByUser(userId)
-      .then(response => {
-        setSites(response.data);
-      })
-      .catch(error => {
-        console.error("Error al obtener los sitios del usuario:", error);
-      });
-  }
-}, [userId]); // 👈 Reaccionamos al cambio en userId
-
-
-useEffect(() => {
-  getUserId().then((response) => {
-    setUserId(response.data);
-  });
-}, []);
-
-
-
-const addSite = (newSite) => {
-  createSitio(newSite)
-    .then(response => {
-      setSites(prevSites => [...prevSites, response.data]);
-    })
-    .catch(error => {
-      console.error("Error al crear el sitio:", error);
+  // Obtener userId UNA SOLA VEZ
+  useEffect(() => {
+    getUserId().then((response) => {
+      setUserId(response.data);
     });
-}
-  
+  }, []);
+
+  // Cuando ya tengas userId, carga sitios del backend
+  useEffect(() => {
+    if (userId) {
+      getSitiosByUser(userId)
+        .then((response) => {
+          setSites(response.data);
+        })
+        .catch((error) => {
+          console.error("Error al obtener los sitios del usuario:", error);
+        });
+    }
+  }, [userId]); // 👈 Reaccionamos al cambio en userId
+
+  useEffect(() => {
+    getUserId().then((response) => {
+      setUserId(response.data);
+    });
+  }, []);
+
+  const addSite = (newSite) => {
+    createSitio(newSite)
+      .then((response) => {
+        setSites((prevSites) => [...prevSites, response.data]);
+      })
+      .catch((error) => {
+        console.error("Error al crear el sitio:", error);
+      });
+  };
 
   // Función para abrir un sitio
   const openSite = (site) => {
@@ -70,14 +65,27 @@ const addSite = (newSite) => {
 
   const renderComponent = () => {
     switch (activeTab) {
-      case 'misSitios':
-        return <MySitesComponent sites={sites} setSites={setSites} onSiteClick={openSite} userId={userId} />
-      case 'buscarSitios':
+      case "misSitios":
+        return (
+          <MySitesComponent
+            sites={sites}
+            setSites={setSites}
+            onSiteClick={openSite}
+            userId={userId}
+          />
+        );
+      case "buscarSitios":
         return <SitesFinderComponent />;
-      case 'crearSitio':
-        return <CreateSitesComponent addSite={addSite} usuarioId={userId}/>;
-      case 'favoritos':
-        return <FavoritesComponent sites={sites} setSites={setSites} onSiteClick={openSite} />;
+      case "crearSitio":
+        return <CreateSitesComponent addSite={addSite} usuarioId={userId} />;
+      case "favoritos":
+        return (
+          <FavoritesComponent
+            sites={sites}
+            setSites={setSites}
+            onSiteClick={openSite}
+          />
+        );
       default:
         return null;
     }
@@ -85,7 +93,7 @@ const addSite = (newSite) => {
 
   // Si hay un sitio seleccionado, mostramos la vista detallada
   if (currentSite) {
-    return <SiteView site={currentSite} onGoBack={goBack} usuarioId={userId}/>;
+    return <SiteView site={currentSite} onGoBack={goBack} usuarioId={userId} />;
   }
 
   // Vista normal de pestañas
@@ -94,35 +102,41 @@ const addSite = (newSite) => {
       {/* Botones de pestaña */}
       <div className="d-flex gap-3 mb-4 flex-wrap">
         <button
-          className={`btn tab-button ${activeTab === 'misSitios' ? 'active' : ''}`}
-          onClick={() => setActiveTab('misSitios')}
+          className={`btn tab-button ${
+            activeTab === "misSitios" ? "active" : ""
+          }`}
+          onClick={() => setActiveTab("misSitios")}
         >
           Mis sitios
         </button>
         <button
-          className={`btn tab-button ${activeTab === 'buscarSitios' ? 'active' : ''}`}
-          onClick={() => setActiveTab('buscarSitios')}
+          className={`btn tab-button ${
+            activeTab === "buscarSitios" ? "active" : ""
+          }`}
+          onClick={() => setActiveTab("buscarSitios")}
         >
           Buscar sitios
         </button>
         <button
-          className={`btn tab-button ${activeTab === 'crearSitio' ? 'active' : ''}`}
-          onClick={() => setActiveTab('crearSitio')}
+          className={`btn tab-button ${
+            activeTab === "crearSitio" ? "active" : ""
+          }`}
+          onClick={() => setActiveTab("crearSitio")}
         >
           Crear sitio
         </button>
         <button
-          className={`btn tab-button ${activeTab === 'favoritos' ? 'active' : ''}`}
-          onClick={() => setActiveTab('favoritos')}
+          className={`btn tab-button ${
+            activeTab === "favoritos" ? "active" : ""
+          }`}
+          onClick={() => setActiveTab("favoritos")}
         >
           Favoritos
         </button>
       </div>
 
       {/* Render del contenido dinámico */}
-      <div className="components-container">
-        {renderComponent()}
-      </div>
+      <div className="components-container">{renderComponent()}</div>
     </div>
   );
 };
