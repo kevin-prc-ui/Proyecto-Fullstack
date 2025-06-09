@@ -31,15 +31,17 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
     if (site?.id) {
       getArchivosPorSitio(site.id)
         .then((res) => {
-          const archivos = res.data.map((a) => ({
-            id: a.id,
-            name: a.nombre,
-            type: "file",
-            size: (a.tamaño / 1024).toFixed(2) + " KB",
-            date: new Date(a.fechaSubida).toLocaleDateString(),
-            url: getArchivoUrl(a.id), // ✔️ genera la URL
-            fileType: a.tipo,         // ej: image/jpeg, application/pdf
-          }));
+const archivos = res.data.map((a) => ({
+  id: a.id,
+  name: a.nombre,
+  type: "file",
+  size: (a.tamaño / 1024).toFixed(2) + " KB",
+  date: new Date(a.fechaSubida).toLocaleString(), // Incluye fecha y hora
+  url: getArchivoUrl(a.id),
+  fileType: a.tipo,
+  usuario: a.usuario, // Agrega el objeto completo
+}));
+
           setArchivosSitio(archivos); // ✔️ guarda la lista
           console.log("✅ Archivos recibidos:", archivos);
         })
@@ -347,11 +349,22 @@ const handlePostSubmit = async (e) => {
                       </a>
 
                       {/* Timestamp */}
-                      {archivo.fechaSubida && (
-                        <small className="text-muted d-block mt-2">
-                          {archivo.fechaSubida}
-                        </small>
-                      )}
+<small className="text-muted d-block mt-2">
+  Subido el {archivo.date}
+</small>
+
+<div className="d-flex align-items-center mt-2">
+  <FaUser className="text-primary me-2" />
+  {archivo.usuario ? (
+    <div>
+      <strong>{archivo.usuario.nombre} {archivo.usuario.apellido}</strong><br />
+      <small className="text-muted">{archivo.usuario.email}</small>
+    </div>
+  ) : (
+    <small className="text-muted">Usuario desconocido</small>
+  )}
+</div>
+
 
                       {/* Info del usuario */}
                       <div className="d-flex align-items-center mt-2">
