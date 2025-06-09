@@ -70,6 +70,16 @@ useEffect(() => {
   fetchUserId();
 }, []);
 
+useEffect(() => {
+  if (site?.id) {
+    getUsuariosAsignados(site.id)
+      .then(res => setSelectedUsers(res.data))
+      .catch(err => {
+        console.error("Error al obtener usuarios asignados:", err);
+      });
+  }
+}, [site]);
+
   // Filtrar usuarios basado en el término de búsqueda
   const filteredUsers = usersState.users.filter(user =>
     `${user.nombre} ${user.apellido}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
