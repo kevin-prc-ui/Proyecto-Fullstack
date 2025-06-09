@@ -80,10 +80,14 @@ public class SitioServiceImpl implements SitioService {
     @Override
     public List<SitioDto> listarMisSitios(Long usuarioId) {
         return sitioRepository.findAll().stream()
-                .filter(s -> s.getCreador().getId().equals(usuarioId))
+                .filter(sitio ->
+                        sitio.getCreador().getId().equals(usuarioId) || // creador
+                                sitio.getUsuarios().stream().anyMatch(u -> u.getId().equals(usuarioId)) // o asignado
+                )
                 .map(sitioMapper::toDto)
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public List<SitioDto> obtenerPorSlug(Long id) {
