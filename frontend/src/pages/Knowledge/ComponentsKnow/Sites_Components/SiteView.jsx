@@ -3,8 +3,8 @@ import { Container, Row, Col, Card, Form, Button, ListGroup, Modal } from 'react
 import { FaFileUpload, FaImage, FaFilePdf, FaCheckCircle, FaArrowLeft, FaUserPlus, FaUser } from 'react-icons/fa';
 import { getUserId, listUsers } from '../../../../services/UsuarioService'; // Asegúrate que la ruta es correcta
 import { getUsuariosAsignados, agregarUsuariosAsignados } from '../../../../services/SitioService';
-import { uploadArchivo } from '../../../../services/MisArchivosService';
-import { getArchivosPorSitio } from "../../../../services/MisArchivosService"; // debes crear esta función
+import { uploadArchivo, getArchivosPorSitio, getArchivoUrl } from "../../../../services/MisArchivosService";
+
 
 
 const SiteView = ({ site, onGoBack, usuarioId}) => {
@@ -17,6 +17,7 @@ const SiteView = ({ site, onGoBack, usuarioId}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [usuarioLogueado, setUsuarioLogueado] = useState(null);
   const [usuariosSeleccionadosModal, setUsuariosSeleccionadosModal] = useState([]);
+  const [archivosSitio, setArchivosSitio] = useState([]);
 
   // Estado para la lista de usuarios cargados del backend
   const [usersState, setUsersState] = useState({
@@ -28,32 +29,26 @@ const SiteView = ({ site, onGoBack, usuarioId}) => {
   // Carga usuarios desde backend cuando se abre el modal
 useEffect(() => {
   if (site?.id) {
-    // Cargar usuario logueado
-    getUserId().then((res) => setUsuarioLogueado(res.data));
-
-    // Cargar usuarios asignados al sitio
-    getUsuariosAsignados(site.id)
-      .then(res => setSelectedUsers(res.data))
-      .catch(err => console.error("Error al cargar usuarios asignados:", err));
-          getArchivosPorSitio(site.id).then(res => {
-
-     // Cargar archivos ya subidos          
-      const actividadesCargadas = res.data.map(archivo => ({
-        id: archivo.id,
-        text: "Archivo publicado anteriormente", // si no tienes texto, puedes usar esto como mensaje genérico
-        file: {
-          name: archivo.nombre,
-          type: archivo.tipo.includes("image") ? "image" : "pdf",
-          url: `/api/archivos/ver/${archivo.id}`
-        },
-        user: selectedUsers.find(u => u.id === archivo.usuarioId),
-        timestamp: new Date(archivo.fechaSubida).toLocaleString()
-      }));
-
-      setActivities(actividadesCargadas);
-    });
+    getArchivosPorSitio(site.id)
+      .then((res) => {
+        const archivos = res.data.map((a) => ({
+          id: a.id,
+          name: a.nombre,
+          type: "file",
+          size: (a.tamaño / 1024).toFixed(2) + " KB",
+          date: new Date(a.fechaSubida).toLocaleDateString(),
+          url: getArchivoUrl(a.id), // ✔️ genera la URL
+          fileType: a.tipo,         // ej: image/jpeg, application/pdf
+        }));
+        setArchivosSitio(archivos); // ✔️ guarda la lista
+        console.log("✅ Archivos recibidos:", archivos);
+      })
+      .catch((err) => console.error("❌ Error al cargar archivos del sitio:", err));
   }
 }, [site]);
+
+
+
 
 useEffect(() => {
   if (showUserModal) {
@@ -276,67 +271,86 @@ const markAsCompleted = (postId) => {
 
         {/* Contenedor Actividades Completadas (más grande) */}
         <Col md={4}>
-          <Card style={{ minHeight: '600px', overflowY: 'auto' }}>
-            <Card.Header>archivo subidos</Card.Header>
-            <Card.Body>
-              {activities.length === 0 ? (
-                <p>No hay archivos subidos</p>
-              ) : (
-                activities.map(activity => (
-                  <Card key={activity.id} className="mb-3">
-                    <Card.Body>
-                      <Card.Text>{activity.text}</Card.Text>
-<img
-  src={activity.file.url}
-  alt={activity.file.name}
-  style={{ maxWidth: '100%', maxHeight: 200 }}
-/>
-<a
-  href={activity.file.url}
-  download
-  className="btn btn-sm btn-outline-primary mt-1"
->
-  Descargar imagen
-</a>
 
+<Card style={{ minHeight: "600px", overflowY: "auto" }}>
+      <Card.Header>Archivos subidos</Card.Header>
+      <Card.Body>
+        {archivosSitio.length === 0 ? (
+          <p className="text-muted">No hay archivos subidos a este sitio.</p>
+        ) : (
+          archivosSitio.map((archivo) => (
+            <Card key={archivo.id} className="mb-3">
+              <Card.Body>
+                {/* Texto descriptivo si aplica */}
+                {archivo.descripcion && (
+                  <Card.Text>{archivo.descripcion}</Card.Text>
+                )}
 
-{activity.file && activity.file.type === 'pdf' && (
-  <div>
-    <a href={activity.file.url} target="_blank" rel="noopener noreferrer">
-<a href={activity.file.url} target="_blank" rel="noopener noreferrer">
-  <FaFilePdf size={30} className="me-2" />
-  {activity.file.name}
-</a>
-<a
-  href={activity.file.url}
-  download
-  className="btn btn-sm btn-outline-primary ms-2"
->
-  Descargar
-</a>
+                {/* Mostrar imagen o PDF */}
+                {archivo.fileType.startsWith("image") ? (
+                  <img
+                    src={archivo.url}
+                    alt={archivo.name}
+                    style={{ maxWidth: "100%", maxHeight: 200 }}
+                    className="mb-2"
+                  />
+                ) : archivo.fileType === "application/pdf" ? (
+                  <div className="mb-2">
+                    <a
+                      href={archivo.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="d-flex align-items-center text-decoration-none"
+                    >
+                      <FaFilePdf size={30} className="me-2 text-danger" />
+                      <span>{archivo.name}</span>
+                    </a>
+                  </div>
+                ) : (
+                  <span>{archivo.name}</span>
+                )}
 
-    </a>
-  </div>
-)}
+                {/* Botón de descarga */}
+                <a
+                  href={archivo.url}
+                  download
+                  className="btn btn-sm btn-outline-primary mt-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Descargar
+                </a>
 
-                      <small className="text-muted d-block mb-2">{activity.timestamp}</small>
-                      <div className="d-flex align-items-center">
-                        <FaUser className="text-primary mr-2" />
-                        {activity.user ? (
-                          <div>
-                            <strong>{activity.user.nombre} {activity.user.apellido}</strong><br />
-                            <small className="text-muted">{activity.user.email}</small>
-                          </div>
-                        ) : (
-                          <small className="text-muted">Usuario desconocido</small>
-                        )}
-                      </div>
-                    </Card.Body>
-                  </Card>
-                ))
-              )}
-            </Card.Body>
-          </Card>
+                {/* Timestamp */}
+                {archivo.fechaSubida && (
+                  <small className="text-muted d-block mt-2">
+                    {archivo.fechaSubida}
+                  </small>
+                )}
+
+                {/* Info del usuario */}
+                <div className="d-flex align-items-center mt-2">
+                  <FaUser className="text-primary me-2" />
+                  {archivo.usuario ? (
+                    <div>
+                      <strong>
+                        {archivo.usuario.nombre} {archivo.usuario.apellido}
+                      </strong>
+                      <br />
+                      <small className="text-muted">
+                        {archivo.usuario.email}
+                      </small>
+                    </div>
+                  ) : (
+                    <small className="text-muted">Usuario desconocido</small>
+                  )}
+                </div>
+              </Card.Body>
+            </Card>
+          ))
+        )}
+      </Card.Body>
+    </Card>
         </Col>
       </Row>
 
