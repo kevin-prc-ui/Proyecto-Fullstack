@@ -1,17 +1,54 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import "../../styles/estilos.css";
+import { useNavigate } from "react-router-dom";
+import { getUserId } from "../../services/UsuarioService";
+import { getSitiosByUser } from "../../services/SitioService";
 
 const Home = () => {
-  // Funciones para manejar los cambios en los filtros
+  const [userId, setUserId] = useState(null);
+  const [misSitios, setMisSitios] = useState([]);
+  const [filtroSitios, setFiltroSitios] = useState("all");
+
+  const navigate = useNavigate();
+
+  // Obtener usuario y sus sitios
+  useEffect(() => {
+    getUserId().then((res) => {
+      const id = res.data;
+      setUserId(id);
+
+      getSitiosByUser(id)
+        .then((response) => setMisSitios(response.data))
+        .catch((error) =>
+          console.error("Error al obtener sitios del usuario:", error)
+        );
+    });
+  }, []);
+
+  // Filtro de sitios
+  const sitiosFiltrados = misSitios
+    .filter((sitio) => {
+      if (filtroSitios === "favorites") return sitio.favorito;
+      return true;
+    })
+    .sort((a, b) => {
+      if (filtroSitios === "recent") {
+        return new Date(b.fechaCreacion) - new Date(a.fechaCreacion);
+      }
+      return 0;
+    });
+
+  // Manejador de filtros
   const handleFilterChange = (filterName, value) => {
-    // Aquí puedes agregar la lógica para filtrar los datos
+    if (filterName === "Sites") {
+      setFiltroSitios(value);
+    }
   };
 
   return (
     <div className="home-container">
       <h1>Inicio</h1>
 
-      {/* Contenedores */}
       <div className="grid-layout">
         {/* Contenedor 1: Mis Sitios */}
         <div className="grid-item">
@@ -27,6 +64,26 @@ const Home = () => {
             </select>
           </div>
           <p>Aquí puedes gestionar tus sitios</p>
+
+          <div className="mt-3">
+            {sitiosFiltrados.length === 0 ? (
+              <p className="text-muted">No hay sitios para mostrar.</p>
+            ) : (
+              <ul className="list-unstyled">
+                {sitiosFiltrados.map((sitio) => (
+                  <li
+                    key={sitio.id}
+                    className="mb-2 p-2 border rounded bg-light"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate("/sitio", { state: { site: sitio } })}
+                  >
+                    <strong>{sitio.name}</strong> <br />
+                    <small className="text-muted">ID: {sitio.siteId}</small>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         {/* Contenedor 2: Mis Actividades */}
@@ -35,7 +92,9 @@ const Home = () => {
           <div className="filter-container activities-filters">
             <select
               className="filter small-filter"
-              onChange={(e) => handleFilterChange("Activities - Following", e.target.value)}
+              onChange={(e) =>
+                handleFilterChange("Activities - Following", e.target.value)
+              }
             >
               <option value="Following">Siguiendo</option>
               <option value="Myactivities">Mis actividades</option>
@@ -44,7 +103,9 @@ const Home = () => {
             </select>
             <select
               className="filter small-filter"
-              onChange={(e) => handleFilterChange("Activities - Comments", e.target.value)}
+              onChange={(e) =>
+                handleFilterChange("Activities - Comments", e.target.value)
+              }
             >
               <option value="all">Todos los elementos</option>
               <option value="Comments">Comentarios</option>
@@ -53,7 +114,9 @@ const Home = () => {
             </select>
             <select
               className="filter small-filter"
-              onChange={(e) => handleFilterChange("Activities - Last 28 Days", e.target.value)}
+              onChange={(e) =>
+                handleFilterChange("Activities - Last 28 Days", e.target.value)
+              }
             >
               <option value="today">Hoy</option>
               <option value="week1">Últimos 7 días</option>

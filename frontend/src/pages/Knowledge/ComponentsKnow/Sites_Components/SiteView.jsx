@@ -28,8 +28,11 @@ import {
   getArchivosPorSitio,
   getArchivoUrl,
 } from "../../../../services/MisArchivosService";
+import { useLocation } from "react-router-dom";
 
 const SiteView = ({ site, onGoBack, usuarioId }) => {
+    const location = useLocation();
+  const sitio = location.state?.site;
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState("");
