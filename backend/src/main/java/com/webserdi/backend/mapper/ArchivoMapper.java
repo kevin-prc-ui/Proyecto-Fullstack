@@ -6,14 +6,20 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ArchivoMapper {
+
+    private final UsuarioMapper usuarioMapper;
+
+    public ArchivoMapper(UsuarioMapper usuarioMapper) {
+        this.usuarioMapper = usuarioMapper;
+    }
+
     public Archivo toEntity(ArchivoDto archivoDto) {
-        Archivo archivo = new com.webserdi.backend.entity.Archivo();
+        Archivo archivo = new Archivo();
         archivo.setId(archivoDto.getId());
         archivo.setNombre(archivoDto.getNombre());
         archivo.setTipo(archivoDto.getTipo());
         archivo.setTamaño(archivoDto.getTamaño());
         archivo.setFechaSubida(archivoDto.getFechaSubida());
-        // La carpeta debe ser manejada por el servicio, no el mapper
         return archivo;
     }
 
@@ -31,6 +37,7 @@ public class ArchivoMapper {
 
         if (archivo.getUsuario() != null) {
             archivoDto.setUsuarioId(archivo.getUsuario().getId());
+            archivoDto.setUsuario(usuarioMapper.mapToUsuarioDto(archivo.getUsuario())); // ✅ agregado
         }
 
         return archivoDto;
