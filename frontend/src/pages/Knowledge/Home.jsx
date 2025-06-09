@@ -3,27 +3,54 @@ import "../../styles/estilos.css";
 import { useNavigate } from "react-router-dom";
 import { getUserId } from "../../services/UsuarioService";
 import { getSitiosByUser } from "../../services/SitioService";
+import { getAllActivities } from "../../services/ActivityService";
 
 const Home = () => {
   const [userId, setUserId] = useState(null);
   const [misSitios, setMisSitios] = useState([]);
+  const [misTareas, setMisTareas] = useState([]);
+const [misWorkflows, setMisWorkflows] = useState([]);
   const [filtroSitios, setFiltroSitios] = useState("all");
 
   const navigate = useNavigate();
 
   // Obtener usuario y sus sitios
-  useEffect(() => {
-    getUserId().then((res) => {
-      const id = res.data;
-      setUserId(id);
+useEffect(() => {
+  getUserId().then((res) => {
+    const id = res.data;
+    setUserId(id);
 
-      getSitiosByUser(id)
-        .then((response) => setMisSitios(response.data))
-        .catch((error) =>
-          console.error("Error al obtener sitios del usuario:", error)
+    // Cargar sitios
+    getSitiosByUser(id)
+      .then((response) => setMisSitios(response.data))
+      .catch((error) =>
+        console.error("Error al obtener sitios del usuario:", error)
+      );
+
+    // Cargar actividades y filtrar por usuario asignado
+    getAllActivities()
+      .then((response) => {
+        const actividades = response.data;
+
+        // Tareas asignadas al usuario actual
+        const tareas = actividades.filter(
+          (a) => a.type === "task" && a.usuariosAsignados?.includes(id)
         );
-    });
-  }, []);
+
+        // Workflows asignados al usuario actual
+        const workflows = actividades.filter(
+          (a) => a.type === "workflow" && a.usuariosAsignados?.includes(id)
+        );
+
+        setMisTareas(tareas);
+        setMisWorkflows(workflows);
+      })
+      .catch((error) =>
+        console.error("Error al obtener actividades del usuario:", error)
+      );
+  });
+}, []);
+
 
   // Filtro de sitios
   const sitiosFiltrados = misSitios
@@ -124,7 +151,24 @@ const Home = () => {
               <option value="week3">Últimos 28 días</option>
             </select>
           </div>
-          <p>Revisa y organiza tus actividades recientes.</p>
+          <p>Revisa y organiza tus flujos asignados.</p>
+<ul className="list-unstyled mt-3">
+  {misWorkflows.length === 0 ? (
+    <p className="text-muted">No tienes flujos de trabajo asignados.</p>
+  ) : (
+    misWorkflows.map((wf) => (
+      <li key={wf.id} className="mb-2 border rounded p-2 bg-light">
+        <strong>{wf.name}</strong><br />
+        <small className="text-muted">
+          Aprobación requerida: {wf.approvalPercentage}%
+        </small><br />
+        <span className="text-dark">{wf.description}</span>
+      </li>
+    ))
+  )}
+</ul>
+
+
         </div>
 
         {/* Contenedor 3: Mis Tareas */}
@@ -145,6 +189,21 @@ const Home = () => {
             </select>
           </div>
           <p>Administra tus tareas pendientes.</p>
+<ul className="list-unstyled mt-3">
+  {misTareas.length === 0 ? (
+    <p className="text-muted">No tienes tareas asignadas.</p>
+  ) : (
+    misTareas.map((tarea) => (
+      <li key={tarea.id} className="mb-2 border rounded p-2 bg-light">
+        <strong>{tarea.name}</strong><br />
+        <small className="text-muted">Prioridad: {tarea.priority}</small><br />
+        <span className="text-dark">{tarea.description}</span>
+      </li>
+    ))
+  )}
+</ul>
+
+
         </div>
 
         {/* Contenedor 4: Mis Documentos */}
