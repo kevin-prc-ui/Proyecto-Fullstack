@@ -7,7 +7,7 @@ import { uploadArchivo, getArchivosPorSitio, getArchivoUrl } from "../../../../s
 
 
 
-const SiteView = ({ site, onGoBack, usuarioId}) => {
+const SiteView = ({ site, onGoBack, usuarioId }) => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
@@ -27,39 +27,48 @@ const SiteView = ({ site, onGoBack, usuarioId}) => {
   });
 
   // Carga usuarios desde backend cuando se abre el modal
+  useEffect(() => {
+    if (site?.id) {
+      getArchivosPorSitio(site.id)
+        .then((res) => {
+          const archivos = res.data.map((a) => ({
+            id: a.id,
+            name: a.nombre,
+            type: "file",
+            size: (a.tamaño / 1024).toFixed(2) + " KB",
+            date: new Date(a.fechaSubida).toLocaleDateString(),
+            url: getArchivoUrl(a.id), // ✔️ genera la URL
+            fileType: a.tipo,         // ej: image/jpeg, application/pdf
+          }));
+          setArchivosSitio(archivos); // ✔️ guarda la lista
+          console.log("✅ Archivos recibidos:", archivos);
+        })
+        .catch((err) => console.error("❌ Error al cargar archivos del sitio:", err));
+    }
+  }, [site]);
+
+
+  useEffect(() => {
+    if (showUserModal) {
+      setUsersState({ ...usersState, loading: true });
+      listUsers()
+        .then((res) => setUsersState({ users: res.data, loading: false, error: null }))
+        .catch((err) => setUsersState({ ...usersState, error: err.message, loading: false }));
+    }
+  }, [showUserModal]);
+
 useEffect(() => {
-  if (site?.id) {
-    getArchivosPorSitio(site.id)
-      .then((res) => {
-        const archivos = res.data.map((a) => ({
-          id: a.id,
-          name: a.nombre,
-          type: "file",
-          size: (a.tamaño / 1024).toFixed(2) + " KB",
-          date: new Date(a.fechaSubida).toLocaleDateString(),
-          url: getArchivoUrl(a.id), // ✔️ genera la URL
-          fileType: a.tipo,         // ej: image/jpeg, application/pdf
-        }));
-        setArchivosSitio(archivos); // ✔️ guarda la lista
-        console.log("✅ Archivos recibidos:", archivos);
-      })
-      .catch((err) => console.error("❌ Error al cargar archivos del sitio:", err));
-  }
-}, [site]);
-
-
-
-
-useEffect(() => {
-  if (showUserModal) {
-    setUsersState({ ...usersState, loading: true });
-    listUsers()
-      .then((res) => setUsersState({ users: res.data, loading: false, error: null }))
-      .catch((err) => setUsersState({ ...usersState, error: err.message, loading: false }));
-  }
-}, [showUserModal]);
-
-
+  const fetchUserId = async () => {
+    try {
+      const response = await getUserId();
+      setUsuarioLogueado(response.data);
+    } catch (error) {
+      console.error("Error al obtener ID de usuario:", error);
+    }
+  };
+  
+  fetchUserId();
+}, []);
 
   // Filtrar usuarios basado en el término de búsqueda
   const filteredUsers = usersState.users.filter(user =>
@@ -68,42 +77,42 @@ useEffect(() => {
   );
 
   // Toggle usuario seleccionado en el modal
-const toggleUserSelection = (user) => {
-  setUsuariosSeleccionadosModal(prev => {
-    const exists = prev.some(u => u.id === user.id);
-    if (exists) {
-      return prev.filter(u => u.id !== user.id);
-    } else {
-      return [...prev, user];
-    }
-  });
-};
+  const toggleUserSelection = (user) => {
+    setUsuariosSeleccionadosModal(prev => {
+      const exists = prev.some(u => u.id === user.id);
+      if (exists) {
+        return prev.filter(u => u.id !== user.id);
+      } else {
+        return [...prev, user];
+      }
+    });
+  };
 
 
   // Cuando se confirma agregar usuarios seleccionados
-const handleAddUsers = () => {
-  const idsYaAsignados = selectedUsers.map(u => u.id);
-  const idsNuevos = usuariosSeleccionadosModal
-    .filter(user => !idsYaAsignados.includes(user.id))
-    .map(user => user.id);
+  const handleAddUsers = () => {
+    const idsYaAsignados = selectedUsers.map(u => u.id);
+    const idsNuevos = usuariosSeleccionadosModal
+      .filter(user => !idsYaAsignados.includes(user.id))
+      .map(user => user.id);
 
-  if (idsNuevos.length === 0) {
-    alert("No hay usuarios nuevos para agregar.");
-    return;
-  }
+    if (idsNuevos.length === 0) {
+      alert("No hay usuarios nuevos para agregar.");
+      return;
+    }
 
-  agregarUsuariosAsignados(site.id, idsNuevos)
-    .then(() => {
-      setShowUserModal(false);
-      setSearchTerm('');
-      setUsuariosSeleccionadosModal([]);
-      getUsuariosAsignados(site.id).then(res => setSelectedUsers(res.data));
-    })
-    .catch(err => {
-      console.error("Error al agregar usuarios:", err);
-      alert("Error al agregar usuarios al sitio");
-    });
-};
+    agregarUsuariosAsignados(site.id, idsNuevos)
+      .then(() => {
+        setShowUserModal(false);
+        setSearchTerm('');
+        setUsuariosSeleccionadosModal([]);
+        getUsuariosAsignados(site.id).then(res => setSelectedUsers(res.data));
+      })
+      .catch(err => {
+        console.error("Error al agregar usuarios:", err);
+        alert("Error al agregar usuarios al sitio");
+      });
+  };
 
 
 
@@ -114,6 +123,12 @@ const handlePostSubmit = async (e) => {
   if (!newPost.trim() && !selectedFile) return;
 
   try {
+    // Asegurarnos de que tenemos el ID del usuario logueado
+    if (!usuarioLogueado) {
+      const userIdResponse = await getUserId();
+      setUsuarioLogueado(userIdResponse.data);
+    }
+
     const uploadResponse = await uploadArchivo(
       selectedFile,
       null, // carpetaId si aplica
@@ -147,17 +162,17 @@ const handlePostSubmit = async (e) => {
 
 
   // Marcar publicación como completada, asignando el usuario logueado
-const markAsCompleted = (postId) => {
-  const post = posts.find(p => p.id === postId);
-  if (post) {
-    const activityWithUser = {
-      ...post,
-      user: usuarioLogueado // Aquí aseguramos que se use el usuario logueado
-    };
-    setActivities(prev => [...prev, activityWithUser]);
-    setPosts(prev => prev.filter(p => p.id !== postId));
-  }
-};
+  const markAsCompleted = (postId) => {
+    const post = posts.find(p => p.id === postId);
+    if (post) {
+      const activityWithUser = {
+        ...post,
+        user: usuarioLogueado // Aquí aseguramos que se use el usuario logueado
+      };
+      setActivities(prev => [...prev, activityWithUser]);
+      setPosts(prev => prev.filter(p => p.id !== postId));
+    }
+  };
 
   return (
     <Container className="mt-4">
@@ -235,22 +250,22 @@ const markAsCompleted = (postId) => {
                   <Card key={post.id} className="mb-2">
                     <Card.Body>
                       <Card.Text>{post.text}</Card.Text>
-{post.file && post.file.type === 'image' && (
-  <img
-    src={post.file.url}
-    alt={post.file.name}
-    style={{ maxWidth: '100%', maxHeight: 200 }}
-  />
-)}
+                      {post.file && post.file.type === 'image' && (
+                        <img
+                          src={post.file.url}
+                          alt={post.file.name}
+                          style={{ maxWidth: '100%', maxHeight: 200 }}
+                        />
+                      )}
 
-{post.file && post.file.type === 'pdf' && (
-  <div>
-    <a href={post.file.url} target="_blank" rel="noopener noreferrer">
-      <FaFilePdf size={30} className="me-2" />
-      {post.file.name}
-    </a>
-  </div>
-)}
+                      {post.file && post.file.type === 'pdf' && (
+                        <div>
+                          <a href={post.file.url} target="_blank" rel="noopener noreferrer">
+                            <FaFilePdf size={30} className="me-2" />
+                            {post.file.name}
+                          </a>
+                        </div>
+                      )}
 
                       <small className="text-muted">{post.timestamp}</small>
                       <Button
@@ -272,85 +287,85 @@ const markAsCompleted = (postId) => {
         {/* Contenedor Actividades Completadas (más grande) */}
         <Col md={4}>
 
-<Card style={{ minHeight: "600px", overflowY: "auto" }}>
-      <Card.Header>Archivos subidos</Card.Header>
-      <Card.Body>
-        {archivosSitio.length === 0 ? (
-          <p className="text-muted">No hay archivos subidos a este sitio.</p>
-        ) : (
-          archivosSitio.map((archivo) => (
-            <Card key={archivo.id} className="mb-3">
-              <Card.Body>
-                {/* Texto descriptivo si aplica */}
-                {archivo.descripcion && (
-                  <Card.Text>{archivo.descripcion}</Card.Text>
-                )}
+          <Card style={{ minHeight: "600px", overflowY: "auto" }}>
+            <Card.Header>Archivos subidos</Card.Header>
+            <Card.Body>
+              {archivosSitio.length === 0 ? (
+                <p className="text-muted">No hay archivos subidos a este sitio.</p>
+              ) : (
+                archivosSitio.map((archivo) => (
+                  <Card key={archivo.id} className="mb-3">
+                    <Card.Body>
+                      {/* Texto descriptivo si aplica */}
+                      {archivo.descripcion && (
+                        <Card.Text>{archivo.descripcion}</Card.Text>
+                      )}
 
-                {/* Mostrar imagen o PDF */}
-                {archivo.fileType.startsWith("image") ? (
-                  <img
-                    src={archivo.url}
-                    alt={archivo.name}
-                    style={{ maxWidth: "100%", maxHeight: 200 }}
-                    className="mb-2"
-                  />
-                ) : archivo.fileType === "application/pdf" ? (
-                  <div className="mb-2">
-                    <a
-                      href={archivo.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="d-flex align-items-center text-decoration-none"
-                    >
-                      <FaFilePdf size={30} className="me-2 text-danger" />
-                      <span>{archivo.name}</span>
-                    </a>
-                  </div>
-                ) : (
-                  <span>{archivo.name}</span>
-                )}
+                      {/* Mostrar imagen o PDF */}
+                      {archivo.fileType.startsWith("image") ? (
+                        <img
+                          src={archivo.url}
+                          alt={archivo.name}
+                          style={{ maxWidth: "100%", maxHeight: 200 }}
+                          className="mb-2"
+                        />
+                      ) : archivo.fileType === "application/pdf" ? (
+                        <div className="mb-2">
+                          <a
+                            href={archivo.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="d-flex align-items-center text-decoration-none"
+                          >
+                            <FaFilePdf size={30} className="me-2 text-danger" />
+                            <span>{archivo.name}</span>
+                          </a>
+                        </div>
+                      ) : (
+                        <span>{archivo.name}</span>
+                      )}
 
-                {/* Botón de descarga */}
-                <a
-                  href={archivo.url}
-                  download
-                  className="btn btn-sm btn-outline-primary mt-2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Descargar
-                </a>
+                      {/* Botón de descarga */}
+                      <a
+                        href={archivo.url}
+                        download
+                        className="btn btn-sm btn-outline-primary mt-2"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Descargar
+                      </a>
 
-                {/* Timestamp */}
-                {archivo.fechaSubida && (
-                  <small className="text-muted d-block mt-2">
-                    {archivo.fechaSubida}
-                  </small>
-                )}
+                      {/* Timestamp */}
+                      {archivo.fechaSubida && (
+                        <small className="text-muted d-block mt-2">
+                          {archivo.fechaSubida}
+                        </small>
+                      )}
 
-                {/* Info del usuario */}
-                <div className="d-flex align-items-center mt-2">
-                  <FaUser className="text-primary me-2" />
-                  {archivo.usuario ? (
-                    <div>
-                      <strong>
-                        {archivo.usuario.nombre} {archivo.usuario.apellido}
-                      </strong>
-                      <br />
-                      <small className="text-muted">
-                        {archivo.usuario.email}
-                      </small>
-                    </div>
-                  ) : (
-                    <small className="text-muted">Usuario desconocido</small>
-                  )}
-                </div>
-              </Card.Body>
-            </Card>
-          ))
-        )}
-      </Card.Body>
-    </Card>
+                      {/* Info del usuario */}
+                      <div className="d-flex align-items-center mt-2">
+                        <FaUser className="text-primary me-2" />
+                        {archivo.usuario ? (
+                          <div>
+                            <strong>
+                              {archivo.usuario.nombre} {archivo.usuario.apellido}
+                            </strong>
+                            <br />
+                            <small className="text-muted">
+                              {archivo.usuario.email}
+                            </small>
+                          </div>
+                        ) : (
+                          <small className="text-muted">Usuario desconocido</small>
+                        )}
+                      </div>
+                    </Card.Body>
+                  </Card>
+                ))
+              )}
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
 
