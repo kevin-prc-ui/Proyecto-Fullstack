@@ -5,6 +5,7 @@ import TaskList from './ComponentsKnow/Task_Components/TaskList';
 import TaskForm from './ComponentsKnow/Task_Components/TaskForm';
 import {listUsers} from '../../services/UsuarioService';
 import { getAllActivities } from '../../services/ActivityService';
+import { deleteActivity } from "../../services/ActivityService";
 
 const Task = () => {
   // Estados para manejar actividades, formulario, filtros y usuarios
@@ -14,6 +15,20 @@ const Task = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [filter, setFilter] = useState('all');
   const [usuarios, setUsuarios] = useState([]); // Lista de usuarios para asignación de tareas
+
+
+const handleDeleteTask = async (id) => {
+  if (!window.confirm("¿Estás seguro de eliminar esta actividad?")) return;
+  try {
+    await deleteActivity(id);
+    const updated = activities.filter((a) => a.id !== id);
+    setActivities(updated);
+  } catch (err) {
+    console.error("Error al eliminar actividad:", err);
+    alert("No se pudo eliminar la actividad.");
+  }
+};
+
 
   const isAuth = localStorage.getItem("authToken"); // Verifica si hay token de autenticación
 // Efecto para cargar usuarios si el usuario está autenticado
@@ -165,6 +180,7 @@ const saveActivities = (updatedActivities) => {
             );
             saveActivities(updatedActivities);
           }}
+          onDeleteTask={handleDeleteTask}
         />
       )}
 

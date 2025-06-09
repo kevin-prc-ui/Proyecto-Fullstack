@@ -40,3 +40,8 @@ export const createActivity = (activity) => axios.post(`${REST_API_BASE_URL}/act
 
 // Nueva función para obtener todas las actividades
 export const getAllActivities = () => axios.get(`${REST_API_BASE_URL}/activities/`, getHeaders());
+export const deleteActivity = (id) =>
+  axios.delete(`${REST_API_BASE_URL}/activities/${id}`, getHeaders());
+
+export const updateActivity = (activity) =>
+  axios.put(`${REST_API_BASE_URL}/activities/${activity.id}`, activity, getHeaders());
