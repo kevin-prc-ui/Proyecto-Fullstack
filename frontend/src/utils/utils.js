@@ -1,20 +1,16 @@
 /**
- * Archivo de utilidades que contiene funciones y constantes compartidas
- */
-
-/**
  * Formatea el rol del usuario para mostrar un nombre legible.
  * @param {string} rolId - ID del rol del usuario.
  * @returns {string} Nombre del rol.
  */
-export const formatUserRole = (rolId) => {
-    switch (rolId) {
-    case 1:
-        return "ADMIN";
-    case 2:
-        return "USER";
-    case 3:
-        return "AGENTE";
+export const formatUserRole = (rol) => {  
+  switch (rol[0]) {
+    case "ROLE_ADMIN":
+        return "Administrador";
+    case 'ROLE_USER':
+        return "Usuario";
+    case "ROLE_AGENTE":
+        return "Agente";
     default:
         return "Desconocido";
     }
@@ -146,8 +142,8 @@ export const formatUserRole = (rolId) => {
   };
   
   export const TICKET_TYPE = {
-    1: "bg-gray-600",
-    2: "bg-green-600",
+    1: "bg-yellow-500",
+    2: "bg-gray-500",
     3: "bg-yellow-600",
     4: "bg-red-600",
   };
@@ -161,6 +157,6 @@ export const formatUserRole = (rolId) => {
   export const TASK_TYPE = {
     pendiente: "bg-blue-600",
     "en-proceso": "bg-yellow-600", 
-    completado: "bg-green-600", 
+    "completados": "bg-green-600", 
   };
   

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner"; // Importar toast
 import { FaSearch } from "react-icons/fa"; // Importar icono de búsqueda
 import { deleteUser, listUsers } from "../../services/UsuarioService";
+import { formatUserRole } from "../../utils/utils";
 
 export const ListedUsers = () => {
   const [usuarios, setUsuarios] = useState([]);
@@ -250,7 +251,7 @@ export const ListedUsers = () => {
                       {usuario.email}
                     </div>
                     <div className="col-span-2 text-center text-gray-700">
-                      {usuario.roles}
+                      {formatUserRole(usuario.roles)}
                     </div><div className="col-span-2 text-center text-gray-700">
                       {usuario.departamento?.nombre}
                     </div>

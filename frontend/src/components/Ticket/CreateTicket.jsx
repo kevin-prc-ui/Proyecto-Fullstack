@@ -248,7 +248,7 @@ export default function CreateTicket({
         fuente: 1, // Asumimos fuente fija por ahora
         incidencia: parseInt(data.incidencia),
         motivo: parseInt(data.motivo),
-        estado: 2,
+        estado: 1,
         prioridad: parseInt(data.prioridad),
       };
       if (ticket?.id) {
