@@ -3,11 +3,13 @@ package com.webserdi.backend.service.impl;
 import com.webserdi.backend.dto.ArchivoDto;
 import com.webserdi.backend.entity.Archivo;
 import com.webserdi.backend.entity.Carpeta;
+import com.webserdi.backend.entity.Sitio;
 import com.webserdi.backend.entity.Usuario;
 import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.mapper.ArchivoMapper;
 import com.webserdi.backend.repository.ArchivoRepository;
 import com.webserdi.backend.repository.CarpetaRepository;
+import com.webserdi.backend.repository.SitioRepository;
 import com.webserdi.backend.repository.UsuarioRepository;
 import com.webserdi.backend.service.ArchivoService;
 import lombok.AllArgsConstructor;
@@ -35,6 +37,7 @@ public class ArchivoServiceImpl implements ArchivoService {
     private final ArchivoMapper archivoMapper;
     private final CarpetaRepository carpetaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final SitioRepository sitioRepository;
 
 
     @Value("${file.upload-dir}")
@@ -43,12 +46,16 @@ public class ArchivoServiceImpl implements ArchivoService {
 
     public ArchivoServiceImpl(ArchivoRepository archivoRepository,
                               ArchivoMapper archivoMapper,
-                              CarpetaRepository carpetaRepository, UsuarioRepository usuarioRepository) {
+                              CarpetaRepository carpetaRepository,
+                              UsuarioRepository usuarioRepository,
+                              SitioRepository sitioRepository) {
         this.archivoRepository = archivoRepository;
         this.archivoMapper = archivoMapper;
         this.carpetaRepository = carpetaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.sitioRepository = sitioRepository;
     }
+
 
     @Override
     public ArchivoDto createArchivo(ArchivoDto archivoDto) {
@@ -75,7 +82,7 @@ public class ArchivoServiceImpl implements ArchivoService {
 // Dentro de ArchivoServiceImpl
 
     @Override
-    public ArchivoDto guardarArchivoConContenido(MultipartFile archivo, Long carpetaId, Long usuarioId) {
+    public ArchivoDto guardarArchivoConContenido(MultipartFile archivo, Long carpetaId, Long usuarioId, Long sitioId) {
         try {
             String nombreArchivo = archivo.getOriginalFilename();
             String tipoArchivo = archivo.getContentType();
@@ -102,6 +109,12 @@ public class ArchivoServiceImpl implements ArchivoService {
             Usuario usuario = usuarioRepository.findById(usuarioId)
                     .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
             entidad.setUsuario(usuario);
+            if (sitioId != null) {
+                Sitio sitio = sitioRepository.findById(sitioId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Sitio no encontrado con id: " + sitioId));
+                entidad.setSitio(sitio);
+            }
+
 
             // Guardar la ruta relativa (para usarla luego al ver el archivo)
             String rutaRelativa = Paths.get("uploads", subdirectorio, nombreArchivo).toString();
@@ -199,4 +212,6 @@ public class ArchivoServiceImpl implements ArchivoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Archivo no encontrado con id: " + archivoId));
         archivoRepository.delete(archivo);
     }
+
+
 }

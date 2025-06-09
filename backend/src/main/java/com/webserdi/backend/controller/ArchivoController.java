@@ -42,9 +42,10 @@ public class ArchivoController {
     public ResponseEntity<ArchivoDto> subirArchivoConContenido(
             @RequestParam("archivo") MultipartFile archivo,
             @RequestParam(value = "carpetaId", required = false) Long carpetaId,
-            @RequestParam("usuarioId") Long usuarioId) {
+            @RequestParam("usuarioId") Long usuarioId,
+            @RequestParam(value = "sitioId", required = false) Long sitioId) {
 
-        ArchivoDto archivoDto = archivoService.guardarArchivoConContenido(archivo, carpetaId, usuarioId);
+        ArchivoDto archivoDto = archivoService.guardarArchivoConContenido(archivo, carpetaId, usuarioId, sitioId);
         return new ResponseEntity<>(archivoDto, HttpStatus.CREATED);
     }
 
