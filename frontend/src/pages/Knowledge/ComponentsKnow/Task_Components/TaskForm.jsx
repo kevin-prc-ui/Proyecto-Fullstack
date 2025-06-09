@@ -118,7 +118,16 @@ useEffect(() => {
 
     // Llamamos al servicio para crear o actualizar la actividad
     
-    createActivity(preparedData);
+    try {
+  const response = await createActivity(preparedData);
+  if (response.status === 200) {
+    onSave(response.data); // ✅ notifica al padre
+  }
+} catch (error) {
+  console.error("Error al guardar actividad:", error);
+  alert("Ocurrió un error al guardar la actividad.");
+}
+
   };
 
   return (
