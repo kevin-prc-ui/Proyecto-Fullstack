@@ -74,4 +74,12 @@ public class CarpetaServiceImpl implements CarpetaService {
                 .orElseThrow(() -> new ResourceNotFoundException("Carpeta no encontrada con id" + carpetaId));
         carpetaRepository.delete(carpeta);
     }
+    @Override
+    public List<CarpetaDto> getCarpetasByUsuario(Long usuarioId) {
+        List<Carpeta> carpetas = carpetaRepository.findByUsuarioId(usuarioId);
+        return carpetas.stream()
+                .map(carpetaMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
 }

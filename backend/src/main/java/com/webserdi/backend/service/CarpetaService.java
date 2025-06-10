@@ -10,4 +10,6 @@ public interface CarpetaService {
     List<CarpetaDto> getAllCarpetas();
     CarpetaDto updateCarpeta(Long carpetaId, CarpetaDto carpetaDto);
     void deleteCarpeta(Long carpetaId);
+    List<CarpetaDto> getCarpetasByUsuario(Long usuarioId);
+
 }

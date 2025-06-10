@@ -9,5 +9,6 @@ public interface CarpetaRepository extends JpaRepository<Carpeta, Long> {
     List<Carpeta> findByCarpetaPadreIdAndUsuarioId(Long carpetaPadreId, Long usuarioId);
 
     List<Carpeta> findByCarpetaPadreIdIsNullAndUsuarioId(Long usuarioId);
+    List<Carpeta> findByUsuarioId(Long usuarioId);
 
 }

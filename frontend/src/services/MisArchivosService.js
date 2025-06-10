@@ -58,6 +58,9 @@ export const getUserId = () =>
 export const getArchivosPorSitio = (sitioId) =>
   axios.get(`${REST_API_BASE_URL}/archivos/sitio/${sitioId}`, getHeaders());
 
+export const getCarpetasByUsuario = (usuarioId) =>
+  axios.get(`${REST_API_BASE_URL}/carpetas/usuario/${usuarioId}`, getHeaders());
+
 
 // ✅ Nuevo método para subir archivos binarios
 export const uploadArchivo = (file, carpetaId, usuarioId, sitioId) => {

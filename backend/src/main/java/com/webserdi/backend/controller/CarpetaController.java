@@ -48,5 +48,11 @@ public class CarpetaController {
         carpetaService.deleteCarpeta(carpetaId);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<CarpetaDto>> getCarpetasByUsuario(@PathVariable Long usuarioId) {
+        List<CarpetaDto> carpetas = carpetaService.getCarpetasByUsuario(usuarioId);
+        return ResponseEntity.ok(carpetas);
+    }
+
 }
 

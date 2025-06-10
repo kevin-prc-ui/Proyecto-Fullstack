@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { getUserId } from "../../services/UsuarioService";
 import { getSitiosByUser } from "../../services/SitioService";
 import { getAllActivities } from "../../services/ActivityService";
+import { getCarpetasByUsuario } from "../../services/MisArchivosService";
 
 const Home = () => {
   const [userId, setUserId] = useState(null);
@@ -11,6 +12,7 @@ const Home = () => {
   const [misTareas, setMisTareas] = useState([]);
 const [misWorkflows, setMisWorkflows] = useState([]);
   const [filtroSitios, setFiltroSitios] = useState("all");
+  const [misCarpetas, setMisCarpetas] = useState([]);
 
   const navigate = useNavigate();
 
@@ -19,6 +21,10 @@ useEffect(() => {
   getUserId().then((res) => {
     const id = res.data;
     setUserId(id);
+
+        getCarpetasByUsuario(id)
+      .then((res) => setMisCarpetas(res.data))
+      .catch((err) => console.error("Error al obtener carpetas:", err));
 
     // Cargar sitios
     getSitiosByUser(id)
@@ -206,21 +212,41 @@ useEffect(() => {
 
         </div>
 
-        {/* Contenedor 4: Mis Documentos */}
-        <div className="grid-item">
-          <h2>Mis Documentos</h2>
-          <div className="filter-container">
-            <select
-              className="filter small-filter"
-              onChange={(e) => handleFilterChange("Documents", e.target.value)}
-            >
-              <option value="recently-modified">Modificados Recientemente</option>
-              <option value="editing">Editando Actualmente</option>
-              <option value="favorites">Mis Favoritos</option>
-            </select>
-          </div>
-          <p>Accede y gestiona tus documentos.</p>
-        </div>
+{/* Contenedor 4: Mis Documentos */}
+<div className="grid-item">
+  <h2>Mis Documentos</h2>
+  <div className="filter-container">
+    <select
+      className="filter small-filter"
+      onChange={(e) => handleFilterChange("Documents", e.target.value)}
+    >
+      <option value="recently-modified">Modificados Recientemente</option>
+      <option value="editing">Editando Actualmente</option>
+      <option value="favorites">Mis Favoritos</option>
+    </select>
+  </div>
+  <p>Accede y gestiona tus documentos.</p>
+
+  <div className="mt-3">
+    {misCarpetas.length === 0 ? (
+      <p className="text-muted">No tienes carpetas creadas.</p>
+    ) : (
+      <ul className="list-unstyled">
+        {misCarpetas.map((carpeta) => (
+          <li
+            key={carpeta.id}
+            className="mb-2 p-2 border rounded bg-light"
+          >
+            <strong>{carpeta.nombre}</strong><br />
+            <small className="text-muted">
+              Creada el {new Date(carpeta.fechaCreacion).toLocaleDateString()}
+            </small>
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+</div>
       </div>
     </div>
   );
