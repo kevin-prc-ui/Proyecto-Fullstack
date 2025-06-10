@@ -13,10 +13,9 @@ import {
   TICKET_TYPE,
   formatDate,
   getVencimiento,
-} from "../../utils/utils"; //CREATE
+} from "../../utils/utils"; 
 import { BiMessageAltDetail } from "react-icons/bi";
-import { FaList } from "react-icons/fa";
-import UserInfo from "../Users/UserInfo"; //CREATE
+import UserInfo from "../Users/UserInfo";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 
@@ -26,9 +25,8 @@ const ICONS = {
   3: <MdKeyboardArrowDown />,
 };
 
-const Card = ({ ticket, status }) => {
+const Card = ({ ticket}) => {
   const navigate = useNavigate();
-  console.log(ticket);
 
   return (
     <>
