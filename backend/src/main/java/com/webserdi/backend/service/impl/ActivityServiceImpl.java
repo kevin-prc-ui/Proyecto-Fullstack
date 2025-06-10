@@ -59,6 +59,7 @@ public class ActivityServiceImpl {
         return activityMapper.toDto(activityRepo.save(activity));
     }
 
+
     public List<ActivityDto> getAllActivities() {
         return activityRepo.findAll().stream()
                 .map(activityMapper::toDto)
@@ -68,6 +69,13 @@ public class ActivityServiceImpl {
 
     public Activity getActivityById(Long id) {
         return activityRepo.findById(id).orElse(null);
+    }
+
+    public void deleteActivity(Long id) {
+        if (!activityRepo.existsById(id)) {
+            throw new RuntimeException("Actividad con ID " + id + " no encontrada.");
+        }
+        activityRepo.deleteById(id);
     }
 
     public List<Activity> getFilteredActivities(String type, String priority) {

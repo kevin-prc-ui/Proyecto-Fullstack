@@ -63,4 +63,11 @@ public class ActivityController {
         // Retorna las actividades que cumplen los filtros
         return ResponseEntity.ok(activities);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteActivity(@PathVariable Long id) {
+        activityServiceImpl.deleteActivity(id);
+        return ResponseEntity.ok().build();
+    }
+
 }

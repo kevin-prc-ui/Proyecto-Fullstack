@@ -43,5 +43,6 @@ export const getAllActivities = () => axios.get(`${REST_API_BASE_URL}/activities
 export const deleteActivity = (id) =>
   axios.delete(`${REST_API_BASE_URL}/activities/${id}`, getHeaders());
 
+
 export const updateActivity = (activity) =>
   axios.put(`${REST_API_BASE_URL}/activities/${activity.id}`, activity, getHeaders());
