@@ -162,10 +162,11 @@ const linkData = [
         icon: <PiFolderSimpleUser />,  
         children: [ 
           {
-            label: "Gestión doc",
-            link: "/admin/gestion/gestion",
-            icon: <FaHome />,
+            label: "Usuarios",
+            link: "/admin/knowledge/usuarios",
+            icon: <FaUsers />,
             roles: ["ROLE_ADMIN"]
+            
           }
         ]
       }

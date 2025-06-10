@@ -6,7 +6,7 @@ import { FaSearch } from "react-icons/fa"; // Importar icono de búsqueda
 import { deleteUser, listUsers } from "../../services/UsuarioService";
 import { formatUserRole } from "../../utils/utils";
 
-export const ListedUsers = () => {
+export const UsuariosGH = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,7 +23,7 @@ export const ListedUsers = () => {
   const fetchUsuarios = async () => {
     try {
       setLoading(true);
-      const response = await listUsers(null,1);
+      const response = await listUsers(null,2);
       setUsuarios(response.data);
     } catch (err) {
       setError("Error al cargar usuarios");
@@ -259,7 +259,7 @@ export const ListedUsers = () => {
                       <button
                         className="text-blue-500 hover:text-blue-700 m-1 bg-blue-50 hover:bg-blue-100 rounded p-2 transition-colors"
                         onClick={() =>
-                          navigate(`/admin/edit-user/${usuario.id}`)
+                          navigate(`/admin/knowledge/edit-user/${usuario.id}`)
                         }
                         title="Editar"
                       >

@@ -1,12 +1,10 @@
 package com.webserdi.backend.mapper;
 
 import com.webserdi.backend.dto.DepartamentoDto;
+import com.webserdi.backend.dto.ModuloDto;
 import com.webserdi.backend.dto.UsuarioDto;
 import com.webserdi.backend.dto.UsuarioSimpleDto; // Importar si se usa aquí
-import com.webserdi.backend.entity.Departamento;
-import com.webserdi.backend.entity.Permiso;
-import com.webserdi.backend.entity.Rol;
-import com.webserdi.backend.entity.Usuario;
+import com.webserdi.backend.entity.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils; // Para comprobaciones de colecciones
 
@@ -46,6 +44,12 @@ public class UsuarioMapper {
             departamentoDto.setId(departamentoEntity.getId());
             departamentoDto.setNombre(departamentoEntity.getNombre());
             usuarioDto.setDepartamento(departamentoDto);
+        }
+
+        Modulo moduloEntity = usuario.getModulo();
+        if (moduloEntity != null) {
+            ModuloDto moduloDto = ModuloMapper.toDto(moduloEntity);
+            usuarioDto.setModulo(moduloDto);
         }
 
         // Mapear roles

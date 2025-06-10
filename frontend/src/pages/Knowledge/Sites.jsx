@@ -117,14 +117,7 @@ const Sites = () => {
         >
           Buscar sitios
         </button>
-        <button
-          className={`btn tab-button ${
-            activeTab === "crearSitio" ? "active" : ""
-          }`}
-          onClick={() => setActiveTab("crearSitio")}
-        >
-          Crear sitio
-        </button>
+        <CreateSitesComponent onClick={true} />
         <button
           className={`btn tab-button ${
             activeTab === "favoritos" ? "active" : ""

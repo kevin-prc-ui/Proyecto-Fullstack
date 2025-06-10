@@ -10,7 +10,7 @@ public interface UsuarioService {
 
     UsuarioDto createUsuario(UsuarioDto usuarioDto);
     UsuarioDto getUsuarioById(Long usuarioId);
-    List<UsuarioDto> getAllUsuarios();
+    List<UsuarioDto> getAllUsuarios(Long id);
     List<PermisoDto> getAllPermisos(String email);
     UsuarioDto updateUsuario(Long usuarioId,UsuarioDto usuarioDto);
     void deleteUsuario(Long usuarioId);

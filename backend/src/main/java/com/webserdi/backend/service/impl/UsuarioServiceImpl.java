@@ -162,9 +162,9 @@ public class UsuarioServiceImpl implements UsuarioService {
      */
     @Override
     @Transactional(readOnly = true) // Buena práctica para operaciones de solo lectura
-    public List<UsuarioDto> getAllUsuarios() {
+    public List<UsuarioDto> getAllUsuarios(Long id) {
         logger.debug("Obteniendo todos los usuarios.");
-        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<Usuario> usuarios = usuarioRepository.findAllByModuloId(id);
         return usuarios.stream()
                 .map(usuarioMapper::mapToUsuarioDto)
                 .toList();

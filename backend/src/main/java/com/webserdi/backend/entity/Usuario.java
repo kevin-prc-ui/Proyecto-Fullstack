@@ -44,9 +44,14 @@ public class Usuario {
 
     /** Departamento al que pertenece el usuario (opcional). */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "departamento_id", nullable = true) // Nullable si un usuario puede no tener departamento
+    @JoinColumn(name = "departamento_id") // Nullable si un usuario puede no tener departamento
     @JsonBackReference("usuario-departamento") // Nombre único para la referencia
     private Departamento departamento;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "modulo_id") // Nullable si un usuario puede no tener departamento
+    @JsonBackReference("usuario-modulo") // Nombre único para la referencia
+    private Modulo modulo;
 
     /** Roles asignados al usuario. */
     @ManyToMany(fetch = FetchType.EAGER) // EAGER para roles es común si se usan en seguridad con frecuencia

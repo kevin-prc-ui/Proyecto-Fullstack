@@ -32,6 +32,7 @@ import { AddDepartamento } from "./components/Generic/AddDepartamento";
 import { AddPrioridad } from "./components/Generic/AddPrioridades";
 import { AddMotivo } from "./components/Generic/AddMotivos";
 import { AddIncidencia } from "./components/Generic/AddIncidencias";
+import {UsuariosGH} from "./pages/Knowledge/Users"; 
 import Perfil from "./components/Users/Perfil";
 
 function Layout() {
@@ -118,8 +119,9 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
           <Route element={<Layout />}>
             <Route path="/admin/helpdesk/users" element={<Users />} />
-            <Route path="/admin/helpdesk/add-user" element={<UsersComponent />} />
-            <Route path="/admin/edit-user/:id" element={<UsersComponent />} />
+            <Route path="/admin/helpdesk/add-user" element={<UsersComponent/>} />
+            <Route path="/admin/knowledge/edit-user/:id" element={<UsersComponent modulo={2}/>} />
+            <Route path="/admin/edit-user/:id" element={<UsersComponent modulo={1}/>} />
             <Route
               path="/admin/helpdesk/incidencias"
               element={<Incidencias />}
@@ -151,6 +153,10 @@ function App() {
               path="/admin/helpdesk/prioridades/nuevo"
               element={<AddPrioridad />}
             />
+            <Route
+              path="/admin/knowledge/usuarios"
+              element={<UsuariosGH /> /* Componente para gestionar usuarios */ }
+            ></Route>
             {/* Ejemplo: si es solo para admin */}
           </Route>
         </Route>

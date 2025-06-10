@@ -37,8 +37,10 @@ const getHeaders = () => {
   };
 };
 
-export const listUsers = (departamento) =>
+export const listUsers = (departamento,modulo) =>
 {
+  console.log(departamento," ",modulo);
+  
   if (departamento) {
     return axios
       .get(`${REST_API_BASE_URL}/users/departamento/${departamento}`, getHeaders()) // Add headers to the request
@@ -53,7 +55,7 @@ export const listUsers = (departamento) =>
   }
 
   return axios
-      .get(`${REST_API_BASE_URL}/users`, getHeaders()) // Add headers to the request
+      .get(`${REST_API_BASE_URL}/users/list/${modulo}`, getHeaders()) // Add headers to the request
       .then((response) => response)
       .catch((error) => {
         if (!error.response) {

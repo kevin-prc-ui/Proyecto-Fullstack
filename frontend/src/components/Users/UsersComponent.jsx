@@ -10,7 +10,8 @@ import { toast } from "sonner";
 /**
  * Componente para agregar o editar un usuario con activación/desactivación de perfil.
  */
-const UsersComponent = () => {
+const UsersComponent = (modulo) => {
+  console.log("Modulo:", modulo);
   // Estados para los campos del formulario
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
@@ -63,9 +64,10 @@ const UsersComponent = () => {
         const response = await axios.get("/api/permisos", getHeaders());
         const data = response.data;
         const filteredPermisos = data.filter(
-          (permiso) => permiso.moduloId === 1
+          (permiso) => permiso.moduloId === modulo.modulo
         );
         setPermisosDisponibles(filteredPermisos);
+        console.log("Permisos disponibles:", filteredPermisos);
       } catch (error) {
         toast.error("Error al cargar los permisos", error);
       }

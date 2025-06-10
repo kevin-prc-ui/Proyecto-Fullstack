@@ -66,7 +66,6 @@ const TaskDetails = () => {
   }, [id]);
 
   const editarTicket = () => {
-    console.log();
     permisos.map((permiso) => {
       console.log(permiso.nombre);
       

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
 import { getUserId, listUsers } from '../../../../services/UsuarioService';
 
-export const CreateSitesComponent = ({ addSite }) => {
+export const CreateSitesComponent = ({ addSite, onClick }) => {
   const [showModal, setShowModal] = useState(false);
   const [siteData, setSiteData] = useState({
     type: 'Collaboration Site',
@@ -14,7 +14,7 @@ export const CreateSitesComponent = ({ addSite }) => {
   const [usuarios, setUsuarios] = useState([]);
 
 useEffect(() => {
-  listUsers()
+  listUsers(null,2)
     .then((res) => setUsuarios(res.data))
     .catch((err) => console.error("Error al cargar usuarios:", err));
 }, []);
@@ -55,7 +55,7 @@ const handleSubmit = async (e) => {
       <button 
         type="button" 
         className="list-group-item list-group-item-action create-site-btn"
-        onClick={handleShow}
+        onClick={(() => setShowModal(onClick))}
       >
         <i className="bi bi-plus-circle-fill me-2"></i>
         Crear Sitio
@@ -249,7 +249,7 @@ const handleSubmit = async (e) => {
             </Button>
             <Button variant="primary" type="submit">
               <i className="bi bi-check-circle me-2"></i>
-              Crear Sitio
+              Crear Sitios
             </Button>
           </Modal.Footer>
         </Form>
