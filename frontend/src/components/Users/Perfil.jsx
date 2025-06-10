@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FiUser, FiBriefcase, FiMail, FiShield, FiKey } from "react-icons/fi";
 import { getUserByEmail, getUserById } from "../../services/UsuarioService";
+import { formatUserRole } from "../../utils/utils";
 
 /**
  * @component UserProfileCard
@@ -18,9 +19,12 @@ import { getUserByEmail, getUserById } from "../../services/UsuarioService";
  */
 const Perfil = () => {
   const [usuario, setUsuario] = useState(null);
+  
 
   useEffect(() => {
     fetchUsuario();
+    console.log();
+    
   }, []);
   
   const fetchUsuario = async () => {
@@ -96,10 +100,11 @@ const Perfil = () => {
           icon={<FiShield className="text-green-500" />}
         >
           {roles && roles.length > 0 ? (
-            roles.map((rol, index) => (
+            roles.map((rol, index) => 
+              (
               <Pill
                 key={`rol-${index}`}
-                text={rol.replace("ROLE_", "")}
+                text={formatUserRole(rol)}
                 color="green"
               />
             ))

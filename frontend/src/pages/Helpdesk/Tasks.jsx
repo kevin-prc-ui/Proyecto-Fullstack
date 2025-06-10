@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { FaList, FaUser } from "react-icons/fa";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { FaList} from "react-icons/fa";
 import { MdGridView } from "react-icons/md";
 import { useParams, useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -14,10 +14,11 @@ import Title from "../../components/Ticket/Title";
 import CreateTicket from "../../components/Ticket/CreateTicket";
 
 // Servicios y utilidades
-import { 
-  listTickets, 
-  listFilteredTickets, 
-  listTicketsByUser 
+import {
+  listTickets,
+  listFilteredTickets,
+  listTicketsByUser,
+  searchTickets,
 } from "../../services/TicketService";
 import { listAllDepartamentos } from "../../services/DepartamentoService";
 import { getUserId } from "../../services/UsuarioService";
@@ -47,7 +48,7 @@ const useQuery = () => {
  * @description Componente principal para mostrar y gestionar la lista de tickets.
  * Permite visualizar tickets en formato de cuadrícula o tabla, filtrar por estado/departamento/usuario,
  * paginar resultados y manejar estados de carga/error.
- * 
+ *
  * @param {Object} props - Propiedades del componente
  * @param {boolean} [props.userTicketsOnly=false] - Si es true, muestra solo los tickets del usuario actual
  * @returns {JSX.Element} El componente renderizado.
@@ -59,6 +60,7 @@ const Tasks = ({ userTicketsOnly = false }) => {
   // const { currentUser } = useAuth(); // Obtener usuario actual del contexto de autenticación
 
   // Estados del componente
+  const [searchTerm, setSearchTerm] = useState("");
   const [pagina, setPagina] = useState(0);
   const [loading, setLoading] = useState(false);
   const [tickets, setTickets] = useState([]);
@@ -71,12 +73,14 @@ const Tasks = ({ userTicketsOnly = false }) => {
     const initialSelected = saved !== null ? Number(saved) : 0;
     return [0, 1, 2].includes(initialSelected) ? initialSelected : 0;
   });
+  const [inputValue, setInputValue] = useState(""); // Nuevo estado para el valor temporal del input
+  const searchInputRef = useRef(null); // Ref para el input de búsqueda
 
   /**
    * @description Estado del ticket extraído de los parámetros de la URL o query params
    * Prioridad: params.estado > query.get('estado') > ''
    */
-  const status = params?.estado || query.get('estado') || '';
+  const status = params?.estado || query.get("estado") || "";
 
   /**
    * @function fetchDepartamentos
@@ -103,63 +107,71 @@ const Tasks = ({ userTicketsOnly = false }) => {
    * @function fetchTickets
    * @description Obtiene tickets según los filtros aplicados
    */
-  const fetchTickets = useCallback(async (page, filterStatus = "", filterDepartamento = "") => {
-    setLoading(true);
-    setErrorConexion(false);
-    
-    try {
-      let response;
-      const userId = await getUserId();
-      if (userTicketsOnly && userId) {
-        if (filterDepartamento) {
-          // Obtener tickets específicos del usuario en un departamento
-        response = await listTicketsByUser(
-          userId.data,
-          page,
-          filterDepartamento
-        );
-        }else{//Obtener tickets específicos del usuario
-          response = await listTicketsByUser(
-            userId.data,
-            page,
-            ""
-          );
-        }
-        // Obtener tickets específicos del usuario
-      } else if (filterStatus) {
-        // Obtener tickets filtrados por estado
-        response = await listFilteredTickets(
-          page,
-          filterStatus,
-          filterDepartamento
-        );
-      } else {
-        // Obtener todos los tickets
-        response = await listTickets(page, filterDepartamento);
-      }
-
-      
-      setTickets(response.data.content);
-      setTotalPages(response.data.totalPages);
-    } catch (error) {
-      setErrorConexion(true);
-      showErrorToast("Error al obtener los tickets.");
-      console.error("Error fetching tickets:", error);
+  const fetchTickets = useCallback(
+    async (page, filterStatus = "", filterDepartamento = "", search = "") => {
+      setLoading(true);
+      setErrorConexion(false);
       setTickets([]);
       setTotalPages(0);
-    } finally {
-      setLoading(false);
-    }
-  }, [userTicketsOnly]);
+
+      try {
+        let response;
+        const userId = await getUserId();
+        if (search) {
+          setTickets([]);
+          console.log(search);
+
+          response = await searchTickets(search);
+          console.log(response);
+        } else if (userTicketsOnly && userId) {
+          if (filterDepartamento) {
+            // Obtener tickets específicos del usuario en un departamento
+            response = await listTicketsByUser(
+              userId.data,
+              page,
+              filterDepartamento
+            );
+          } else {
+            //Obtener tickets específicos del usuario
+            response = await listTicketsByUser(userId.data, page, "");
+          }
+          // Obtener tickets específicos del usuario
+        } else if (filterStatus) {
+          // Obtener tickets filtrados por estado
+          response = await listFilteredTickets(
+            page,
+            filterStatus,
+            filterDepartamento
+          );
+        } else {
+          // Obtener todos los tickets
+          response = await listTickets(page, filterDepartamento);
+        }
+
+        setTickets(response.data.content);
+        setTotalPages(response.data.totalPages);
+      } catch (error) {
+        setErrorConexion(true);
+        showErrorToast("Error al obtener los tickets.");
+        console.error("Error fetching tickets:", error);
+        setTickets([]);
+        setTotalPages(0);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [userTicketsOnly]
+  );
+
+  //Se hace una nueva busqueda si la pagina, el estado, termino de busqueda o el departamento cambian
+  useEffect(() => {
+    fetchTickets(pagina, status, selectedDepartamento, searchTerm);
+  }, [pagina, status, selectedDepartamento, searchTerm, fetchTickets]);
 
   // Efectos secundarios
   useEffect(() => {
     fetchDepartamentos();
   }, [fetchDepartamentos]);
-
-  useEffect(() => {
-    fetchTickets(pagina, status, selectedDepartamento);
-  }, [pagina, status, selectedDepartamento, fetchTickets]);
 
   useEffect(() => {
     setPagina(0);
@@ -194,6 +206,19 @@ const Tasks = ({ userTicketsOnly = false }) => {
       setPagina(pagina - 1);
     }
   }
+  // Función para manejar la tecla Enter
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      setSearchTerm(inputValue);
+      setPagina(0);
+    }
+  };
+
+  // Función para limpiar la búsqueda
+  const clearSearch = () => {
+    setInputValue("");
+    setSearchTerm("");
+  };
 
   /**
    * @function getPageTitle
@@ -201,27 +226,29 @@ const Tasks = ({ userTicketsOnly = false }) => {
    */
   const getPageTitle = () => {
     let title = userTicketsOnly ? "Mis Tickets" : "Todos los Tickets";
-    
+
     if (status) {
       title += ` ${status.replace("-", " ")}`;
     }
-    
+
     if (selectedDepartamento && departamentos.length > 0) {
-      const dept = departamentos.find(d => d.nombre.toString() === selectedDepartamento);
+      const dept = departamentos.find(
+        (d) => d.nombre.toString() === selectedDepartamento
+      );
       if (dept) {
         title += ` en ${dept.nombre}`;
       }
     }
-    
+
     return title;
   };
 
   // Renderizado condicional durante la carga
   if (loading) {
     return (
-      <div className="py-10 text-center" role="status" aria-live="polite">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-        <p className="mt-2 text-gray-600">Cargando tickets...</p>
+      <div className="p-5 text-center" role="status" aria-live="polite">
+        <div className="animate-spin rounded-full h-30 w-30 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+        <p className="m-2 text-gray-600">Cargando tickets...</p>
       </div>
     );
   }
@@ -236,8 +263,74 @@ const Tasks = ({ userTicketsOnly = false }) => {
       enterTo="opacity-100"
       className="w-full"
     >
-      <Title title={getPageTitle()} />
-      
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <Title title={getPageTitle()} />
+        <div className="relative w-full md:w-80">
+          <div className="absolute inset-y-0 left-0 p-1 flex items-center pointer-events-none">
+            <svg
+              className="h-5 w-5 text-gray-400"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+          <input
+            ref={searchInputRef}
+            type="text"
+            className="block w-full p-4 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+            placeholder="Buscar por tema o código..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          {inputValue && (
+            <div className="absolute inset-y-0 right-0 flex items-center">
+              <button className="p-2 flex items-center" onClick={clearSearch}>
+                <svg
+                  className="h-5 w-5 text-gray-400 hover:text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+              <button
+                className="p-2 flex items-center"
+                onClick={() => {
+                  setSearchTerm(inputValue);
+                  setPagina(0);
+                }}
+              >
+                <svg
+                  className="h-5 w-5 text-gray-400 hover:text-blue-500"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       <Tabs
         tabs={TABS}
         selected={selected}
@@ -276,16 +369,20 @@ const Tasks = ({ userTicketsOnly = false }) => {
 
       {errorConexion && (
         <div className="text-red-600 text-center mt-4 px-4 py-2 border border-red-300 bg-red-50 rounded">
-          Error al cargar los tickets. Por favor, revisa tu conexión e inténtalo de nuevo.
+          Error al cargar los tickets. Por favor, revisa tu conexión e inténtalo
+          de nuevo.
         </div>
       )}
 
       {!loading && !errorConexion && tickets.length === 0 && (
         <div className="text-gray-500 text-center mt-4">
-          {userTicketsOnly 
+          {userTicketsOnly
             ? "No has creado ningún ticket aún."
-            : `No se encontraron tickets${status ? ` con el estado "${status.replace("-", " ")}"` : ""}${selectedDepartamento ? ` en el departamento seleccionado` : ""}.`
-          }
+            : `No se encontraron tickets${
+                status ? ` con el estado "${status.replace("-", " ")}"` : ""
+              }${
+                selectedDepartamento ? ` en el departamento seleccionado` : ""
+              }.`}
           {userTicketsOnly && (
             <button
               onClick={handleCreateTicket}
@@ -297,8 +394,8 @@ const Tasks = ({ userTicketsOnly = false }) => {
         </div>
       )}
 
-      <CreateTicket 
-        open={openDialog} 
+      <CreateTicket
+        open={openDialog}
         setOpen={setOpenDialog}
         onTicketCreated={() => {
           fetchTickets(pagina, status, selectedDepartamento);

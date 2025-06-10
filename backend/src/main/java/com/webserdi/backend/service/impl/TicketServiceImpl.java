@@ -351,6 +351,13 @@ public class TicketServiceImpl implements TicketService {
         return ticketsPage.map(ticketMapper::toDto);
     }
 
+    @Override
+    public Page<TicketDto> getTicketsByTema(Pageable pageable, String busqueda) {
+        logger.debug("Obteniendo tickets por tema. Pageable: {}, Busqueda: {}", pageable, busqueda);
+        Page<Ticket> ticketsPage = ticketRepository.findAllByTemaContainsIgnoreCaseAndIsTrashedFalseOrCodigoContainsIgnoreCaseAndIsTrashedFalse(busqueda,busqueda, pageable);
+        return ticketsPage.map(ticketMapper::toDto);
+    }
+
     /**
      * Obtiene un ticket específico por su ID.
      *

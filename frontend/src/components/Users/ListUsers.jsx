@@ -251,7 +251,7 @@ export const ListedUsers = () => {
                       {usuario.email}
                     </div>
                     <div className="col-span-2 text-center text-gray-700">
-                      {formatUserRole(usuario.roles)}
+                      {formatUserRole(usuario.roles[0])}
                     </div><div className="col-span-2 text-center text-gray-700">
                       {usuario.departamento?.nombre}
                     </div>

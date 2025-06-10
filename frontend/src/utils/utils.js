@@ -3,8 +3,8 @@
  * @param {string} rolId - ID del rol del usuario.
  * @returns {string} Nombre del rol.
  */
-export const formatUserRole = (rol) => {  
-  switch (rol[0]) {
+export const formatUserRole = (rol) => {
+  switch (rol) {
     case "ROLE_ADMIN":
         return "Administrador";
     case 'ROLE_USER':

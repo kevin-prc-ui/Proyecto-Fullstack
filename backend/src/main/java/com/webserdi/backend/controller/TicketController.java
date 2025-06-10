@@ -47,14 +47,26 @@ public class TicketController {
             @RequestParam(required = false) String departamento) {
         return ResponseEntity.ok(ticketService.GetTicketsByUsuario(pageable, id, departamento));
     }
+    @PutMapping("/restore/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void restoreTicket(@PathVariable Long id) {
+        ticketService.restoreTicket(id);
+    }
 
-    /**
-     * Obtiene una lista paginada de tickets activos, filtrados por estado y opcionalmente por departamento.
-     * @param pageable Configuración de paginación.
-     * @param filtro Nombre del estado para filtrar.
-     * @param departamento Nombre del departamento para filtrar (opcional).
-     * @return Página de DTOs de tickets.
-     */
+    @GetMapping("/search")
+    public ResponseEntity<Page<TicketDto>> getTicketsByTema(
+            @PageableDefault(size = 8, sort = "fechaVencimiento") Pageable pageable,
+            @RequestParam String busqueda) {
+        return ResponseEntity.ok(ticketService.getTicketsByTema(pageable, busqueda));
+    }
+
+                    /**
+                     * Obtiene una lista paginada de tickets activos, filtrados por estado y opcionalmente por departamento.
+                     * @param pageable Configuración de paginación.
+                     * @param filtro Nombre del estado para filtrar.
+                     * @param departamento Nombre del departamento para filtrar (opcional).
+                     * @return Página de DTOs de tickets.
+                     */
     @GetMapping
     public ResponseEntity<Page<TicketDto>> getTickets(
             @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable,
@@ -114,9 +126,5 @@ public class TicketController {
      * @param id El ID del ticket a restaurar.
      * @return Respuesta sin contenido con estado HTTP 204 (No Content).
      */
-    @PutMapping("/restore/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void restoreTicket(@PathVariable Long id) {
-        ticketService.restoreTicket(id);
-    }
+
 }

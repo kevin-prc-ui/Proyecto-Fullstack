@@ -70,6 +70,9 @@ export const listTickets = (page, departamento = "") => {
 export const listTicketsByUser= (userId, page, departamento="", size=8) =>
   axios.get(`${REST_API_BASE_URL}/tickets/user/${userId}?page=${page}&size=${size}&departamento=${departamento}`, getHeaders());
 
+export const searchTickets= (busqueda) =>
+  axios.get(`${REST_API_BASE_URL}/tickets/search?busqueda=${busqueda}`, getHeaders());
+
 /**
  * Lists tickets filtered by status, optionally filtered by department.
  * @param {number} page - The page number (0-indexed).

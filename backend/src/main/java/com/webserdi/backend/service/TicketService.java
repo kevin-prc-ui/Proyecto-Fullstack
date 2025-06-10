@@ -10,8 +10,10 @@ public interface TicketService {
     Page<TicketDto> GetTicketsByUsuario(Pageable pageable, Long id, String departamentoNombre);
     Page<TicketDto> getTickets(Pageable pageable, String filtro, String departamento);
     Page<TicketDto> getAllTrashedTickets(Pageable pageable, String filtro);
+    Page<TicketDto> getTicketsByTema(Pageable pageable, String busqueda);
     TicketDto getTicketById(Long id);
     TicketDto updateTicket(Long id, TicketDto dto);
     void deleteTicket(Long id);
     void restoreTicket(Long id);
+
 }
