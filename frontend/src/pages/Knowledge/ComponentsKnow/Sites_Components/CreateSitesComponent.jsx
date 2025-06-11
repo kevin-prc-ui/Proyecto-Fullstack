@@ -52,14 +52,15 @@ const handleSubmit = async (e) => {
     <>
       {/* No necesitamos botón aquí si abres modal desde arriba */}
       {/* Pero si quieres mantener botón dentro del componente, mantenlo */}
-      <button 
-        type="button" 
-        className="list-group-item list-group-item-action create-site-btn"
-        onClick={(() => setShowModal(onClick))}
-      >
-        <i className="bi bi-plus-circle-fill me-2"></i>
-        Crear Sitio
-      </button>
+<button
+  type="button"
+  className={`btn tab-button ${showModal ? "active" : ""}`}
+  onClick={() => setShowModal(onClick)}
+>
+  <i className="bi bi-plus-circle-fill me-2"></i>
+  Crear Sitio
+</button>
+
 
       <Modal show={showModal} onHide={handleClose} size="lg" centered>
         <Modal.Header closeButton className="bg-primary text-white">
