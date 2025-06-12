@@ -71,6 +71,7 @@ public class SitioServiceImpl implements SitioService {
     @Override
     public List<SitioDto> listarSitiosPublicosYModerados() {
         return sitioRepository.findAll().stream()
+                .filter(sitio -> sitio.isActivo())
                 .filter(sitio -> sitio.getVisibilidad().equalsIgnoreCase("Public") ||
                         sitio.getVisibilidad().equalsIgnoreCase("Moderated"))
                 .map(sitioMapper::toDto)
@@ -80,6 +81,7 @@ public class SitioServiceImpl implements SitioService {
     @Override
     public List<SitioDto> listarMisSitios(Long usuarioId) {
         return sitioRepository.findAll().stream()
+                .filter(sitio -> sitio.isActivo())
                 .filter(sitio ->
                         sitio.getCreador().getId().equals(usuarioId) || // creador
                                 sitio.getUsuarios().stream().anyMatch(u -> u.getId().equals(usuarioId)) // o asignado
@@ -92,14 +94,19 @@ public class SitioServiceImpl implements SitioService {
     @Override
     public List<SitioDto> obtenerPorSlug(Long id) {
         return sitioRepository.findAllByCreadorId(id).stream()
+                .filter(Sitio::isActivo)
                 .map(sitioMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void eliminarSitio(Long id) {
-        sitioRepository.deleteById(id);
+        Sitio sitio = sitioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sitio no encontrado"));
+        sitio.setActivo(false);
+        sitioRepository.save(sitio);
     }
+
 
     @Override
     public SitioDto actualizarSitio(Long id, SitioDto sitioDto) {

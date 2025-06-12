@@ -49,6 +49,9 @@ public class Sitio {
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
 
+    @Column(nullable = false, columnDefinition = "bit default 1")
+    private boolean activo = true;
+
 
     // ✅ Relación corregida con usuarios asignados al sitio
     @ManyToMany

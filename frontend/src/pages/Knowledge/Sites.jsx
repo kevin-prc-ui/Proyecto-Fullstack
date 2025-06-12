@@ -117,7 +117,7 @@ const Sites = () => {
         >
           Buscar sitios
         </button>
-        <CreateSitesComponent onClick={true} />
+        <CreateSitesComponent onClick={true} addSite={addSite} />
         <button
           className={`btn tab-button ${
             activeTab === "favoritos" ? "active" : ""
