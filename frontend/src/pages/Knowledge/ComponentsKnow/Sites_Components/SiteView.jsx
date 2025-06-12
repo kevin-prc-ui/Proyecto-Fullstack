@@ -81,7 +81,7 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
   useEffect(() => {
     if (showUserModal) {
       setUsersState({ ...usersState, loading: true });
-      listUsers(null,)
+      listUsers(null, 2)
         .then((res) =>
           setUsersState({ users: res.data, loading: false, error: null })
         )
