@@ -38,6 +38,8 @@ public class ActivityMapper {
         activity.setPriority(activityDto.getPriority());
         activity.setDescription(activityDto.getDescription());
         activity.setSendNotifications(activityDto.getSendNotifications());
+        activity.setStatus(activityDto.getStatus());
+        activity.setCompletedAt(activityDto.getCompletedAt());
 
         // Set approvalPercentage only if type is "workflow"
         if ("workflow".equals(activityDto.getType())) {
@@ -91,6 +93,8 @@ public class ActivityMapper {
         activityDto.setApprovalPercentage(activity.getApprovalPercentage());
         activityDto.setCreatedAt(activity.getCreatedAt());
         activityDto.setUpdatedAt(activity.getUpdatedAt());
+        activityDto.setStatus(activity.getStatus());
+        activityDto.setCompletedAt(activity.getCompletedAt());
 
         // Map Usuario IDs
         if (activity.getUsuarioCreador() != null) {

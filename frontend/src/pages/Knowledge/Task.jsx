@@ -6,6 +6,7 @@ import TaskForm from './ComponentsKnow/Task_Components/TaskForm';
 import {listUsers} from '../../services/UsuarioService';
 import { getAllActivities } from '../../services/ActivityService';
 import { deleteActivity } from "../../services/ActivityService";
+import { updateActivity } from "../../services/ActivityService"; // Asegúrate de importar la función correcta
 
 const Task = () => {
   // Estados para manejar actividades, formulario, filtros y usuarios
@@ -169,17 +170,30 @@ const saveActivities = (updatedActivities) => {
             setEditingTask(task);
             setShowTaskForm(true);
           }}
-          onToggleComplete={(id) => {
-            // Cambia el estado de completado/pendiente de la actividad
-            const updatedActivities = activities.map(activity => 
-              activity.id === id ? { 
-                ...activity, 
-                status: activity.status === 'Completado' ? 'Pendiente' : 'Completado',
-                completedAt: activity.status === 'Completado' ? null : new Date().toISOString()
-              } : activity
-            );
-            saveActivities(updatedActivities);
-          }}
+onToggleComplete={async (id) => {
+  const updatedActivities = activities.map(activity => {
+    if (activity.id === id) {
+      const isCompleted = activity.status === 'Completado';
+      return {
+        ...activity,
+        status: isCompleted ? 'Pendiente' : 'Completado',
+        completedAt: isCompleted ? null : new Date().toISOString()
+      };
+    }
+    return activity;
+  });
+
+  const updated = updatedActivities.find(a => a.id === id);
+
+  try {
+    await updateActivity(updated); // 🔁 persistencia real
+    saveActivities(updatedActivities); // 🔄 actualizar frontend
+  } catch (err) {
+    console.error("Error al actualizar estado:", err);
+    alert("Error al cambiar el estado de la actividad.");
+  }
+}}
+
           onDeleteTask={handleDeleteTask}
         />
       )}

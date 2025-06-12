@@ -1,26 +1,35 @@
 // c:\react\Proyecto\frontend\src\components\TaskList.js
 
-import React from 'react';
-import { 
-  FiCheck, FiEdit2, FiTrash2, FiClock, FiUser, 
-  FiAlertCircle, FiAlertTriangle, FiCheckCircle 
-} from 'react-icons/fi';
-import { MdTaskAlt } from 'react-icons/md';
-import { RiFlowChart } from 'react-icons/ri';
+import React from "react";
+import {
+  FiCheck,
+  FiEdit2,
+  FiTrash2,
+  FiClock,
+  FiUser,
+  FiAlertCircle,
+  FiAlertTriangle,
+  FiCheckCircle,
+} from "react-icons/fi";
+import { MdTaskAlt } from "react-icons/md";
+import { RiFlowChart } from "react-icons/ri";
 
-const TaskList = ({ tasks, workflows, users, onEditTask, onToggleComplete, onDeleteTask }) => {
-  
+const TaskList = ({
+  tasks,
+  workflows,
+  users,
+  onEditTask,
+  onToggleComplete,
+  onDeleteTask,
+}) => {
   // Devuelve la lista de usuarios que están asignados (por id)
-const getAssignedUsers = (ids) => {
-  if (!Array.isArray(ids)) return [];
-  return users.filter(user => ids.includes(user.id));
-};
-
-
+  const getAssignedUsers = (ids) => {
+    if (!Array.isArray(ids)) return [];
+    return users.filter((user) => ids.includes(user.id));
+  };
 
   return (
     <div className="row g-4">
-
       {/* === Sección de Tareas === */}
       <div className="col-lg-6">
         <div className="card border-0 shadow-sm">
@@ -36,20 +45,24 @@ const getAssignedUsers = (ids) => {
           <div className="card-body p-0">
             {tasks.length > 0 ? (
               <div className="list-group list-group-flush">
-                
-                {tasks.map(task => (
-                  <div 
-                    key={task.id} 
-                    className={`list-group-item list-group-item-action p-3 hover-shadow ${task.status === 'Completado' ? 'bg-light' : ''}`}
+                {tasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className={`list-group-item list-group-item-action p-3 hover-shadow ${
+                      task.status === "Completado" ? "bg-light" : ""
+                    }`}
                     // Permite editar al hacer click en toda la tarjeta
                     onClick={() => onEditTask(task)}
                   >
                     <div className="d-flex justify-content-between align-items-start mb-2">
                       <div className="d-flex align-items-center">
-
                         {/* Botón para marcar como completado/incompleto */}
-                        <button 
-                          className={`btn btn-sm me-2 ${task.status === 'Completado' ? 'btn-success' : 'btn-outline-secondary'}`}
+                        <button
+                          className={`btn btn-sm me-2 ${
+                            task.status === "Completado"
+                              ? "btn-success"
+                              : "btn-outline-secondary"
+                          }`}
                           onClick={(e) => {
                             e.stopPropagation(); // Evita que se active el onClick del contenedor
                             onToggleComplete(task.id); // Cambia estado de completado
@@ -60,9 +73,9 @@ const getAssignedUsers = (ids) => {
 
                         {/* Título con ícono de prioridad */}
                         <h6 className="mb-0">
-                          {task.priority === 'High' ? (
+                          {task.priority === "High" ? (
                             <FiAlertTriangle className="text-danger me-2" />
-                          ) : task.priority === 'Medium' ? (
+                          ) : task.priority === "Medium" ? (
                             <FiAlertCircle className="text-warning me-2" />
                           ) : (
                             <FiCheckCircle className="text-success me-2" />
@@ -73,7 +86,7 @@ const getAssignedUsers = (ids) => {
 
                       {/* Botones de editar y eliminar */}
                       <div>
-                        <button 
+                        <button
                           className="btn btn-sm btn-outline-primary me-1"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -82,11 +95,11 @@ const getAssignedUsers = (ids) => {
                         >
                           <FiEdit2 size={14} />
                         </button>
-                        <button 
+                        <button
                           className="btn btn-sm btn-outline-danger"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (window.confirm('¿Eliminar esta actividad?')) {
+                            if (window.confirm("¿Eliminar esta actividad?")) {
                               onDeleteTask(task.id);
                             }
                           }}
@@ -98,13 +111,14 @@ const getAssignedUsers = (ids) => {
 
                     {/* Detalles adicionales de la tarea */}
                     <div className="d-flex flex-wrap gap-3 mt-2">
-
                       {/* Usuarios asignados */}
                       <small className="text-muted d-flex align-items-center">
                         <FiUser className="me-1" />
-                        {getAssignedUsers(task.usuariosAsignados).length > 0 
-                          ? getAssignedUsers(task.usuariosAsignados).map(u => u.avatar).join(', ') 
-                          : 'Sin asignados'}
+                        {getAssignedUsers(task.usuariosAsignados).length > 0
+                          ? getAssignedUsers(task.usuariosAsignados)
+                              .map((u) => u.avatar)
+                              .join(", ")
+                          : "Sin asignados"}
                       </small>
 
                       {/* Fecha de vencimiento */}
@@ -116,7 +130,7 @@ const getAssignedUsers = (ids) => {
                       )}
 
                       {/* Fecha de finalización si está completada */}
-                      {task.status === 'Completado' && task.completedAt && (
+                      {task.status === "Completado" && task.completedAt && (
                         <small className="text-success d-flex align-items-center">
                           <FiCheck className="me-1" />
                           {new Date(task.completedAt).toLocaleDateString()}
@@ -131,7 +145,9 @@ const getAssignedUsers = (ids) => {
               <div className="text-center p-5 text-muted bg-light">
                 <MdTaskAlt size={48} className="mb-3 text-primary opacity-25" />
                 <h5 className="mb-2">No hay tareas</h5>
-                <p className="mb-0">Crea tu primera tarea haciendo clic en el botón "Crear Nueva"</p>
+                <p className="mb-0">
+                  Crea tu primera tarea haciendo clic en el botón "Crear Nueva"
+                </p>
               </div>
             )}
           </div>
@@ -153,20 +169,24 @@ const getAssignedUsers = (ids) => {
           <div className="card-body p-0">
             {workflows.length > 0 ? (
               <div className="list-group list-group-flush">
-
-                {workflows.map(workflow => (
-                  <div 
-                    key={workflow.id} 
-                    className={`list-group-item list-group-item-action p-3 hover-shadow ${workflow.status === 'Completado' ? 'bg-light' : ''}`}
+                {workflows.map((workflow) => (
+                  <div
+                    key={workflow.id}
+                    className={`list-group-item list-group-item-action p-3 hover-shadow ${
+                      workflow.status === "Completado" ? "bg-light" : ""
+                    }`}
                     // Permite editar flujo al hacer click en toda la tarjeta
                     onClick={() => onEditTask(workflow)}
                   >
                     <div className="d-flex justify-content-between align-items-start mb-2">
                       <div className="d-flex align-items-center">
-
                         {/* Botón de completado/incompleto para flujo */}
-                        <button 
-                          className={`btn btn-sm me-2 ${workflow.status === 'Completado' ? 'btn-success' : 'btn-outline-secondary'}`}
+                        <button
+                          className={`btn btn-sm me-2 ${
+                            workflow.status === "Completado"
+                              ? "btn-success"
+                              : "btn-outline-secondary"
+                          }`}
                           onClick={(e) => {
                             e.stopPropagation();
                             onToggleComplete(workflow.id);
@@ -184,7 +204,7 @@ const getAssignedUsers = (ids) => {
 
                       {/* Botones de editar y eliminar */}
                       <div>
-                        <button 
+                        <button
                           className="btn btn-sm btn-outline-primary me-1"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -193,11 +213,11 @@ const getAssignedUsers = (ids) => {
                         >
                           <FiEdit2 size={14} />
                         </button>
-                        <button 
+                        <button
                           className="btn btn-sm btn-outline-danger"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (window.confirm('¿Eliminar esta actividad?')) {
+                            if (window.confirm("¿Eliminar esta actividad?")) {
                               onDeleteTask(workflow.id);
                             }
                           }}
@@ -209,13 +229,14 @@ const getAssignedUsers = (ids) => {
 
                     {/* Detalles adicionales del flujo */}
                     <div className="d-flex flex-wrap gap-3 mt-2">
-
                       {/* Usuarios asignados */}
                       <small className="text-muted d-flex align-items-center">
                         <FiUser className="me-1" />
-                        {getAssignedUsers(workflow.assignees).length > 0 
-                          ? getAssignedUsers(workflow.assignees).map(u => u.avatar).join(', ') 
-                          : 'Sin asignados'}
+                        {getAssignedUsers(workflow.assignees).length > 0
+                          ? getAssignedUsers(workflow.assignees)
+                              .map((u) => u.avatar)
+                              .join(", ")
+                          : "Sin asignados"}
                       </small>
 
                       {/* Cantidad de revisores */}
@@ -231,24 +252,39 @@ const getAssignedUsers = (ids) => {
                       </small>
 
                       {/* Fecha de finalización si está completado */}
-                      {workflow.status === 'Completado' && workflow.completedAt && (
-                        <small className="text-success d-flex align-items-center">
-                          <FiCheck className="me-1" />
-                          {new Date(workflow.completedAt).toLocaleDateString()}
-                        </small>
-                      )}
+                      {workflow.status === "Completado" &&
+                        workflow.completedAt && (
+                          <small className="text-success d-flex align-items-center">
+                            <FiCheck className="me-1" />
+                            {new Date(
+                              workflow.completedAt
+                            ).toLocaleDateString()}
+                          </small>
+                        )}
                     </div>
 
                     {/* Lista de items asociados al flujo (máximo 3 visibles) */}
                     {workflow.items?.length > 0 && (
                       <div className="mt-2">
-                        <small className="text-muted d-block mb-1">Items:</small>
+                        <small className="text-muted d-block mb-1">
+                          Items:
+                        </small>
                         <div className="d-flex flex-wrap gap-1">
-                          {workflow.items.slice(0, 3).map((item, index) => (
-                            <span key={index} className="badge bg-light text-dark">
-                              {item.name}
-                            </span>
-                          ))}
+                          {Array.isArray(workflow.items) &&
+                            workflow.items
+                              .filter(
+                                (item) => item !== null && item !== undefined
+                              )
+                              .slice(0, 3)
+                              .map((item, index) => (
+                                <span
+                                  key={index}
+                                  className="badge bg-light text-dark"
+                                >
+                                  {typeof item === "string" ? item : item.name}
+                                </span>
+                              ))}
+
                           {workflow.items.length > 3 && (
                             <span className="badge bg-light text-dark">
                               +{workflow.items.length - 3} más
@@ -265,13 +301,14 @@ const getAssignedUsers = (ids) => {
               <div className="text-center p-5 text-muted bg-light">
                 <RiFlowChart size={48} className="mb-3 text-info opacity-25" />
                 <h5 className="mb-2">No hay flujos de trabajo</h5>
-                <p className="mb-0">Crea tu primer flujo haciendo clic en el botón "Crear Nueva"</p>
+                <p className="mb-0">
+                  Crea tu primer flujo haciendo clic en el botón "Crear Nueva"
+                </p>
               </div>
             )}
           </div>
         </div>
       </div>
-
     </div>
   );
 };

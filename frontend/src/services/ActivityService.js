@@ -44,11 +44,15 @@ export const deleteActivity = (id) =>
   axios.delete(`${REST_API_BASE_URL}/activities/${id}`, getHeaders());
 
 
+//export const updateActivity = (activity) =>
+  //axios.put(`${REST_API_BASE_URL}/activities/${activity.id}`, activity, getHeaders());
+
 export const updateActivity = (activity) =>
-  axios.put(`${REST_API_BASE_URL}/activities/${activity.id}`, activity, getHeaders());
+  axios.post(`${REST_API_BASE_URL}/activities/save`, activity, getHeaders());
 
 export const getDeletedActivities = () =>
   axios.get(`${REST_API_BASE_URL}/activities/eliminadas`, getHeaders());
 
 export const restoreActivity = (id) =>
   axios.put(`${REST_API_BASE_URL}/activities/restaurar/${id}`, null, getHeaders());
+

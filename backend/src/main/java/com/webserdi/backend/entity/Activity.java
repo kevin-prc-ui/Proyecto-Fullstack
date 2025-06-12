@@ -32,6 +32,8 @@ public class Activity {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+
+
     @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items = new ArrayList<>();
 
@@ -41,6 +43,11 @@ public class Activity {
 
     @Column(nullable = false, columnDefinition = "bit default 1")
     private boolean activo = true;
+
+    @Column(nullable = false, length = 20)
+    private String status = "Pendiente";
+
+    private LocalDateTime completedAt;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
