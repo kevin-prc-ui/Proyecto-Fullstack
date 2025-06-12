@@ -276,6 +276,14 @@ public class TicketServiceImpl implements TicketService {
         return ticketMapper.toDto(updatedTicket);
     }
 
+    @Override
+    public TicketDto updateStatus(Long id, Long estadoId) {
+        Ticket updatedTicket = ticketRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Ticket no encontrado con ID: " + id));
+        updatedTicket.setEstado(estadoRepository.findById(estadoId).orElseThrow());
+        updatedTicket = ticketRepository.save(updatedTicket);
+        return ticketMapper.toDto(updatedTicket);
+    }
+
     // --- Métodos de consulta y eliminación (con documentación añadida) ---
 
     /**

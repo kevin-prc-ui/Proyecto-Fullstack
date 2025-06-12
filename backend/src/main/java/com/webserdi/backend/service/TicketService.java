@@ -13,6 +13,7 @@ public interface TicketService {
     Page<TicketDto> getTicketsByTema(Pageable pageable, String busqueda);
     TicketDto getTicketById(Long id);
     TicketDto updateTicket(Long id, TicketDto dto);
+    TicketDto updateStatus(Long id, Long estadoId);
     void deleteTicket(Long id);
     void restoreTicket(Long id);
 

@@ -278,9 +278,10 @@ const Tasks = ({ userTicketsOnly = false }) => {
         setPagina={setPagina}
       >
         {!status && selected === 0 && (
-          <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-x-12 py-4">
-            {/* Títulos de columnas para vista de cuadrícula */}
-          </div>
+          <h1 className="">
+            {getPageTitle()}
+
+          </h1>
         )}
 
         {selected === 0 ? (

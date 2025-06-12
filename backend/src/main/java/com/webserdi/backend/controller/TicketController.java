@@ -108,6 +108,10 @@ public class TicketController {
     public ResponseEntity<TicketDto> updateTicket(@PathVariable Long id, @RequestBody TicketDto dto) {
         return ResponseEntity.ok(ticketService.updateTicket(id, dto));
     }
+    @PutMapping("/status/{id}")
+    public ResponseEntity<TicketDto> updateStatus(@PathVariable Long id, @RequestParam Long estadoId) {
+        return ResponseEntity.ok(ticketService.updateStatus(id, estadoId));
+    }
 
     /**
      * Mueve un ticket a la papelera (soft delete).

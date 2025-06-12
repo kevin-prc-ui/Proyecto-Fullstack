@@ -127,6 +127,32 @@ export const formatUserRole = (rol) => {
   
     return initialsStr;
   }
+
+  export const getBadgeColor = (statusName) => {
+  const lowerStatus = String(statusName ?? "").toLowerCase();
+  switch (lowerStatus) {
+    case "en-proceso":
+      return "bg-yellow-100 text-yellow-800";
+    case "completados":
+      return "bg-blue-100 text-blue-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
+export const getPriorityColor = (priorityName) => {
+  const lowerPriority = String(priorityName ?? "").toLowerCase();
+  switch (lowerPriority) {
+    case "alta":
+      return "bg-red-100 text-red-800";
+    case "media":
+      return "bg-yellow-100 text-yellow-800";
+    case "baja":
+      return "bg-green-100 text-green-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};  
   
   export const PRIORITYNAMES = {
     1: "Alta",
@@ -143,7 +169,7 @@ export const formatUserRole = (rol) => {
   
   export const TICKET_TYPE = {
     1: "bg-yellow-500",
-    2: "bg-gray-500",
+    2: "bg-blue-500",
     3: "bg-yellow-600",
     4: "bg-red-600",
   };

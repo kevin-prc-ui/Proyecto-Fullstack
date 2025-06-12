@@ -6,7 +6,6 @@ import {
   FaGlobe,
   FaTasks,
   FaUsers,
-  FaDatabase,
   FaTrashAlt,
 } from "react-icons/fa";
 import {
@@ -38,21 +37,15 @@ const linkData = [
         roles: ["ROLE_ADMIN", "ROLE_AGENT", "ROLE_SUPERVISOR"],
       },
       {
-        label: "Completados",
-        link: "/helpdesk/completados/completados",
-        icon: <MdTaskAlt />,
-        roles: ["ROLE_ADMIN", "ROLE_AGENT", "ROLE_SUPERVISOR"],
-      },
-      {
         label: "En proceso",
         link: "/helpdesk/en-proceso/en-proceso",
         icon: <MdOutlinePendingActions />,
         roles: ["ROLE_ADMIN", "ROLE_AGENT", "ROLE_SUPERVISOR"],
       },
       {
-        label: "Pendientes",
-        link: "/helpdesk/pendientes/pendientes",
-        icon: <MdOutlinePendingActions />,
+        label: "Completados",
+        link: "/helpdesk/completados/completados",
+        icon: <MdTaskAlt />,
         roles: ["ROLE_ADMIN", "ROLE_AGENT", "ROLE_SUPERVISOR"],
       },
       {

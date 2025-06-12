@@ -14,7 +14,7 @@ import {
   FaPencilAlt,
 } from "react-icons/fa";
 import ChatContainer from "../../components/Chat/ChatContainer";
-import { getVencimiento } from "../../utils/utils";
+import { getBadgeColor, getPriorityColor, getVencimiento } from "../../utils/utils";
 import CreateTicket from "../../components/Ticket/CreateTicket";
 import { getPermisos } from "../../services/UsuarioService";
 
@@ -309,35 +309,5 @@ const formatDateTime = (dateTimeString, isDueDate = false) => {
 };
 
 // Updated to use names directly as passed in ticket object
-const getBadgeColor = (statusName) => {
-  const lowerStatus = String(statusName ?? "").toLowerCase();
-  switch (lowerStatus) {
-    case "pendiente":
-      return "bg-yellow-100 text-yellow-800";
-    case "en-proceso":
-      return "bg-blue-100 text-blue-800";
-    case "completado":
-      return "bg-green-100 text-green-800";
-    case "cerrado":
-      return "bg-gray-200 text-gray-700";
-    case "cancelado":
-      return "bg-red-100 text-red-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
 
-const getPriorityColor = (priorityName) => {
-  const lowerPriority = String(priorityName ?? "").toLowerCase();
-  switch (lowerPriority) {
-    case "alta":
-      return "bg-red-100 text-red-800";
-    case "media":
-      return "bg-yellow-100 text-yellow-800";
-    case "baja":
-      return "bg-green-100 text-green-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};  
 export default TaskDetails;

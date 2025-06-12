@@ -138,3 +138,6 @@ export const createTicket = (ticketData) =>
 
 export const updateTicket = (id, ticketData) =>
   axios.put(`${REST_API_BASE_URL}/tickets/${id}`, ticketData, getHeaders());
+
+export const updateTicketStatus = (id, estadoId) =>
+  axios.put(`${REST_API_BASE_URL}/tickets/status/${id}?estadoId=${estadoId}`, null ,getHeaders());

@@ -116,13 +116,7 @@ const Table = ({ tickets }) => {
           ))}
         </div>
       </td>
-
       <td className='py-2 flex gap-2 md:gap-4 justify-end'>
-        <Button
-          className='text-blue-600 hover:text-blue-500 sm:px-0 text-sm md:text-base'
-          label='Editar'
-          type='button'
-        />
         <Button
           className='text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base'
           label='Eliminar'
