@@ -16,4 +16,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> findByType(String type);
     // 👉 Obtiene las actividades que coinciden solo por prioridad
     List<Activity> findByPriority(String priority);
+    // ✅ Nuevo método para actividades activas
+    List<Activity> findByActivoTrue();
+
 }

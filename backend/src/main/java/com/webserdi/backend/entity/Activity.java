@@ -39,6 +39,9 @@ public class Activity {
     @JoinColumn(name = "usuario_creador_id", nullable = false)
     private Usuario usuarioCreador;
 
+    @Column(nullable = false, columnDefinition = "bit default 1")
+    private boolean activo = true;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "activity_usuario_asignado",

@@ -61,10 +61,11 @@ public class ActivityServiceImpl {
 
 
     public List<ActivityDto> getAllActivities() {
-        return activityRepo.findAll().stream()
+        return activityRepo.findByActivoTrue().stream()
                 .map(activityMapper::toDto)
                 .collect(Collectors.toList());
     }
+
 
 
     public Activity getActivityById(Long id) {
@@ -72,11 +73,13 @@ public class ActivityServiceImpl {
     }
 
     public void deleteActivity(Long id) {
-        if (!activityRepo.existsById(id)) {
-            throw new RuntimeException("Actividad con ID " + id + " no encontrada.");
-        }
-        activityRepo.deleteById(id);
+        Activity activity = activityRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Actividad con ID " + id + " no encontrada."));
+
+        activity.setActivo(false);
+        activityRepo.save(activity);
     }
+
 
     public List<Activity> getFilteredActivities(String type, String priority) {
         if (type != null && priority != null) {
