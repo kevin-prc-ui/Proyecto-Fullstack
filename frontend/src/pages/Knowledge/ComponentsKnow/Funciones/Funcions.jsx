@@ -7,8 +7,10 @@ import {
   getArchivosPorCarpeta,
   getArchivosSinCarpeta,
   desactivarArchivo,
+  desactivarCarpeta,
   getUserId
 } from "../../../../services/MisArchivosService";
+import { getCarpetasByUsuario } from "../../../../services/MisArchivosService";
 
 
 export const useFileManager = () => {
@@ -45,7 +47,7 @@ useEffect(() => {
       if (!usuarioId) return;
 
       try {
-        const carpetasResponse = await getAllCarpetas();
+        const carpetasResponse = await getCarpetasByUsuario(usuarioId);
         const carpetas = carpetasResponse.data.map((c) => ({
           id: c.id,
           type: "folder",
@@ -175,14 +177,19 @@ useEffect(() => {
     );
   };
 
-  const handleRemoveItem = async (id) => {
-    try {
-      await desactivarArchivo(id);
-      setItems((prev) => prev.filter((item) => item.id !== id));
-    } catch (error) {
-      console.error("❌ Error al desactivar archivo:", error);
+const handleRemoveItem = async (item) => {
+  try {
+    if (item.type === "folder") {
+      await desactivarCarpeta(item.id);
+    } else {
+      await desactivarArchivo(item.id);
     }
-  };
+
+    setItems((prev) => prev.filter((i) => i.id !== item.id));
+  } catch (error) {
+    console.error("❌ Error al desactivar:", error);
+  }
+};
 
   const enterFolder = (folderId) => setCurrentFolder(folderId);
   const goBack = () => setCurrentFolder(null);

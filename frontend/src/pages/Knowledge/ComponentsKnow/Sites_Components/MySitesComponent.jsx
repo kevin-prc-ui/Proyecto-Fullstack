@@ -108,55 +108,71 @@ const toggleFavorite = async (siteId) => {
     );
   }
 
-  return (
-    <>
-      {sites.length === 0 ? (
-        <p className="mt-3">No tienes sitios creados.</p>
-      ) : (
-        <ListGroup className="mt-3">
+return (
+  <>
+    {sites.length === 0 ? (
+      <p className="mt-3">No tienes sitios creados.</p>
+    ) : (
+      <div className="mt-4">
+        <div className="row g-3">
           {sites.map(site => (
-            <ListGroup.Item
-              key={site.id}
-              className="d-flex justify-content-between align-items-center"
-            >
-              <div 
-                className="flex-grow-1 site-name"
-                onClick={() => onSiteClick(site)}
-                style={{cursor: 'pointer'}}
+            <div className="col-12 col-md-6 col-lg-4" key={site.id}>
+              <div
+                className={`card h-100 border-0 shadow-sm ${
+                  site.favorito ? 'border-start border-5 border-warning' : 'border-start border-5 border-secondary'
+                }`}
               >
-                <strong>{site.name}</strong> <br />
-                <small className="text-muted">ID: {site.siteId}</small>
-              </div>
-              <div>
-                <Button
-                  variant="link"
-                  title={site.favorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
-                  onClick={() => toggleFavorite(site.id)}
-                >
-                  {site.favorito ? <FaStar color="#ffc107" /> : <FaRegStar />}
-                </Button>
+                <div className="card-body d-flex flex-column justify-content-between">
+                  <div
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => onSiteClick(site)}
+                  >
+                    <h5 className="card-title text-dark fw-bold mb-1">
+                      {site.name}
+                    </h5>
+                    <h6 className="card-subtitle mb-2 text-muted">
+                      ID: {site.siteId}
+                    </h6>
+                  </div>
 
-                <Button
-                  variant="link"
-                  title="Abrir sitio"
-                  onClick={() => onSiteClick(site)}
-                >
-                  <FaExternalLinkAlt color="#0d6efd" />
-                </Button>
-                <Button
-                  variant="link"
-                  title="Eliminar sitio"
-                  onClick={() => handleDeleteSite(site.id)}
-                >
-                  <FaTrash color="#dc3545" />
-                </Button>
+                  <div className="d-flex justify-content-end gap-2 mt-3">
+                    <Button
+                      variant={site.favorito ? 'warning' : 'outline-warning'}
+                      size="sm"
+                      title={site.favorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+                      onClick={() => toggleFavorite(site.id)}
+                    >
+                      {site.favorito ? <FaStar /> : <FaRegStar />}
+                    </Button>
+
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      title="Abrir sitio"
+                      onClick={() => onSiteClick(site)}
+                    >
+                      <FaExternalLinkAlt />
+                    </Button>
+
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      title="Eliminar sitio"
+                      onClick={() => handleDeleteSite(site.id)}
+                    >
+                      <FaTrash />
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </ListGroup.Item>
+            </div>
           ))}
-        </ListGroup>
-      )}
-    </>
-  );
+        </div>
+      </div>
+    )}
+  </>
+);
+
 };
 
 export default MySitesComponent;

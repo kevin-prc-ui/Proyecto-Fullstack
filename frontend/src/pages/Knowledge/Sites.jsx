@@ -98,7 +98,7 @@ const Sites = () => {
 
   // Vista normal de pestañas
   return (
-    <div className="container mt-4 sites-tabs">
+    <div className="container mt-4 sites-tabs lg shadow-lg p-4 bg-white rounded">
       {/* Botones de pestaña */}
       <div className="d-flex gap-3 mb-4 flex-wrap">
         <button
