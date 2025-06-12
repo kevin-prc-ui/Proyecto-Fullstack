@@ -5,6 +5,7 @@ import com.webserdi.backend.service.CarpetaService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,6 +49,7 @@ public class CarpetaController {
         carpetaService.deleteCarpeta(carpetaId);
         return ResponseEntity.noContent().build();
     }
+
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<CarpetaDto>> getCarpetasByUsuario(@PathVariable Long usuarioId) {
         List<CarpetaDto> carpetas = carpetaService.getCarpetasByUsuario(usuarioId);
@@ -55,7 +57,7 @@ public class CarpetaController {
     }
 
     @GetMapping("/eliminadas")
-    public ResponseEntity<List<CarpetaDto>> listarEliminadas(@RequestParam Long usuarioId) {
+    public ResponseEntity<List<CarpetaDto>> listarCarpetasEliminadas(@RequestParam Long usuarioId) {
         return ResponseEntity.ok(carpetaService.getCarpetasEliminadasPorUsuario(usuarioId));
     }
 

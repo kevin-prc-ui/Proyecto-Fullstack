@@ -71,16 +71,20 @@ public class CarpetaServiceImpl implements CarpetaService {
     @Override
     public void deleteCarpeta(Long carpetaId) {
         Carpeta carpeta = carpetaRepository.findById(carpetaId)
-                .orElseThrow(() -> new ResourceNotFoundException("Carpeta no encontrada con id" + carpetaId));
-        carpetaRepository.delete(carpeta);
+                .orElseThrow(() -> new ResourceNotFoundException("Carpeta no encontrada con id " + carpetaId));
+        carpeta.setActivo(false); // ✅ Cambia el estado
+        carpetaRepository.save(carpeta); // ✅ Guarda el cambio
     }
+
     @Override
     public List<CarpetaDto> getCarpetasByUsuario(Long usuarioId) {
-        List<Carpeta> carpetas = carpetaRepository.findByUsuarioId(usuarioId);
+        List<Carpeta> carpetas = carpetaRepository.findByUsuarioIdAndActivoTrue(usuarioId);
         return carpetas.stream()
                 .map(carpetaMapper::toDto)
                 .collect(Collectors.toList());
     }
+
+
 
     @Override
     public List<CarpetaDto> getCarpetasEliminadasPorUsuario(Long usuarioId) {

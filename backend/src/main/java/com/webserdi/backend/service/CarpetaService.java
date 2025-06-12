@@ -12,7 +12,6 @@ public interface CarpetaService {
     void deleteCarpeta(Long carpetaId);
     List<CarpetaDto> getCarpetasByUsuario(Long usuarioId);
     List<CarpetaDto> getCarpetasEliminadasPorUsuario(Long usuarioId);
-
     CarpetaDto restaurarCarpeta(Long carpetaId);
 
 }

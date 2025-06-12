@@ -73,6 +73,9 @@ export const restaurarArchivo = (id) =>
 export const restaurarCarpeta = (id) =>
   axios.put(`${REST_API_BASE_URL}/carpetas/restaurar/${id}`, {}, getHeaders());
 
+export const desactivarCarpeta = (carpetaId) =>
+  axios.delete(`${REST_API_BASE_URL}/carpetas/${carpetaId}`, getHeaders());
+
 // ✅ Nuevo método para subir archivos binarios
 export const uploadArchivo = (file, carpetaId, usuarioId, sitioId) => {
   const accessToken = getAuthToken();
