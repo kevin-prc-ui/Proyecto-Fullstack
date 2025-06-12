@@ -46,3 +46,9 @@ export const deleteActivity = (id) =>
 
 export const updateActivity = (activity) =>
   axios.put(`${REST_API_BASE_URL}/activities/${activity.id}`, activity, getHeaders());
+
+export const getDeletedActivities = () =>
+  axios.get(`${REST_API_BASE_URL}/activities/eliminadas`, getHeaders());
+
+export const restoreActivity = (id) =>
+  axios.put(`${REST_API_BASE_URL}/activities/restaurar/${id}`, null, getHeaders());

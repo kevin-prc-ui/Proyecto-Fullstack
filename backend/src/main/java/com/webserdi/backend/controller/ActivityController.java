@@ -38,6 +38,18 @@ public class ActivityController {
         return ResponseEntity.ok(activities);
     }
 
+    @GetMapping("/eliminadas")
+    public ResponseEntity<?> getDeletedActivities() {
+        return ResponseEntity.ok(activityServiceImpl.getDeletedActivities());
+    }
+
+    @PutMapping("/restaurar/{id}")
+    public ResponseEntity<?> restoreActivity(@PathVariable Long id) {
+        activityServiceImpl.restoreActivity(id);
+        return ResponseEntity.ok().build();
+    }
+
+
     // 👉 Obtiene una actividad específica por su ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getActivityById(@PathVariable Long id) {

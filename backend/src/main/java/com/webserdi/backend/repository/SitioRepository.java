@@ -12,4 +12,6 @@ public interface SitioRepository extends JpaRepository<Sitio, Long> {
     Optional<Sitio> findBySlug(String slug);
     List<Sitio> findAllByCreadorId(Long id); //>
     boolean existsBySlug(String slug);
+    List<Sitio> findAllByActivoFalse();
+
 }

@@ -18,5 +18,6 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> findByPriority(String priority);
     // ✅ Nuevo método para actividades activas
     List<Activity> findByActivoTrue();
+    List<Activity> findByActivoFalse();
 
 }

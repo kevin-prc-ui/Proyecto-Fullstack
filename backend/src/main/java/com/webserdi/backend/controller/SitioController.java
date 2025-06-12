@@ -47,6 +47,15 @@ public class SitioController {
         return ResponseEntity.ok(sitioService.agregarUsuarios(id, nuevosIds));
     }
 
+    @GetMapping("/eliminados")
+    public ResponseEntity<List<SitioDto>> listarEliminados() {
+        return ResponseEntity.ok(sitioService.listarSitiosEliminados());
+    }
+
+    @PutMapping("/restaurar/{id}")
+    public ResponseEntity<SitioDto> restaurarSitio(@PathVariable Long id) {
+        return ResponseEntity.ok(sitioService.restaurarSitio(id));
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarSitio(@PathVariable Long id) {

@@ -15,5 +15,9 @@ public interface SitioService {
     List<SitioDto> listarSitiosPublicosYModerados();
     Set<UsuarioDto> obtenerUsuariosAsignados(Long sitioId);
     SitioDto agregarUsuarios(Long sitioId, Set<Long> usuariosNuevosIds);
+    // SitioService.java
+    List<SitioDto> listarSitiosEliminados();
+
+    SitioDto restaurarSitio(Long id); // También asegúrate de que este esté declarado
 
 }

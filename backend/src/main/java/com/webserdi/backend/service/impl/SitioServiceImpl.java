@@ -107,6 +107,23 @@ public class SitioServiceImpl implements SitioService {
         sitioRepository.save(sitio);
     }
 
+    @Override
+    public List<SitioDto> listarSitiosEliminados() {
+        return sitioRepository.findAllByActivoFalse()
+                .stream()
+                .map(sitioMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public SitioDto restaurarSitio(Long id) {
+        Sitio sitio = sitioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sitio no encontrado"));
+        sitio.setActivo(true);
+        return sitioMapper.toDto(sitioRepository.save(sitio));
+    }
+
+
 
     @Override
     public SitioDto actualizarSitio(Long id, SitioDto sitioDto) {

@@ -22,6 +22,7 @@ import Task from "./pages/Knowledge/Task";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import NotFound from "./pages/NotFound";
+import  Eliminados  from "./pages/Knowledge/Eliminados";
 import { Toaster } from "sonner";
 import { Incidencias } from "./pages/Helpdesk/Incidencias";
 import { Departamentos } from "./pages/Helpdesk/Departamentos";
@@ -112,6 +113,7 @@ function App() {
             <Route path="/knowledge/task" element={<Task />} />
             <Route path="/knowledge/people" element={<People />} />
             <Route path="/knowledge/repository" element={<Repository />} />
+            <Route path="/knowledge/eliminados" element={<Eliminados />}/>
           </Route>
         </Route>
 

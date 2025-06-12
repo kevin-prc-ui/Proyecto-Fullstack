@@ -109,6 +109,12 @@ const linkData = [
       //   icon: <FaDatabase />,
       //   roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
       // },
+      {
+          label: "Eliminados",
+          link: "/knowledge/eliminados",
+          icon: <FaTrashAlt/>,
+          roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
+      },
     ],
   },
   {

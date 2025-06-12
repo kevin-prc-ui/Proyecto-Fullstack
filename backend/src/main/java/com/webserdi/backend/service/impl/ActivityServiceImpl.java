@@ -66,6 +66,19 @@ public class ActivityServiceImpl {
                 .collect(Collectors.toList());
     }
 
+    public List<ActivityDto> getDeletedActivities() {
+        return activityRepo.findByActivoFalse().stream()
+                .map(activityMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public void restoreActivity(Long id) {
+        Activity activity = activityRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Actividad no encontrada"));
+        activity.setActivo(true);
+        activityRepo.save(activity);
+    }
+
 
 
     public Activity getActivityById(Long id) {

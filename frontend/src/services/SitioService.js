@@ -46,3 +46,9 @@ export const getUsuariosAsignados = (sitioId) =>
 
 export const agregarUsuariosAsignados = (sitioId, userIds) =>
   axios.post(`${REST_API_BASE_URL}/sitios/${sitioId}/usuarios`, userIds, getHeaders());
+
+export const getSitiosEliminados = () =>
+  axios.get(`${REST_API_BASE_URL}/sitios/eliminados`, getHeaders());
+
+export const restaurarSitio = (id) =>
+  axios.put(`${REST_API_BASE_URL}/sitios/restaurar/${id}`, null, getHeaders());
