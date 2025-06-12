@@ -56,7 +56,7 @@ const handleDeleteTask = async (id) => {
 
   // Obtiene todos los usuarios desde el servicio
   async function getAllUsers() {
-      const response = await listUsers();
+      const response = await listUsers(null, 2);
       setUsuarios(response.data);
   }
 

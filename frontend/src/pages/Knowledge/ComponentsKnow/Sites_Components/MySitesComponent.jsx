@@ -124,7 +124,7 @@ const toggleFavorite = async (siteId) => {
                 onClick={() => onSiteClick(site)}
                 style={{cursor: 'pointer'}}
               >
-                <strong>{site.nombre}</strong> <br />
+                <strong>{site.name}</strong> <br />
                 <small className="text-muted">ID: {site.siteId}</small>
               </div>
               <div>
