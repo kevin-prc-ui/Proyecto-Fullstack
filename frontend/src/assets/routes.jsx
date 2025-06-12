@@ -79,12 +79,12 @@ const linkData = [
         icon: <FaFileAlt />,
         roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
       },
-      {
-        label: "Archivo Compartido",
-        link: "/knowledge/sharedfile",
-        icon: <FaFolderOpen />,
-        roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
-      },
+      // {
+      //   label: "Archivo Compartido",
+      //   link: "/knowledge/sharedfile",
+      //   icon: <FaFolderOpen />,
+      //   roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
+      // },
       {
         label: "Sitios",
         link: "/knowledge/sites",
@@ -97,18 +97,18 @@ const linkData = [
         icon: <FaTasks />,
         roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
       },
-      {
-        label: "Personas",
-        link: "/knowledge/people",
-        icon: <FaUsers />,
-        roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
-      },
-      {
-        label: "Repositorio",
-        link: "/knowledge/repository",
-        icon: <FaDatabase />,
-        roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
-      },
+      // {
+      //   label: "Personas",
+      //   link: "/knowledge/people",
+      //   icon: <FaUsers />,
+      //   roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
+      // },
+      // {
+      //   label: "Repositorio",
+      //   link: "/knowledge/repository",
+      //   icon: <FaDatabase />,
+      //   roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
+      // },
     ],
   },
   {
