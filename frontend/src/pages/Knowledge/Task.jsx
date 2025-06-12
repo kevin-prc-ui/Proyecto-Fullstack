@@ -43,6 +43,8 @@ const handleDeleteTask = async (id) => {
 
   async function listActivities() {
         const response = await getAllActivities();
+        console.log("Actividades cargadas:", response.data);
+        
         setActivities(response.data);
     }
 
@@ -102,8 +104,8 @@ const saveActivities = (updatedActivities) => {
   
   // Filtra las actividades según el estado seleccionado (todas, pendientes o completadas)
   const filteredActivities = activities.filter(activity => {
-    if (filter === 'completed') return activity.status === 'Completado';
-    if (filter === 'pending') return activity.status === 'Pendiente';
+    if (filter === true) return activity.status === true;
+    if (filter === false) return activity.status === false;
     return true;
   });
 
@@ -145,14 +147,14 @@ const saveActivities = (updatedActivities) => {
               Todas
             </button>
             <button 
-              className={`btn btn-outline-secondary ${filter === 'pending' ? 'active' : ''}`}
-              onClick={() => setFilter('pending')}
+              className={`btn btn-outline-secondary ${filter === false ? 'active' : ''}`}
+              onClick={() => setFilter(false)}
             >
               Pendientes
             </button>
             <button 
-              className={`btn btn-outline-secondary ${filter === 'completed' ? 'active' : ''}`}
-              onClick={() => setFilter('completed')}
+              className={`btn btn-outline-secondary ${filter === true ? 'active' : ''}`}
+              onClick={() => setFilter(true)}
             >
               Completadas
             </button>
@@ -173,10 +175,10 @@ const saveActivities = (updatedActivities) => {
 onToggleComplete={async (id) => {
   const updatedActivities = activities.map(activity => {
     if (activity.id === id) {
-      const isCompleted = activity.status === 'Completado';
+      const isCompleted = activity.status === true;
       return {
         ...activity,
-        status: isCompleted ? 'Pendiente' : 'Completado',
+        status: isCompleted ? false : true,
         completedAt: isCompleted ? null : new Date().toISOString()
       };
     }

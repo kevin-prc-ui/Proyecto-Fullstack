@@ -38,7 +38,7 @@ public class ActivityMapper {
         activity.setPriority(activityDto.getPriority());
         activity.setDescription(activityDto.getDescription());
         activity.setSendNotifications(activityDto.getSendNotifications());
-        activity.setStatus(activityDto.getStatus());
+        activity.setStatus(activityDto.getStatus() != null ? activityDto.getStatus() : false);
         activity.setCompletedAt(activityDto.getCompletedAt());
 
         // Set approvalPercentage only if type is "workflow"

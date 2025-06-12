@@ -113,7 +113,7 @@ const linkData = [
           label: "Eliminados",
           link: "/knowledge/eliminados",
           icon: <FaTrashAlt/>,
-          roles: ["ROLE_ADMIN", "ROLE_USER", "ROLE_SUPERVISOR"],
+          roles: ["ROLE_ADMIN", "ROLE_SUPERVISOR"],
       },
     ],
   },
@@ -173,7 +173,7 @@ const linkData = [
             icon: <FaUsers />,
             roles: ["ROLE_ADMIN"]
             
-          }
+          },
         ]
       }
     ],

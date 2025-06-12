@@ -59,7 +59,7 @@ const TaskList = ({
                         {/* Botón para marcar como completado/incompleto */}
                         <button
                           className={`btn btn-sm me-2 ${
-                            task.status === "Completado"
+                            task.status === true
                               ? "btn-success"
                               : "btn-outline-secondary"
                           }`}
@@ -173,7 +173,7 @@ const TaskList = ({
                   <div
                     key={workflow.id}
                     className={`list-group-item list-group-item-action p-3 hover-shadow ${
-                      workflow.status === "Completado" ? "bg-light" : ""
+                      workflow.status === true ? "bg-light" : ""
                     }`}
                     // Permite editar flujo al hacer click en toda la tarjeta
                     onClick={() => onEditTask(workflow)}
@@ -183,7 +183,7 @@ const TaskList = ({
                         {/* Botón de completado/incompleto para flujo */}
                         <button
                           className={`btn btn-sm me-2 ${
-                            workflow.status === "Completado"
+                            workflow.status === true
                               ? "btn-success"
                               : "btn-outline-secondary"
                           }`}

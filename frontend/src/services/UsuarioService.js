@@ -39,7 +39,6 @@ const getHeaders = () => {
 
 export const listUsers = (departamento,modulo) =>
 {
-  console.log(departamento," ",modulo);
   
   if (departamento) {
     return axios

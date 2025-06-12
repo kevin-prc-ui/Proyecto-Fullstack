@@ -4,7 +4,7 @@ import "../../styles/estilos.css";
 
 const MyFile = () => {
   return (
-    <div className="container">
+    <div className="container m-4 rounded-lg shadow-lg p-4 bg-white">
       <MisArchivos />
     </div>
   );

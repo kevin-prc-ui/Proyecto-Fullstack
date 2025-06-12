@@ -24,7 +24,7 @@ public class ActivityDto {
     private List<Long> usuariosAsignados;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private String status;
+    private Boolean status;
     private LocalDateTime completedAt;
 
 

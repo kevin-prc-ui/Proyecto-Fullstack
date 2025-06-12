@@ -44,8 +44,8 @@ public class Activity {
     @Column(nullable = false, columnDefinition = "bit default 1")
     private boolean activo = true;
 
-    @Column(nullable = false, length = 20)
-    private String status = "Pendiente";
+    @Column(nullable = false, columnDefinition = "bit default 0")
+    private Boolean status = false;
 
     private LocalDateTime completedAt;
 
