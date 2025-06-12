@@ -13,4 +13,7 @@ public interface ArchivoRepository extends JpaRepository<Archivo, Long> {
     List<Archivo> findByCarpetaIsNullAndUsuarioIdAndActivoTrue(Long usuarioId);
 
     List<Archivo> findBySitioIdAndActivoTrue(Long sitioId);
+    List<Archivo> findByActivoFalseAndUsuarioId(Long usuarioId);
+
+
 }

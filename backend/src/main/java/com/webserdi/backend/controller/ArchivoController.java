@@ -126,6 +126,16 @@ public class ArchivoController {
         return ResponseEntity.ok(archivos);
     }
 
+    @GetMapping("/eliminados")
+    public ResponseEntity<List<ArchivoDto>> getArchivosEliminados(@RequestParam Long usuarioId) {
+        return ResponseEntity.ok(archivoService.getArchivosEliminadosPorUsuario(usuarioId));
+    }
+
+    @PutMapping("/restaurar/{id}")
+    public ResponseEntity<ArchivoDto> restaurarArchivo(@PathVariable Long id) {
+        return ResponseEntity.ok(archivoService.restaurarArchivo(id));
+    }
+
 
 
 }

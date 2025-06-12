@@ -82,4 +82,21 @@ public class CarpetaServiceImpl implements CarpetaService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<CarpetaDto> getCarpetasEliminadasPorUsuario(Long usuarioId) {
+        return carpetaRepository.findByActivoFalseAndUsuarioId(usuarioId)
+                .stream()
+                .map(carpetaMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CarpetaDto restaurarCarpeta(Long carpetaId) {
+        Carpeta carpeta = carpetaRepository.findById(carpetaId)
+                .orElseThrow(() -> new RuntimeException("Carpeta no encontrada"));
+        carpeta.setActivo(true);
+        return carpetaMapper.toDto(carpetaRepository.save(carpeta));
+    }
+
+
 }

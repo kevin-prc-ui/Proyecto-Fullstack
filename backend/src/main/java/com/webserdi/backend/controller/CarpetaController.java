@@ -54,5 +54,16 @@ public class CarpetaController {
         return ResponseEntity.ok(carpetas);
     }
 
+    @GetMapping("/eliminadas")
+    public ResponseEntity<List<CarpetaDto>> listarEliminadas(@RequestParam Long usuarioId) {
+        return ResponseEntity.ok(carpetaService.getCarpetasEliminadasPorUsuario(usuarioId));
+    }
+
+    @PutMapping("/restaurar/{id}")
+    public ResponseEntity<CarpetaDto> restaurarCarpeta(@PathVariable Long id) {
+        return ResponseEntity.ok(carpetaService.restaurarCarpeta(id));
+    }
+
+
 }
 

@@ -30,6 +30,9 @@ public class Carpeta {
     @Column(name = "fecha_creacion", updatable = false)
     private LocalDateTime fechaCreacion;
 
+    @Column(nullable = false, columnDefinition = "bit default 1")
+    private boolean activo = true;
+
     // Relación con la carpeta padre (auto-referencia)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carpeta_padre_id")

@@ -15,5 +15,7 @@ public interface ArchivoService {
     ArchivoDto guardarArchivoConContenido(MultipartFile archivo, Long carpetaId, Long usuarioId, Long sitioId);
     void desactivarArchivo(Long archivoId);
     List<ArchivoDto> getArchivosPorSitio(Long sitioId);
+    List<ArchivoDto> getArchivosEliminadosPorUsuario(Long usuarioId);
+    ArchivoDto restaurarArchivo(Long archivoId);
 
 }

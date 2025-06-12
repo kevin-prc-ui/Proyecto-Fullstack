@@ -11,5 +11,8 @@ public interface CarpetaService {
     CarpetaDto updateCarpeta(Long carpetaId, CarpetaDto carpetaDto);
     void deleteCarpeta(Long carpetaId);
     List<CarpetaDto> getCarpetasByUsuario(Long usuarioId);
+    List<CarpetaDto> getCarpetasEliminadasPorUsuario(Long usuarioId);
+
+    CarpetaDto restaurarCarpeta(Long carpetaId);
 
 }

@@ -61,6 +61,17 @@ export const getArchivosPorSitio = (sitioId) =>
 export const getCarpetasByUsuario = (usuarioId) =>
   axios.get(`${REST_API_BASE_URL}/carpetas/usuario/${usuarioId}`, getHeaders());
 
+export const getArchivosEliminados = (usuarioId) =>
+  axios.get(`${REST_API_BASE_URL}/archivos/eliminados?usuarioId=${usuarioId}`, getHeaders());
+
+export const getCarpetasEliminadas = (usuarioId) =>
+  axios.get(`${REST_API_BASE_URL}/carpetas/eliminadas?usuarioId=${usuarioId}`, getHeaders());
+
+export const restaurarArchivo = (id) =>
+  axios.put(`${REST_API_BASE_URL}/archivos/restaurar/${id}`, {}, getHeaders());
+
+export const restaurarCarpeta = (id) =>
+  axios.put(`${REST_API_BASE_URL}/carpetas/restaurar/${id}`, {}, getHeaders());
 
 // ✅ Nuevo método para subir archivos binarios
 export const uploadArchivo = (file, carpetaId, usuarioId, sitioId) => {

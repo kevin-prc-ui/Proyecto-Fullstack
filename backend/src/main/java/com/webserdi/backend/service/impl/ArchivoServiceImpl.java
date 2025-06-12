@@ -213,5 +213,23 @@ public class ArchivoServiceImpl implements ArchivoService {
         archivoRepository.delete(archivo);
     }
 
+    @Override
+    public List<ArchivoDto> getArchivosEliminadosPorUsuario(Long usuarioId) {
+        return archivoRepository.findByActivoFalseAndUsuarioId(usuarioId)
+                .stream()
+                .map(archivoMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public ArchivoDto restaurarArchivo(Long archivoId) {
+        Archivo archivo = archivoRepository.findById(archivoId)
+                .orElseThrow(() -> new RuntimeException("Archivo no encontrado"));
+        archivo.setActivo(true);
+        return archivoMapper.toDto(archivoRepository.save(archivo));
+    }
+
+
 
 }
