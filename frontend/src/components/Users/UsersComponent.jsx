@@ -1,24 +1,18 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Button, Alert, Form, Row, Col, ToggleButtonGroup, ToggleButton } from "react-bootstrap";
-import { useEffect, useState } from "react";
-import { signUp, getUserById, updateUser, listAllModulos, listAllPermisos } from "../../services/UsuarioService";
-import { listAllDepartamentos } from "../../services/DepartamentoService";
+import { signUp, getUserById, updateUser, listAllModulos,listAllPermisos } from "../../services/UsuarioService";
+import { listAllDepartamentos, } from "../../services/DepartamentoService";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { toast } from "sonner";
-import { listRol } from "../../services/RolService";
+import { listRol} from "../../services/RolService";
 
-/**
- * Componente para agregar o editar un usuario con activación/desactivación de perfil.
- */
 const UsersComponent = (modulo) => {
-  console.log("Modulo:", modulo);
   // Estados para los campos del formulario
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
   const [rol, setRol] = useState("");
-  const [isEnabled, setIsEnabled] = useState(true); // Estado para activar/desactivar perfil
+  const [isEnabled, setIsEnabled] = useState(true);
   const [selectedPermisos, setSelectedPermisos] = useState([]);
   const [permisosDisponibles, setPermisosDisponibles] = useState([]);
   const [departamentoId, setDepartamentoId] = useState("");
@@ -33,40 +27,45 @@ const UsersComponent = (modulo) => {
     apellido: "",
     email: "",
     rol: "",
-    moduloId:"",
+    moduloId: "",
   });
 
   const { id } = useParams();
   const navigator = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const loadInitialData = useCallback(async () => {
-      try {
-        const [depRes, rolRes, modRes, prmRes] = await Promise.all([
-          listAllDepartamentos(),
-          listRol(),
-          listAllModulos(),
-          listAllPermisos()
-        ]);
-        setDepartamentosDisponibles(depRes.data || []);
-        setModulosDisponibles(modRes.data || []);
-        setRoles(rolRes.data || []);
-        const data= prmRes.data;
-        const filteredPermisos = data.filter(
-          (permiso) => permiso.moduloId === modulo.modulo
-        );
-        setPermisosDisponibles(filteredPermisos || []);
-      } catch (error) {
-        console.error("Error al cargar datos iniciales:", error);
-        toast.error("Error al cargar datos. Contacte a sistemas.");
-        // Opcional: cerrar modal si falla la carga esencial
-        // closeDialog();
-      }
-    }, []); // Sin dependencias, se llama una vez
+  // Determinar si el módulo seleccionado es GESTIÓN
+  const esModuloGestion = modulosDisponibles.some(
+    mod => mod.id === parseInt(moduloId) && mod.nombre.toUpperCase() === "GESTION"
+  );
 
-    useEffect(() => {
-          loadInitialData();
-      }, [loadInitialData]);
+  const loadInitialData = useCallback(async () => {
+    try {
+      const [depRes, rolRes, modRes, prmRes] = await Promise.all([
+        listAllDepartamentos(),
+        listRol(),
+        listAllModulos(),
+        listAllPermisos()
+      ]);
+      
+      setDepartamentosDisponibles(depRes.data || []);
+      setModulosDisponibles(modRes.data || []);
+      setRoles(rolRes.data || []);
+      
+      const data = prmRes.data;
+      const filteredPermisos = data.filter(
+        (permiso) => permiso.moduloId === modulo.modulo
+      );
+      setPermisosDisponibles(filteredPermisos || []);
+    } catch (error) {
+      console.error("Error al cargar datos iniciales:", error);
+      toast.error("Error al cargar datos. Contacte a sistemas.");
+    }
+  }, []);
+
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
 
   useEffect(() => {
     if (id) {
@@ -81,23 +80,24 @@ const UsersComponent = (modulo) => {
             userData.roles && userData.roles.length > 0 ? userData.roles[0] : ""
           );
           setDepartamentoId(userData.departamento?.id ? String(userData.departamento.id) : "");
+          setModuloId(userData.modulo?.id ? String(userData.modulo.id) : "");
           setSelectedPermisos(userData.permisos || []);
-          setIsEnabled(userData.enabled); // Cargar estado de activación del perfil
+          setIsEnabled(userData.enabled);
         })
         .catch((error) => {
           toast.error("Error al cargar el usuario", error);
         })
         .finally(() => setLoading(false));
     } else {
-      // Valores por defecto para nuevo usuario
       setNombre("");
       setApellido("");
       setEmail("");
       setRol("");
       setSelectedPermisos([]);
       setDepartamentoId("");
-      setIsEnabled(true); // Nuevo usuario activo por defecto
-      setErrors({ nombre: "", apellido: "", email: "", rol: "", moduloId:"" });
+      setModuloId("");
+      setIsEnabled(true);
+      setErrors({ nombre: "", apellido: "", email: "", rol: "", moduloId: "" });
     }
   }, [id]);
 
@@ -110,24 +110,22 @@ const UsersComponent = (modulo) => {
     });
   };
 
-  /**
-   * Guarda o actualiza un usuario.
-   */
   const saveOrUpdateUser = async (e) => {
     e.preventDefault();
     
     const userData = {
       nombre,
-      enabled: isEnabled, // Usar el estado de activación
+      enabled: isEnabled,
       apellido,
       email,
       roles: rol ? [rol] : [],
-      permisos: selectedPermisos,
-      departamento: departamentoId ? { id: parseInt(departamentoId) } : null,
+      // Si es módulo GESTIÓN, enviar null en permisos
+      permisos: esModuloGestion ? null : selectedPermisos,
+      departamento: esModuloGestion? null : (departamentoId ? { id: parseInt(departamentoId) } : null),
       modulo: moduloId ? { id: parseInt(moduloId) } : null,
     };
 
-    if (!isFormValid({ nombre, apellido, email, rol, departamentoId, moduloId })) return;
+    if (!isFormValid({ nombre, apellido, email, rol, moduloId })) return;
 
     setLoading(true);
     try {
@@ -149,21 +147,16 @@ const UsersComponent = (modulo) => {
     }
   };
 
-  /**
-   * Verifica si el formulario es válido.
-   */
   const isFormValid = (formData) => {
     let valid = true;
     const newErrors = {
       nombre: "",
       apellido: "",
-      enabled:"",
       email: "",
       rol: "",
       moduloId: "",
     };
 
-    // Validaciones (sin cambios)
     if (!formData.nombre || formData.nombre.trim() === "") {
       newErrors.nombre = "El nombre es obligatorio";
       valid = false;
@@ -185,7 +178,9 @@ const UsersComponent = (modulo) => {
     if (!formData.rol || formData.rol.trim() === "") {
       newErrors.rol = "El Rol es obligatorio";
       valid = false;
-    }if (!formData.moduloId || String(formData.moduloId).trim() === "") {
+    }
+
+    if (!formData.moduloId || String(formData.moduloId).trim() === "") {
       newErrors.moduloId = "El modulo es obligatorio";
       valid = false;
     }
@@ -194,15 +189,8 @@ const UsersComponent = (modulo) => {
     return valid;
   };
 
-  /**
-   * Retorna el título de la página
-   */
   function pageTitle() {
-    if (id) {
-      return <h2 className="text-center">Editar usuario</h2>;
-    } else {
-      return <h2 className="text-center">Agregar usuario</h2>;
-    }
+    return id ? <h2 className="text-center">Editar usuario</h2> : <h2 className="text-center">Agregar usuario</h2>;
   }
 
   return (
@@ -212,7 +200,6 @@ const UsersComponent = (modulo) => {
           <div className="card-header text-center">{pageTitle()}</div>
           <div className="card-body">
             <Form noValidate onSubmit={saveOrUpdateUser}>
-              {/* Estado del perfil (solo para edición) */}
               {id && (
                 <Form.Group className="mb-4">
                   <Form.Label>Estado del perfil:</Form.Label>
@@ -250,7 +237,6 @@ const UsersComponent = (modulo) => {
                 </Form.Group>
               )}
 
-              {/* Nombre */}
               <Form.Group className="mb-3" controlId="formNombre">
                 <Form.Label>Nombre:</Form.Label>
                 <Form.Control
@@ -267,7 +253,6 @@ const UsersComponent = (modulo) => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              {/* Apellido */}
               <Form.Group className="mb-3" controlId="formApellido">
                 <Form.Label>Apellido:</Form.Label>
                 <Form.Control
@@ -284,7 +269,6 @@ const UsersComponent = (modulo) => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              {/* Email */}
               <Form.Group className="mb-3" controlId="formEmail">
                 <Form.Label>Email:</Form.Label>
                 <Form.Control
@@ -301,7 +285,6 @@ const UsersComponent = (modulo) => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              {/* Rol */}
               <Form.Group className="mb-3" controlId="formRol">
                 <Form.Label>Rol:</Form.Label>
                 <Form.Select
@@ -323,8 +306,7 @@ const UsersComponent = (modulo) => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              {/* Departamento */}
-              <Form.Group className="mb-3" controlId="formDepartamento">
+              {!esModuloGestion && (<Form.Group className="mb-3" controlId="formDepartamento">
                 <Form.Label>Departamento:</Form.Label>
                 <Form.Select
                   required
@@ -343,11 +325,10 @@ const UsersComponent = (modulo) => {
                 <Form.Control.Feedback type="invalid">
                   {errors.departamentoId}
                 </Form.Control.Feedback>
-              </Form.Group>
+              </Form.Group>)}
 
-              {/* Modulo */}
-              <Form.Group className="mb-3" controlId="formDepartamento">
-                <Form.Label>Modulo:</Form.Label>
+              <Form.Group className="mb-3" controlId="formModulo">
+                <Form.Label>Módulo:</Form.Label>
                 <Form.Select
                   required
                   name="moduloId"
@@ -355,7 +336,7 @@ const UsersComponent = (modulo) => {
                   onChange={(e) => setModuloId(e.target.value)}
                   isInvalid={!!errors.moduloId}
                 >
-                  <option value="">Seleccione un modulo</option>
+                  <option value="">Seleccione un módulo</option>
                   {modulosDisponibles.map((mod) => (
                     <option key={mod.id} value={mod.id}>
                       {mod.nombre}
@@ -367,35 +348,35 @@ const UsersComponent = (modulo) => {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              {/* Permisos */}
-              <Form.Group className="mb-3">
-                <Form.Label>Permisos (Módulo Usuarios):</Form.Label>
-                <Row>
-                  {permisosDisponibles.length > 0 ? (
-                    permisosDisponibles.map((permiso) => (
-                      <Col key={permiso.nombre} md={6}>
-                        <Form.Check
-                          type="checkbox"
-                          id={`permiso-${permiso.nombre}`}
-                          label={permiso.nombre}
-                          checked={selectedPermisos.includes(permiso.nombre)}
-                          onChange={() =>
-                            handlePermissionChange(permiso.nombre)
-                          }
-                          className="mb-2"
-                        />
+              {/* Mostrar permisos solo si no es módulo GESTIÓN */}
+              {!esModuloGestion && (
+                <Form.Group className="mb-3">
+                  <Form.Label>Permisos:</Form.Label>
+                  <Row>
+                    {permisosDisponibles.length > 0 ? (
+                      permisosDisponibles.map((permiso) => (
+                        <Col key={permiso.nombre} md={6}>
+                          <Form.Check
+                            type="checkbox"
+                            id={`permiso-${permiso.nombre}`}
+                            label={permiso.nombre}
+                            checked={selectedPermisos.includes(permiso.nombre)}
+                            onChange={() => handlePermissionChange(permiso.nombre)}
+                            className="mb-2"
+                          />
+                        </Col>
+                      ))
+                    ) : (
+                      <Col>
+                        <small className="text-muted">
+                          No hay permisos disponibles para este módulo.
+                        </small>
                       </Col>
-                    ))
-                  ) : (
-                    <Col>
-                      <small className="text-muted">
-                        No hay permisos de usuario disponibles.
-                      </small>
-                    </Col>
-                  )}
-                </Row>
-              </Form.Group>
-              
+                    )}
+                  </Row>
+                </Form.Group>
+              )}
+
               {loading && (
                 <Alert variant="info" className="mt-3 text-center">
                   <span
@@ -407,7 +388,6 @@ const UsersComponent = (modulo) => {
                 </Alert>
               )}
 
-              {/* Botones */}
               <div className="d-flex justify-content-evenly mt-4">
                 <Button variant="success" type="submit" disabled={loading}>
                   {"Guardar"}
