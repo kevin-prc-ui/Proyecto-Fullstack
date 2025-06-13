@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Button, Form, Container, Row, Col } from 'react-bootstrap';
-import { getUserId, listUsers } from '../../../../services/UsuarioService';
+import React, { useEffect, useState } from "react";
+import { Modal, Button, Form, Container, Row, Col } from "react-bootstrap";
+import { getUserId, listUsers } from "../../../../services/UsuarioService";
 
 export const CreateSitesComponent = ({ addSite, onClick }) => {
   const [showModal, setShowModal] = useState(false);
   const [siteData, setSiteData] = useState({
-    type: 'Collaboration Site',
-    name: '',
-    siteId: '',
-    visibility: 'Public',
-    description: ''
+    type: "Collaboration Site",
+    name: "",
+    siteId: "",
+    visibility: "Public",
+    description: "",
   });
   const [usuarios, setUsuarios] = useState([]);
 
-useEffect(() => {
-  listUsers(null,2)
-    .then((res) => setUsuarios(res.data))
-    .catch((err) => console.error("Error al cargar usuarios:", err));
-}, []);
+  useEffect(() => {
+    listUsers(null, 2)
+      .then((res) => setUsuarios(res.data))
+      .catch((err) => console.error("Error al cargar usuarios:", err));
+  }, []);
 
   const handleShow = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
@@ -26,41 +26,39 @@ useEffect(() => {
     const { name, value } = e.target;
     setSiteData({
       ...siteData,
-      [name]: value
+      [name]: value,
     });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const creadorId = await getUserId().then(res => res.data);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const creadorId = await getUserId().then((res) => res.data);
 
-  const nuevoSitio = {
-    ...siteData,
-    creadorId,
-    usuariosAsignados: usuarios
-      .filter(u => siteData.usuariosAsignados?.includes(u.id))
-      .map(u => ({ id: u.id }))
+    const nuevoSitio = {
+      ...siteData,
+      creadorId,
+      usuariosAsignados: usuarios
+        .filter((u) => siteData.usuariosAsignados?.includes(u.id))
+        .map((u) => ({ id: u.id })),
+    };
+
+    addSite(nuevoSitio);
+    handleClose();
+    // limpiar
   };
-
-  addSite(nuevoSitio);
-  handleClose();
-  // limpiar
-};
-
 
   return (
     <>
       {/* No necesitamos botón aquí si abres modal desde arriba */}
       {/* Pero si quieres mantener botón dentro del componente, mantenlo */}
-<button
-  type="button"
-  className={`btn tab-button ${showModal ? "active" : ""}`}
-  onClick={() => setShowModal(onClick)}
->
-  <i className="bi bi-plus-circle-fill me-2"></i>
-  Crear Sitio
-</button>
-
+      <button
+        type="button"
+        className={`btn tab-button ${showModal ? "active" : ""}`}
+        onClick={() => setShowModal(onClick)}
+      >
+        <i className="bi bi-plus-circle-fill me-2"></i>
+        Crear Sitio
+      </button>
 
       <Modal show={showModal} onHide={handleClose} size="lg" centered>
         <Modal.Header closeButton className="bg-primary text-white">
@@ -70,25 +68,6 @@ const handleSubmit = async (e) => {
           </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSubmit}>
-  {/* Añade selector de usuarios aquí */}
-  <Form.Group className="mb-3">
-    <Form.Label>Usuarios asignados</Form.Label>
-    <Form.Select
-      multiple
-      value={siteData.usuariosAsignados || []}
-      onChange={(e) => {
-        const selected = Array.from(e.target.selectedOptions).map(option => parseInt(option.value));
-        setSiteData({...siteData, usuariosAsignados: selected});
-      }}
-    >
-      {usuarios.map(usuario => (
-        <option key={usuario.id} value={usuario.id}>
-          {usuario.nombre} {usuario.apellido} - {usuario.email}
-        </option>
-      ))}
-    </Form.Select>
-  </Form.Group>
-
           <Modal.Body className="p-4">
             <Container>
               <Row className="mb-1">
@@ -176,6 +155,54 @@ const handleSubmit = async (e) => {
                 </Col>
               </Row>
 
+              {/* Añade selector de usuarios aquí */}
+              <Form.Group className="mb-4">
+                <Form.Label className="fw-bold text-primary">
+                  Asignar Usuarios al Sitio
+                </Form.Label>
+                <div
+                  style={{
+                    border: "1px solid #ced4da",
+                    borderRadius: "0.5rem",
+                    padding: "0.5rem",
+                    maxHeight: "200px",
+                    overflowY: "auto",
+                    backgroundColor: "#f8f9fa",
+                  }}
+                >
+                  <Form.Select
+                    multiple
+                    size="6"
+                    value={siteData.usuariosAsignados || []}
+                    onChange={(e) => {
+                      const selected = Array.from(e.target.selectedOptions).map(
+                        (option) => parseInt(option.value)
+                      );
+                      setSiteData({ ...siteData, usuariosAsignados: selected });
+                    }}
+                    style={{ border: "none", backgroundColor: "transparent" }}
+                  >
+                    {usuarios.map((usuario) => (
+                      <option key={usuario.id} value={usuario.id}>
+                        👤 {usuario.nombre} {usuario.apellido} — {usuario.email}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </div>
+                <div className="mt-2">
+                  {usuarios
+                    .filter((u) =>
+                      (siteData.usuariosAsignados || []).includes(u.id)
+                    )
+                    .map((u) => (
+                      <span key={u.id} className="badge bg-primary me-1 mb-1">
+                        {u.nombre} {u.apellido}
+                      </span>
+                    ))}
+                    Mantén Ctrl/Cmd para seleccionar múltiples usuarios.
+                </div>
+              </Form.Group>
+
               <Row className="mb-4">
                 <Col>
                   <h5 className="fw-bold text-primary">
@@ -191,12 +218,13 @@ const handleSubmit = async (e) => {
                         <>
                           <span className="fw-bold">Público</span>
                           <div className="text-muted small ms-3">
-                            Todos en tu organización pueden acceder a este sitio.
+                            Todos en tu organización pueden acceder a este
+                            sitio.
                           </div>
                         </>
                       }
                       value="Public"
-                      checked={siteData.visibility === 'Public'}
+                      checked={siteData.visibility === "Public"}
                       onChange={handleInputChange}
                       className="mb-2"
                     />
@@ -209,13 +237,13 @@ const handleSubmit = async (e) => {
                         <>
                           <span className="fw-bold">Moderado</span>
                           <div className="text-muted small ms-3">
-                            Todos pueden encontrar este sitio y solicitar acceso.
-                            El acceso es dado por los Administradores.
+                            Todos pueden encontrar este sitio y solicitar
+                            acceso. El acceso es dado por los Administradores.
                           </div>
                         </>
                       }
                       value="Moderated"
-                      checked={siteData.visibility === 'Moderated'}
+                      checked={siteData.visibility === "Moderated"}
                       onChange={handleInputChange}
                       className="mb-2"
                     />
@@ -234,7 +262,7 @@ const handleSubmit = async (e) => {
                         </>
                       }
                       value="Private"
-                      checked={siteData.visibility === 'Private'}
+                      checked={siteData.visibility === "Private"}
                       onChange={handleInputChange}
                       className="mb-2"
                     />
