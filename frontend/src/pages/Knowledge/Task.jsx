@@ -3,7 +3,7 @@ import { FiPlus, FiClipboard, FiChevronDown, FiChevronUp, FiFilter } from 'react
 import { MdOutlineWorkOutline, MdTaskAlt } from 'react-icons/md';
 import TaskList from './ComponentsKnow/Task_Components/TaskList';
 import TaskForm from './ComponentsKnow/Task_Components/TaskForm';
-import {listUsers} from '../../services/UsuarioService';
+import {listUsers, getUserRoles} from '../../services/UsuarioService';
 import { getAllActivities } from '../../services/ActivityService';
 import { deleteActivity } from "../../services/ActivityService";
 import { updateActivity } from "../../services/ActivityService"; // Asegúrate de importar la función correcta
@@ -16,7 +16,7 @@ const Task = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [filter, setFilter] = useState('all');
   const [usuarios, setUsuarios] = useState([]); // Lista de usuarios para asignación de tareas
-
+  const [userRoles, setUserRoles] = useState([]);
 
 const handleDeleteTask = async (id) => {
   if (!window.confirm("¿Estás seguro de eliminar esta actividad?")) return;
@@ -33,13 +33,25 @@ const handleDeleteTask = async (id) => {
 
   const isAuth = localStorage.getItem("authToken"); // Verifica si hay token de autenticación
 // Efecto para cargar usuarios si el usuario está autenticado
-      useEffect(() => {
-        const fetchActivities = async () => {
-          await listActivities();
-        };
-    
-        if (isAuth) fetchActivities();
-      }, [isAuth]);
+useEffect(() => {
+  const fetchActivities = async () => {
+    await listActivities();
+  };
+  const fetchUserPermissions = async () => { // New function to fetch roles
+    try {
+      const response = await getUserRoles(); // Calls the service to get user roles 
+      setUserRoles(response.data); // Stores the roles in state
+      console.log("Roles del usuario obtenidos:", response.data);
+    } catch (error) {
+      console.error("Error al obtener roles del usuario:", error);
+    }
+  };
+
+  if (isAuth) {
+    fetchActivities();
+    fetchUserPermissions(); // Call the new function
+  }
+}, [isAuth]);
 
   async function listActivities() {
         const response = await getAllActivities();
@@ -113,6 +125,13 @@ const saveActivities = (updatedActivities) => {
   const tasks = filteredActivities.filter(a => a.type === 'task');
   const workflows = filteredActivities.filter(a => a.type === 'workflow');
 
+
+const canCreateActivity = () => {
+  return Array.isArray(userRoles) && userRoles.includes('ROLE_ADMIN');
+
+  
+};
+
   return (
     <div className="container py-4">
       <header className="d-flex justify-content-between align-items-center mb-4">
@@ -127,17 +146,18 @@ const saveActivities = (updatedActivities) => {
 
         {/* Botones para crear tarea y filtrar */}
         <div>
-          <button 
-            className="btn btn-primary me-2"
-            onClick={() => {
-              setShowTaskForm(true);
-              setEditingTask(null);
-            }}
-          >
-            <FiPlus className="me-1" />
-            Crear Nueva
-          </button>
-
+  {canCreateActivity() && ( // Conditionally render the button based on permission
+    <button
+      className="btn btn-primary me-2"
+      onClick={() => {
+        setShowTaskForm(true); 
+        setEditingTask(null); 
+      }}
+    >
+      <FiPlus className="me-1" /> 
+      Crear Nueva 
+    </button>
+  )}
           {/* Filtros por estado */}
           <div className="btn-group">
             <button 

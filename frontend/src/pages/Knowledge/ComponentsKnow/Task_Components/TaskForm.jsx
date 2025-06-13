@@ -295,11 +295,12 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                         required
                       >
                         {/* Aquí se añade el .filter(Boolean) */}
-                        {Array.isArray(users) && users.filter(Boolean).map((user) => (
-                          <option key={user.id} value={user.id}>
-                            {user.nombre}
-                          </option>
-                        ))}
+                        {Array.isArray(users) &&
+                          users.filter(Boolean).map((user) => (
+                            <option key={user.id} value={user.id}>
+                              {user.nombre}
+                            </option>
+                          ))}
                       </select>
                       <small className="text-muted">
                         Mantén Ctrl/Cmd para seleccionar múltiples
@@ -320,11 +321,12 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                             required
                           >
                             {/* Aquí se añade el .filter(Boolean) */}
-                            {Array.isArray(users) && users.filter(Boolean).map((user) => (
-                              <option key={user.id} value={user.id}>
-                                {user.nombre}
-                              </option>
-                            ))}
+                            {Array.isArray(users) &&
+                              users.filter(Boolean).map((user) => (
+                                <option key={user.id} value={user.id}>
+                                  {user.nombre}
+                                </option>
+                              ))}
                           </select>
                         </div>
 
@@ -373,30 +375,29 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                       className="border rounded p-3 mb-3"
                       style={{ maxHeight: "200px", overflowY: "auto" }}
                     >
-{formData.items.length > 0 ? (
-  <ul className="list-group">
-    {formData.items.map((item, index) => (
-      <li
-        key={item.id ?? index}  // 👈 Si no hay item.id, usa el índice
-        className="list-group-item d-flex justify-content-between align-items-center"
-      >
-        <span>{item.name}</span>
-        <button
-          type="button"
-          className="btn btn-sm btn-outline-danger"
-          onClick={() => handleRemoveItem(item.id)}
-        >
-          <FiTrash2 />
-        </button>
-      </li>
-    ))}
-  </ul>
-) : (
-  <div className="text-center text-muted py-3">
-    No hay items agregados
-  </div>
-)}
-
+                      {formData.items.length > 0 ? (
+                        <ul className="list-group">
+                          {formData.items.map((item, index) => (
+                            <li
+                              key={item.id ?? index} // 👈 Si no hay item.id, usa el índice
+                              className="list-group-item d-flex justify-content-between align-items-center"
+                            >
+                              <span>{item.name}</span>
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-outline-danger"
+                                onClick={() => handleRemoveItem(item.id)}
+                              >
+                                <FiTrash2 />
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="text-center text-muted py-3">
+                          No hay items agregados
+                        </div>
+                      )}
                     </div>
 
                     {/* Campo para agregar nuevo item */}
