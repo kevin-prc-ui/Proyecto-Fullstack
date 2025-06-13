@@ -139,7 +139,7 @@ const MisArchivos = () => {
                     )}
                     <button
                       className="btn btn-danger btn-sm"
-                      onClick={() => handleRemoveItem(item.id)}
+                      onClick={() => handleRemoveItem(item)}
                     >
                       <BsTrash size={14} />
                     </button>
