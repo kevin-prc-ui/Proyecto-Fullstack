@@ -119,12 +119,6 @@ const linkData = [
         icon: <MdSupportAgent />,
         children: [ 
           {
-            label: "Usuarios",
-            link: "/admin/helpdesk/users",
-            icon: <FaUsers />,
-            roles: ["ROLE_ADMIN"]
-          },
-          {
             label: "Departamentos",
             link: "/admin/helpdesk/departamentos",
             icon: <FaFolderOpen />,
@@ -157,12 +151,12 @@ const linkData = [
         ]
       },
       {
-        label: "Gestión Documental",
+        label: "Usuario",
         icon: <PiFolderSimpleUser />,  
         children: [ 
           {
-            label: "Usuarios",
-            link: "/admin/knowledge/usuarios",
+            label: "Todos",
+            link: "/admin/usuarios/todos",
             icon: <FaUsers />,
             roles: ["ROLE_ADMIN"]
             
