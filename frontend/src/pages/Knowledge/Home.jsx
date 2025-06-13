@@ -37,10 +37,16 @@ const Home = () => {
         .then((res) => {
           const actividades = res.data;
           const tareas = actividades.filter(
-            (a) => a.type === "task" && a.usuariosAsignados?.includes(id)
+            (a) =>
+              a.type === "task" &&
+              a.usuariosAsignados?.includes(id) &&
+              a.status !== true
           );
           const workflows = actividades.filter(
-            (a) => a.type === "workflow" && a.usuariosAsignados?.includes(id)
+            (a) =>
+              a.type === "workflow" &&
+              a.usuariosAsignados?.includes(id) &&
+              a.status !== true
           );
           setMisTareas(tareas);
           setMisWorkflows(workflows);
@@ -71,7 +77,6 @@ const Home = () => {
       <h1>Inicio</h1>
 
       <div className="grid-layout">
-
         {/* 🔷 Sección: Mis Sitios */}
         <div className="grid-item">
           <h2>Mis Sitios</h2>
@@ -97,9 +102,12 @@ const Home = () => {
                     key={sitio.id}
                     className="mb-2 p-2 border rounded bg-light"
                     style={{ cursor: "pointer" }}
-                    onClick={() => navigate("/sitio", { state: { site: sitio } })}
+                    onClick={() =>
+                      navigate("/sitio", { state: { site: sitio } })
+                    }
                   >
-                    <strong>{sitio.name}</strong><br />
+                    <strong>{sitio.name}</strong>
+                    <br />
                     <small className="text-muted">ID: {sitio.siteId}</small>
                   </li>
                 ))}
@@ -121,12 +129,18 @@ const Home = () => {
 
           <ul className="list-unstyled mt-3">
             {misWorkflows.length === 0 ? (
-              <p className="text-muted">No tienes flujos de trabajo asignados.</p>
+              <p className="text-muted">
+                No tienes flujos de trabajo asignados.
+              </p>
             ) : (
               misWorkflows.map((wf) => (
                 <li key={wf.id} className="mb-2 border rounded p-2 bg-light">
-                  <strong>{wf.name}</strong><br />
-                  <small className="text-muted">Aprobación requerida: {wf.approvalPercentage}%</small><br />
+                  <strong>{wf.name}</strong>
+                  <br />
+                  <small className="text-muted">
+                    Aprobación requerida: {wf.approvalPercentage}%
+                  </small>
+                  <br />
                   <span>{wf.description}</span>
                 </li>
               ))
@@ -153,8 +167,12 @@ const Home = () => {
             ) : (
               misTareas.map((tarea) => (
                 <li key={tarea.id} className="mb-2 border rounded p-2 bg-light">
-                  <strong>{tarea.name}</strong><br />
-                  <small className="text-muted">Prioridad: {tarea.priority}</small><br />
+                  <strong>{tarea.name}</strong>
+                  <br />
+                  <small className="text-muted">
+                    Prioridad: {tarea.priority}
+                  </small>
+                  <br />
                   <span>{tarea.description}</span>
                 </li>
               ))
@@ -178,10 +196,15 @@ const Home = () => {
             ) : (
               <ul className="list-unstyled">
                 {misCarpetas.map((carpeta) => (
-                  <li key={carpeta.id} className="mb-2 p-2 border rounded bg-light">
-                    <strong>{carpeta.nombre}</strong><br />
+                  <li
+                    key={carpeta.id}
+                    className="mb-2 p-2 border rounded bg-light"
+                  >
+                    <strong>{carpeta.nombre}</strong>
+                    <br />
                     <small className="text-muted">
-                      Creada el {new Date(carpeta.fechaCreacion).toLocaleDateString()}
+                      Creada el{" "}
+                      {new Date(carpeta.fechaCreacion).toLocaleDateString()}
                     </small>
                   </li>
                 ))}
