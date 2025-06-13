@@ -42,10 +42,10 @@ const Card = ({ ticket, onTicketStatusChange }) => {
   const navigate = useNavigate();
   const [isCompleting, setIsCompleting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showCompleteConfirm, setShowCompleteConfirm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const target = useRef(null);
-  const [estado, setEstado] = useState(null);
 
   // Referencias para el overlay
   const overlayRef = useRef(null);
@@ -61,11 +61,11 @@ const Card = ({ ticket, onTicketStatusChange }) => {
       toast.error("ID de ticket inválido.");
       return;
     }
-    setShowConfirmDialog(true);
+    setShowCompleteConfirm(true);
   };
 
   const confirmCompleteTicket = async () => {
-    setShowConfirmDialog(false);
+    setShowCompleteConfirm(false);
     setIsCompleting(true);
     try {
       if (ticket?.estado == 1) {
@@ -86,14 +86,15 @@ const Card = ({ ticket, onTicketStatusChange }) => {
   };
 
   // Función para manejar eliminar el ticket
-  const handleDeleteTicket = async () => {
-    if (!ticket || !ticket.id) {
-      toast.error("ID de ticket inválido.");
-      return;
-    }
+  const handleDeleteTicket = () => {
+    setShowDeleteConfirm(true);
+  };
 
-    setShowActions(false); // Cerrar el popover
+  const confirmDeleteTicket = async () => {
+    setShowDeleteConfirm(false);
+    setShowActions(false);
     setIsDeleting(true);
+    
     try {
       await deleteTicket(ticket.id);
       toast.success(`Ticket "${ticket.tema}" eliminado correctamente.`);
@@ -142,7 +143,7 @@ const Card = ({ ticket, onTicketStatusChange }) => {
                   className="flex items-center justify-start px-3 py-2 hover:bg-gray-100 rounded-md text-sm"
                 >
                   {ticket.estado != 1 ? (
-                    <FaLockOpen className="text-blue-500" />
+                    <FaLockOpen className="text-blue-500 mr-2" />
                   ) : (
                     <FaLock className="text-blue-500 mr-2" />
                   )}
@@ -151,11 +152,10 @@ const Card = ({ ticket, onTicketStatusChange }) => {
                 <Button
                   variant="light"
                   onClick={handleDeleteTicket}
-                  disabled={isDeleting}
                   className="flex items-center justify-start px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-red-600"
                 >
                   <FaTrash className="mr-2" />
-                  {isDeleting ? "Eliminando..." : "Eliminar Ticket"}
+                  Eliminar Ticket
                 </Button>
               </div>
             </Popover.Body>
@@ -265,8 +265,8 @@ const Card = ({ ticket, onTicketStatusChange }) => {
         <div ref={overlayRef} className="overlay-container"></div>
       </div>
 
-      {/* Diálogo de confirmación para completar ticket */}
-      {showConfirmDialog && (
+      {/* Diálogo de confirmación para completar/abrir ticket */}
+      {showCompleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
@@ -279,7 +279,7 @@ const Card = ({ ticket, onTicketStatusChange }) => {
             </p>
             <div className="flex justify-end space-x-3 ">
               <button
-                onClick={() => setShowConfirmDialog(false)}
+                onClick={() => setShowCompleteConfirm(false)}
                 disabled={isCompleting}
                 className="px-4 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors disabled:opacity-50 m-2"
               >
@@ -294,6 +294,43 @@ const Card = ({ ticket, onTicketStatusChange }) => {
                   <FaSpinnerSolid className="animate-spin" />
                 ) : (
                   "Confirmar"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Diálogo de confirmación para eliminar ticket */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Confirmar Eliminación
+            </h3>
+            <p className="text-sm text-gray-600 m-2">
+              ¿Estás seguro de que deseas eliminar permanentemente el ticket{" "}
+              <span className="font-semibold">"{ticket?.tema}"</span>?
+              <br />
+              <span className="text-red-500 font-medium">Esta acción no se puede deshacer.</span>
+            </p>
+            <div className="flex justify-end space-x-3 ">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+                className="px-4 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors disabled:opacity-50 m-2"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDeleteTicket}
+                disabled={isDeleting}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-md transition-colors disabled:opacity-50 m-2"
+              >
+                {isDeleting ? (
+                  <FaSpinnerSolid className="animate-spin" />
+                ) : (
+                  "Eliminar"
                 )}
               </button>
             </div>
