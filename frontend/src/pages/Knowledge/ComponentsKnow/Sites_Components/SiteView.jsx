@@ -256,15 +256,6 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
             <Card.Header>Publicaciones</Card.Header>
             <Card.Body>
               <Form onSubmit={handlePostSubmit}>
-                <Form.Group controlId="newPostText">
-                  <Form.Control
-                    as="textarea"
-                    rows={3}
-                    placeholder="Escribe algo..."
-                    value={newPost}
-                    onChange={(e) => setNewPost(e.target.value)}
-                  />
-                </Form.Group>
                 <Form.Group controlId="fileUpload" className="mt-2">
                   <Form.Control
                     type="file"
@@ -281,8 +272,8 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
         </Col>
 
         {/* Contenedor Actividades Completadas (más grande) */}
-        <Col md={4}>
-          <Card style={{ height: "600px", overflowY: "auto" }}>
+        <Col md={4} >
+          <Card style={{ height: "600px", overflowY: "auto" }} className="mb-2">
             <Card.Header className="fw-bold">Archivos subidos</Card.Header>
             <Card.Body className="p-2">
               {archivosSitio.length === 0 ? (
