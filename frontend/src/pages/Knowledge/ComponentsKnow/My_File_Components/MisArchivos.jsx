@@ -41,8 +41,8 @@ const MisArchivos = () => {
           setCurrentFilter={setCurrentFilter}
         />
         <button className="top-button active">Mis archivos</button>
-        <Categorias />
-        <Etiquetas />
+        {/* <Categorias />
+        <Etiquetas /> */}
       </div>
 
       <div className="content">

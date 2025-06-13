@@ -50,12 +50,18 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     if (taskToEdit) {
       setFormData({
         ...taskToEdit,
+        // Asegura que usuariosAsignados sea un array y filtra valores nulos/undefined
         usuariosAsignados: Array.isArray(taskToEdit.usuariosAsignados)
-          ? taskToEdit.usuariosAsignados
+          ? taskToEdit.usuariosAsignados.filter(Boolean)
           : [taskToEdit.usuariosAsignados].filter(Boolean),
+        // Asegura que reviewers sea un array y filtra valores nulos/undefined
         reviewers: Array.isArray(taskToEdit.reviewers)
-          ? taskToEdit.reviewers
+          ? taskToEdit.reviewers.filter(Boolean)
           : [taskToEdit.reviewers].filter(Boolean),
+        // ASEGURA QUE 'items' SEA UN ARRAY Y FILTRA VALORES NULOS/UNDEFINED
+        items: Array.isArray(taskToEdit.items)
+          ? taskToEdit.items.filter(Boolean)
+          : [], // Si no es un array, o es null/undefined, inicializa como array vacío
       });
     }
   }, [taskToEdit]);
@@ -288,7 +294,8 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                         }
                         required
                       >
-                        {users.map((user) => (
+                        {/* Aquí se añade el .filter(Boolean) */}
+                        {Array.isArray(users) && users.filter(Boolean).map((user) => (
                           <option key={user.id} value={user.id}>
                             {user.nombre}
                           </option>
@@ -312,7 +319,8 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                             onChange={(e) => handleMultiSelect(e, "reviewers")}
                             required
                           >
-                            {users.map((user) => (
+                            {/* Aquí se añade el .filter(Boolean) */}
+                            {Array.isArray(users) && users.filter(Boolean).map((user) => (
                               <option key={user.id} value={user.id}>
                                 {user.nombre}
                               </option>
@@ -365,29 +373,30 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
                       className="border rounded p-3 mb-3"
                       style={{ maxHeight: "200px", overflowY: "auto" }}
                     >
-                      {formData.items.length > 0 ? (
-                        <ul className="list-group">
-                          {formData.items.map((item) => (
-                            <li
-                              key={item.id}
-                              className="list-group-item d-flex justify-content-between align-items-center"
-                            >
-                              <span>{item.name}</span>
-                              <button
-                                type="button"
-                                className="btn btn-sm btn-outline-danger"
-                                onClick={() => handleRemoveItem(item.id)}
-                              >
-                                <FiTrash2 />
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className="text-center text-muted py-3">
-                          No hay items agregados
-                        </div>
-                      )}
+{formData.items.length > 0 ? (
+  <ul className="list-group">
+    {formData.items.map((item, index) => (
+      <li
+        key={item.id ?? index}  // 👈 Si no hay item.id, usa el índice
+        className="list-group-item d-flex justify-content-between align-items-center"
+      >
+        <span>{item.name}</span>
+        <button
+          type="button"
+          className="btn btn-sm btn-outline-danger"
+          onClick={() => handleRemoveItem(item.id)}
+        >
+          <FiTrash2 />
+        </button>
+      </li>
+    ))}
+  </ul>
+) : (
+  <div className="text-center text-muted py-3">
+    No hay items agregados
+  </div>
+)}
+
                     </div>
 
                     {/* Campo para agregar nuevo item */}
