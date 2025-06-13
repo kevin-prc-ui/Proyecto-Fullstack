@@ -9,6 +9,8 @@
 ```
 Node.
 Java 17 o superior.
+Docker (opcional).
+Maven.
 ```
 
 ### Ejecutar el proyecto
@@ -25,11 +27,20 @@ Java 17 o superior.
 
 
 ### Dockerizar el proyecto
-_Es necesario principalmente limpiar el proyecto y generar su respectivo jar para poder crear una imagen._
-_Los archivos docker para facilitar la creación de la imagen ya existen. Solo se deberán ejecutar las_
-_siguientes instrucciones._
+_Es necesario principalmente limpiar el proyecto y generar su respectivo jar para poder crear una imagen. Los archivos docker para facilitar la creación de la imagen ya existen. Solo se deberán ejecutar las siguientes instrucciones_
 - maven clean
 - maven install
+```
+docker-compose up -d
+```
+Finalmente el backend estará creado como una imagen dockerizada y contará con volumen donde se almacenan imagenes y documentos únicamente. 
+
+### Notas
+_Aún se deben cambiar ciertos parámetros para que la conexión pueda hacerse en un entorno de producción_
+Clases/componentes que se deben modificar:
+```
+```
+
 
 
 ## Autores ✒️
