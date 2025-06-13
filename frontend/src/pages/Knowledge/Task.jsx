@@ -14,7 +14,7 @@ const Task = () => {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const [editingTask, setEditingTask] = useState(null);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState(false);
   const [usuarios, setUsuarios] = useState([]); // Lista de usuarios para asignación de tareas
   const [userRoles, setUserRoles] = useState([]);
 
