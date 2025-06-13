@@ -114,22 +114,7 @@ const Home = () => {
           <div className="filter-container activities-filters">
             {/* Filtros múltiples (sin lógica aplicada aún) */}
             <select className="filter small-filter">
-              <option value="Following">Siguiendo</option>
-              <option value="Myactivities">Mis actividades</option>
-              <option value="elses">Actividades de otros</option>
-              <option value="Everyones">Actividades de todos</option>
-            </select>
-            <select className="filter small-filter">
               <option value="all">Todos los elementos</option>
-              <option value="Comments">Comentarios</option>
-              <option value="content">Contenido</option>
-              <option value="memberships">Membresías</option>
-            </select>
-            <select className="filter small-filter">
-              <option value="today">Hoy</option>
-              <option value="week1">Últimos 7 días</option>
-              <option value="week2">Últimos 14 días</option>
-              <option value="week3">Últimos 28 días</option>
             </select>
           </div>
           <p>Revisa y organiza tus flujos asignados.</p>
@@ -158,9 +143,6 @@ const Home = () => {
               <option value="Completed">Tareas Completadas</option>
               <option value="High">Tareas de Alta Prioridad</option>
               <option value="TasksToday">Tareas para Hoy</option>
-              <option value="TasksAssigned">Tareas Asignadas a Mí</option>
-              <option value="Unassigned">Tareas sin Asignar</option>
-              <option value="Overdue">Tareas Vencidas</option>
             </select>
           </div>
           <p>Administra tus tareas pendientes.</p>
@@ -185,9 +167,7 @@ const Home = () => {
           <h2>Mis Documentos</h2>
           <div className="filter-container">
             <select className="filter small-filter">
-              <option value="recently-modified">Modificados Recientemente</option>
-              <option value="editing">Editando Actualmente</option>
-              <option value="favorites">Mis Favoritos</option>
+              <option value="recently-modified">Todos los elementos</option>
             </select>
           </div>
           <p>Accede y gestiona tus documentos.</p>
