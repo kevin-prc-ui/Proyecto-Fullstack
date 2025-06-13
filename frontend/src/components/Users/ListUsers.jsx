@@ -23,7 +23,7 @@ export const ListedUsers = () => {
   const fetchUsuarios = async () => {
     try {
       setLoading(true);
-      const response = await listUsers(null,1);
+      const response = await listUsers();
       setUsuarios(response.data);
     } catch (err) {
       setError("Error al cargar usuarios");

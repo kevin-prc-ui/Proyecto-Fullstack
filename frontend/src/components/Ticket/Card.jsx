@@ -16,8 +16,7 @@ import {
   formatDate,
   getVencimiento,
 } from "../../utils/utils"; 
-import { 
-  FaCheckCircle as FaCheckCircleSolid,
+import {
   FaSpinner as FaSpinnerSolid,
   FaTrash,
   FaLock
@@ -48,6 +47,7 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const target = useRef(null);
+  const [estado, setEstado] = useState(null)
   
   // Referencias para el overlay
   const overlayRef = useRef(null);
@@ -261,7 +261,7 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
           <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirmar Acción</h3>
             <p className="text-sm text-gray-600 m-2">
-              ¿Estás seguro de que deseas marcar el ticket <span className="font-semibold">"{ticket?.tema}"</span> como completado?
+              ¿Estás seguro de que deseas marcar el ticket <span className="font-semibold">"{ticket?.tema}"</span> como {estado}?
             </p>
             <div className="flex justify-end space-x-3 ">
               <button

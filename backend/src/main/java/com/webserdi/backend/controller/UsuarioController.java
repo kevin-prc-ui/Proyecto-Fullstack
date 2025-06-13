@@ -53,10 +53,10 @@ public class UsuarioController {
      *
      * @return Lista de DTOs de usuarios.
      */
-    @GetMapping("/list/{id}") // Consistencia en el path variable
+    @GetMapping() // Consistencia en el path variable
     @PreAuthorize("hasRole('ROLE_ADMIN')") // Ejemplo de autorización
-    public ResponseEntity<List<UsuarioDto>> getAllUsuarios(@PathVariable("id") Long id) {
-        List<UsuarioDto> usuarios = usuarioService.getAllUsuarios(id);
+    public ResponseEntity<List<UsuarioDto>> getAllUsuarios() {
+        List<UsuarioDto> usuarios = usuarioService.getAllUsuarios();
         return ResponseEntity.ok(usuarios);
     }
     @GetMapping("/departamento/{id}")

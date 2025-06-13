@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Button, Alert, Form, Row, Col, ToggleButtonGroup, ToggleButton } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import { signUp, getUserById, updateUser } from "../../services/UsuarioService";
+import { signUp, getUserById, updateUser, listAllModulos, listAllPermisos } from "../../services/UsuarioService";
 import { listAllDepartamentos } from "../../services/DepartamentoService";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
+import { listRol } from "../../services/RolService";
 
 /**
  * Componente para agregar o editar un usuario con activación/desactivación de perfil.
@@ -21,7 +22,9 @@ const UsersComponent = (modulo) => {
   const [selectedPermisos, setSelectedPermisos] = useState([]);
   const [permisosDisponibles, setPermisosDisponibles] = useState([]);
   const [departamentoId, setDepartamentoId] = useState("");
+  const [moduloId, setModuloId] = useState("");
   const [departamentosDisponibles, setDepartamentosDisponibles] = useState([]);
+  const [modulosDisponibles, setModulosDisponibles] = useState([]);
   const [roles, setRoles] = useState([]);
 
   // Estado para almacenar los errores de validación
@@ -30,67 +33,41 @@ const UsersComponent = (modulo) => {
     apellido: "",
     email: "",
     rol: "",
-    departamentoId: "",
+    moduloId:"",
   });
 
   const { id } = useParams();
   const navigator = useNavigate();
   const [loading, setLoading] = useState(false);
 
-  const token = () => localStorage.getItem("authToken");
-  const getAuthToken = () => JSON.parse(token()).accessToken;
-
-  const getHeaders = () => ({
-    headers: {
-      Authorization: `Bearer ${getAuthToken()}`,
-    },
-  });
-
-  useEffect(() => {
-    const fetchRoles = async () => {
+  const loadInitialData = useCallback(async () => {
       try {
-        const response = await axios.get("/api/roles", getHeaders());
-        setRoles(response.data);
-      } catch (error) {
-        toast.error("Error al cargar los roles", error);
-      }
-    };
-    fetchRoles();
-  }, []);
-
-  useEffect(() => {
-    const fetchPermisos = async () => {
-      try {
-        const response = await axios.get("/api/permisos", getHeaders());
-        const data = response.data;
+        const [depRes, rolRes, modRes, prmRes] = await Promise.all([
+          listAllDepartamentos(),
+          listRol(),
+          listAllModulos(),
+          listAllPermisos()
+        ]);
+        setDepartamentosDisponibles(depRes.data || []);
+        setModulosDisponibles(modRes.data || []);
+        setRoles(rolRes.data || []);
+        const data= prmRes.data;
         const filteredPermisos = data.filter(
           (permiso) => permiso.moduloId === modulo.modulo
         );
-        setPermisosDisponibles(filteredPermisos);
-        console.log("Permisos disponibles:", filteredPermisos);
+        setPermisosDisponibles(filteredPermisos || []);
       } catch (error) {
-        toast.error("Error al cargar los permisos", error);
+        console.error("Error al cargar datos iniciales:", error);
+        toast.error("Error al cargar datos. Contacte a sistemas.");
+        // Opcional: cerrar modal si falla la carga esencial
+        // closeDialog();
       }
-    };
-    fetchPermisos();
-  }, []);
+    }, []); // Sin dependencias, se llama una vez
 
-  useEffect(() => {
-    const fetchDepartamentos = async () => {
-      try {
-        const response = await listAllDepartamentos();
-        setDepartamentosDisponibles(response.data);
-      } catch (error) {
-        toast.error("Error al cargar los departamentos", error);
-        console.error("Error fetching departamentos:", error);
-      }
-    };
-    fetchDepartamentos();
-  }, []);
+    useEffect(() => {
+          loadInitialData();
+      }, [loadInitialData]);
 
-  /**
-   * Efecto que carga los datos del usuario cuando se está editando
-   */
   useEffect(() => {
     if (id) {
       setLoading(true);
@@ -120,7 +97,7 @@ const UsersComponent = (modulo) => {
       setSelectedPermisos([]);
       setDepartamentoId("");
       setIsEnabled(true); // Nuevo usuario activo por defecto
-      setErrors({ nombre: "", apellido: "", email: "", rol: "", departamentoId: "" });
+      setErrors({ nombre: "", apellido: "", email: "", rol: "", moduloId:"" });
     }
   }, [id]);
 
@@ -147,9 +124,10 @@ const UsersComponent = (modulo) => {
       roles: rol ? [rol] : [],
       permisos: selectedPermisos,
       departamento: departamentoId ? { id: parseInt(departamentoId) } : null,
+      modulo: moduloId ? { id: parseInt(moduloId) } : null,
     };
 
-    if (!isFormValid({ nombre, apellido, email, rol, departamentoId })) return;
+    if (!isFormValid({ nombre, apellido, email, rol, departamentoId, moduloId })) return;
 
     setLoading(true);
     try {
@@ -160,7 +138,7 @@ const UsersComponent = (modulo) => {
         await signUp(userData);
         toast.info("Usuario creado correctamente");
       }
-      navigator("/admin/helpdesk/users");
+      navigator("/admin/usuarios/todos");
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || error.message || "Error desconocido";
@@ -182,7 +160,7 @@ const UsersComponent = (modulo) => {
       enabled:"",
       email: "",
       rol: "",
-      departamentoId: "",
+      moduloId: "",
     };
 
     // Validaciones (sin cambios)
@@ -207,10 +185,8 @@ const UsersComponent = (modulo) => {
     if (!formData.rol || formData.rol.trim() === "") {
       newErrors.rol = "El Rol es obligatorio";
       valid = false;
-    }
-
-    if (!formData.departamentoId || String(formData.departamentoId).trim() === "") {
-      newErrors.departamentoId = "El departamento es obligatorio";
+    }if (!formData.moduloId || String(formData.moduloId).trim() === "") {
+      newErrors.moduloId = "El modulo es obligatorio";
       valid = false;
     }
 
@@ -369,6 +345,28 @@ const UsersComponent = (modulo) => {
                 </Form.Control.Feedback>
               </Form.Group>
 
+              {/* Modulo */}
+              <Form.Group className="mb-3" controlId="formDepartamento">
+                <Form.Label>Modulo:</Form.Label>
+                <Form.Select
+                  required
+                  name="moduloId"
+                  value={moduloId}
+                  onChange={(e) => setModuloId(e.target.value)}
+                  isInvalid={!!errors.moduloId}
+                >
+                  <option value="">Seleccione un modulo</option>
+                  {modulosDisponibles.map((mod) => (
+                    <option key={mod.id} value={mod.id}>
+                      {mod.nombre}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.moduloId}
+                </Form.Control.Feedback>
+              </Form.Group>
+
               {/* Permisos */}
               <Form.Group className="mb-3">
                 <Form.Label>Permisos (Módulo Usuarios):</Form.Label>
@@ -416,7 +414,7 @@ const UsersComponent = (modulo) => {
                 </Button>
                 <Button
                   variant="danger"
-                  onClick={() => navigator("/admin/helpdesk/users")}
+                  onClick={() => navigator("/admin/usuarios/todos")}
                   disabled={loading}
                 >
                   Cancelar

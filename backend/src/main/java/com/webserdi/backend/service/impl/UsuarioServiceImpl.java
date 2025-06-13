@@ -2,18 +2,12 @@ package com.webserdi.backend.service.impl;
 
 import com.webserdi.backend.dto.PermisoDto;
 import com.webserdi.backend.dto.UsuarioDto;
-import com.webserdi.backend.entity.Departamento; // Importar entidad Departamento
-import com.webserdi.backend.entity.Permiso;
-import com.webserdi.backend.entity.Rol;
-import com.webserdi.backend.entity.Usuario;
+import com.webserdi.backend.entity.*;
 import com.webserdi.backend.exception.ResourceNotFoundException;
 import com.webserdi.backend.exception.DuplicateEmailException;
 import com.webserdi.backend.mapper.PermisoMapper;
 import com.webserdi.backend.mapper.UsuarioMapper;
-import com.webserdi.backend.repository.DepartamentoRepository; // Importar DepartamentoRepository
-import com.webserdi.backend.repository.PermisoRepository;
-import com.webserdi.backend.repository.RolRepository;
-import com.webserdi.backend.repository.UsuarioRepository;
+import com.webserdi.backend.repository.*;
 import com.webserdi.backend.service.UsuarioService;
 import lombok.RequiredArgsConstructor; // Usar para inyección de dependencias
 import org.slf4j.Logger;
@@ -42,6 +36,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final DepartamentoRepository departamentoRepository; // Añadir dependencia
     private final PasswordEncoder passwordEncoder;
+    private final ModuloRepository moduloRepository;
     // El UsuarioMapper es estático, no necesita inyección si se mantiene así.
 
     /**
@@ -124,6 +119,17 @@ public class UsuarioServiceImpl implements UsuarioService {
         } else {
             usuario.setDepartamento(null); // Asegurar que sea null si no se proporciona
         }
+        // Asignar Departamento (si se proporciona)
+        if (dto.getModulo() != null && dto.getModulo().getId() != null) {
+            Modulo modulo = moduloRepository.findById(dto.getModulo().getId())
+                    .orElseThrow(() -> {
+                        logger.warn("Modulo no encontrado con ID: {}", dto.getModulo().getId());
+                        return new ResourceNotFoundException("Modulo no encontrado con ID: " + dto.getModulo().getId());
+                    });
+            usuario.setModulo(modulo);
+        } else {
+            usuario.setModulo(null); // Asegurar que sea null si no se proporciona
+        }
 
         // Asignar Roles
         if (!CollectionUtils.isEmpty(dto.getRoles())) {
@@ -162,9 +168,9 @@ public class UsuarioServiceImpl implements UsuarioService {
      */
     @Override
     @Transactional(readOnly = true) // Buena práctica para operaciones de solo lectura
-    public List<UsuarioDto> getAllUsuarios(Long id) {
+    public List<UsuarioDto> getAllUsuarios() {
         logger.debug("Obteniendo todos los usuarios.");
-        List<Usuario> usuarios = usuarioRepository.findAllByModuloId(id);
+        List<Usuario> usuarios = usuarioRepository.findAll();
         return usuarios.stream()
                 .map(usuarioMapper::mapToUsuarioDto)
                 .toList();
@@ -240,12 +246,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         savedUsuario.setNombre(usuarioDto.getNombre());
         savedUsuario.setApellido(usuarioDto.getApellido());
         savedUsuario.setEnabled(usuarioDto.isEnabled());
-
-        // Actualizar contraseña solo si se proporciona una nueva
-        if (StringUtils.hasText(usuarioDto.getPassword())) {
-            logger.debug("Actualizando contraseña para usuario ID: {}", usuarioId);
-            savedUsuario.setPassword(passwordEncoder.encode(usuarioDto.getPassword()));
-        }
 
         // Actualizar relaciones
         setUsuarioRelationships(savedUsuario, usuarioDto); // Reutilizar método

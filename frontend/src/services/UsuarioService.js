@@ -37,7 +37,7 @@ const getHeaders = () => {
   };
 };
 
-export const listUsers = (departamento,modulo) =>
+export const listUsers = (departamento) =>
 {
   
   if (departamento) {
@@ -54,7 +54,7 @@ export const listUsers = (departamento,modulo) =>
   }
 
   return axios
-      .get(`${REST_API_BASE_URL}/users/list/${modulo}`, getHeaders()) // Add headers to the request
+      .get(`${REST_API_BASE_URL}/users`, getHeaders()) // Add headers to the request
       .then((response) => response)
       .catch((error) => {
         if (!error.response) {
@@ -121,3 +121,9 @@ export const getUserId = () =>
 
 export const getPermisos = () =>
   axios.get(`${REST_API_BASE_URL}/users/permisos`, getHeaders());
+
+export const listAllModulos = () =>
+  axios.get(`${REST_API_BASE_URL}/modulos`, getHeaders());
+
+export const listAllPermisos = () =>
+  axios.get(`${REST_API_BASE_URL}/permisos`, getHeaders());
