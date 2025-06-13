@@ -44,6 +44,7 @@ export const CreateSitesComponent = ({ addSite, onClick }) => {
 
     addSite(nuevoSitio);
     handleClose();
+    window.location.reload();
     // limpiar
   };
 
