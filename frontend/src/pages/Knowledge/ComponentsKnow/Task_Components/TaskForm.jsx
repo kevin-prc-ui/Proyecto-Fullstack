@@ -134,6 +134,7 @@ const TaskForm = ({ onClose, onSave, users, taskToEdit }) => {
     };
 
     preparedData.usuariosCreadores = (await getUserId()).data;
+    window.location.reload(); // Recargar la página para reflejar los cambios
 
     // Llamamos al servicio para crear o actualizar la actividad
 
