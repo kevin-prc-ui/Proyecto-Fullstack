@@ -31,7 +31,7 @@ import {
 import { useLocation } from "react-router-dom";
 
 const SiteView = ({ site, onGoBack, usuarioId }) => {
-    const location = useLocation();
+  const location = useLocation();
   const sitio = location.state?.site;
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [posts, setPosts] = useState([]);
@@ -45,7 +45,7 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
     []
   );
   const [archivosSitio, setArchivosSitio] = useState([]);
-
+  const [refreshFiles, setRefreshFiles] = useState(false);
   // Estado para la lista de usuarios cargados del backend
   const [usersState, setUsersState] = useState({
     loading: false,
@@ -69,8 +69,8 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
             usuario: a.usuario, // Agrega el objeto completo
           }));
 
-          setArchivosSitio(archivos); // ✔️ guarda la lista
-          console.log("✅ Archivos recibidos:", archivos);
+          setArchivosSitio(archivos.reverse()); // ✔️ guarda la lista
+
         })
         .catch((err) =>
           console.error("❌ Error al cargar archivos del sitio:", err)
@@ -202,21 +202,6 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
     }
   };
 
-  // Marcar publicación como completada, asignando el usuario logueado
-  const markAsCompleted = (postId) => {
-    const post = posts.find((p) => p.id === postId);
-    if (post) {
-      const activityWithUser = {
-        ...post,
-        user: usuarioLogueado, // Aquí aseguramos que se use el usuario logueado
-      };
-      setActivities((prev) => [...prev, activityWithUser]);
-      setPosts((prev) => prev.filter((p) => p.id !== postId));
-      // window.location.reload(); // Recargar para mostrar el nuevo archivo en la lista de archivos del sitio
-
-    }
-  };
-
   return (
     <Container className="mt-4">
       <Button variant="outline-secondary" onClick={onGoBack} className="mb-3">
@@ -306,7 +291,11 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
                 </p>
               ) : (
                 [...archivosSitio]
-                  .sort((a, b) => new Date(b.date) - new Date(a.date)) // 🔁 ordena más nuevo arriba
+                  .sort((a, b) => {
+                    const dateA = new Date(a.fechaSubida);
+                    const dateB = new Date(b.fechaSubida);
+                    return dateA - dateB; // Orden descendente
+                  })
                   .map((archivo) => (
                     <div
                       key={archivo.id}
