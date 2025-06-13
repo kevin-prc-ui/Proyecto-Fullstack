@@ -2,7 +2,7 @@ import { Popover, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
 import { getInitials } from "../../utils/utils";
 
-const UserInfo = ({ name }) => {
+const UserInfo = ({ name, departamento }) => {
   return (
     <div className='px-4'>
       <Popover className='relative'>
@@ -29,6 +29,7 @@ const UserInfo = ({ name }) => {
                 </div>
                 <div className='flex flex-col gap-y-1'>
                   <p className='text-black text-xl font-bold'>{name}</p>
+                  <p className='text-black font-semibold'>{departamento}</p>
                 </div>
               </div>
             </Popover.Panel>

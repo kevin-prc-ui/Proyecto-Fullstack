@@ -278,14 +278,13 @@ const Tasks = ({ userTicketsOnly = false }) => {
         setPagina={setPagina}
       >
         {!status && selected === 0 && (
-          <h1 className="">
-            {getPageTitle()}
+          <div className="text-center w-full text-l font-bold">
 
-          </h1>
+          </div>
         )}
 
         {selected === 0 ? (
-          <BoardView tickets={tickets} />
+          <BoardView tickets={tickets} fetchTickets={fetchTickets} />
         ) : (
           <div className="pb-2 w-full overflow-x-auto">
             <Table tickets={tickets} />

@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "./Card";
 
-const BoardView = ({ tickets, status }) => {
+const BoardView = ({ tickets, fetchTickets, }) => {
   // En tu componente padre
   const handleTicketStatusChange = () => {
     // Actualizar la lista de tickets
