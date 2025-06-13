@@ -222,11 +222,12 @@ export const Motivos = () => {
                     </div>
                     <div className="col-span-4 flex justify-center">
                       <button
-                        className="text-blue-500 hover:text-blue-700 m-1 bg-blue-50 hover:bg-blue-100 rounded p-2 transition-colors"
+                        disabled
+                        className="text-blue-200 hover:text-blue-400 m-1 bg-blue-50 hover:bg-blue-100 rounded p-2 transition-colors"
                         onClick={() =>
                           navigate(`/motivos/editar/${motivos.id}`)
                         }
-                        title="Editar"
+                        title="Editar deshabilitado"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -238,9 +239,10 @@ export const Motivos = () => {
                         </svg>
                       </button>
                       <button
-                        className="text-red-500 hover:text-red-700 m-1 bg-red-50 hover:bg-red-100 rounded p-2 transition-colors"
+                        disabled
+                        className="text-red-200 hover:text-red-400 m-1 bg-red-50 hover:bg-red-100 rounded p-2 transition-colors"
                         onClick={() => deleteHandler(motivos.id)} // Pasar el id del motivo
-                        title="Eliminar"
+                        title="Eliminar deshabilitado"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

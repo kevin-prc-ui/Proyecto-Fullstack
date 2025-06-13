@@ -6,7 +6,7 @@ import {
   MdKeyboardArrowDown,
   MdKeyboardArrowUp,
   MdKeyboardDoubleArrowUp,
-  MdMoreVert
+  MdMoreVert,
 } from "react-icons/md";
 import {
   BGS,
@@ -15,24 +15,22 @@ import {
   TICKET_TYPE,
   formatDate,
   getVencimiento,
-} from "../../utils/utils"; 
+} from "../../utils/utils";
 import {
   FaSpinner as FaSpinnerSolid,
   FaTrash,
-  FaLock
+  FaLock,
+  FaLockOpen,
 } from "react-icons/fa";
 import { BiMessageAltDetail } from "react-icons/bi";
 import UserInfo from "../Users/UserInfo";
 import { IoMdAdd } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import { 
-  updateTicketStatus,
-  deleteTicket,
-} from "../../services/TicketService";
+import { updateTicketStatus, deleteTicket } from "../../services/TicketService";
 import { toast } from "sonner";
-import Button from 'react-bootstrap/Button';
-import Overlay from 'react-bootstrap/Overlay';
-import Popover from 'react-bootstrap/Popover';
+import Button from "react-bootstrap/Button";
+import Overlay from "react-bootstrap/Overlay";
+import Popover from "react-bootstrap/Popover";
 
 const ICONS = {
   1: <MdKeyboardDoubleArrowUp />,
@@ -40,18 +38,18 @@ const ICONS = {
   3: <MdKeyboardArrowDown />,
 };
 
-const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
+const Card = ({ ticket, onTicketStatusChange }) => {
   const navigate = useNavigate();
   const [isCompleting, setIsCompleting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const target = useRef(null);
-  const [estado, setEstado] = useState(null)
-  
+  const [estado, setEstado] = useState(null);
+
   // Referencias para el overlay
   const overlayRef = useRef(null);
-  
+
   // Función para mostrar el popover de acciones
   const toggleActions = () => {
     setShowActions(!showActions);
@@ -70,17 +68,18 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
     setShowConfirmDialog(false);
     setIsCompleting(true);
     try {
-      if (ticket?.estado==2) {
-        await updateTicketStatus(ticket.id, 2); // Proceso
-      }
-      else await updateTicketStatus(ticket.id, 1); // Completado
+      if (ticket?.estado == 1) {
+        await updateTicketStatus(ticket.id, 2); // se asigna completado si el estado está actualmente en proceso
+      } else await updateTicketStatus(ticket.id, 1); // se asigna en proceso si el estado se encuentra en Completado
       toast.success(`Ticket "${ticket.tema}" marcado como completado.`);
       if (onTicketStatusChange) {
         onTicketStatusChange();
       }
     } catch (error) {
       console.error("Error al completar el ticket:", error);
-      toast.error(error.response?.data?.message || "Error al completar el ticket.");
+      toast.error(
+        error.response?.data?.message || "Error al completar el ticket."
+      );
     } finally {
       setIsCompleting(false);
     }
@@ -92,18 +91,18 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
       toast.error("ID de ticket inválido.");
       return;
     }
-    
+
     setShowActions(false); // Cerrar el popover
     setIsDeleting(true);
     try {
       await deleteTicket(ticket.id);
       toast.success(`Ticket "${ticket.tema}" eliminado correctamente.`);
-      if (onTicketDelete) {
-        onTicketDelete(ticket.id);
-      }
+      window.location.reload();
     } catch (error) {
       console.error("Error al eliminar el ticket:", error);
-      toast.error(error.response?.data?.message || "Error al eliminar el ticket.");
+      toast.error(
+        error.response?.data?.message || "Error al eliminar el ticket."
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -114,7 +113,7 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
       <div className="w-full h-full bg-white shadow-md p-4 rounded-xl relative">
         {/* Botón de acciones (tres puntos) */}
         <div className="absolute top-4 right-4">
-          <Button 
+          <Button
             ref={target}
             variant="light"
             onClick={toggleActions}
@@ -137,13 +136,17 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
           <Popover id="popover-contained" className="shadow-lg">
             <Popover.Body className="p-2">
               <div className="flex flex-col gap-2">
-                <Button 
+                <Button
                   variant="light"
                   onClick={handleCompleteTicket}
                   className="flex items-center justify-start px-3 py-2 hover:bg-gray-100 rounded-md text-sm"
                 >
-                  <FaLock className="text-blue-500 mr-2" />
-                  {ticket?.estado !=1 ? "Abrir Ticket" : "Cerrar Ticket"}
+                  {ticket.estado != 1 ? (
+                    <FaLockOpen className="text-blue-500" />
+                  ) : (
+                    <FaLock className="text-blue-500 mr-2" />
+                  )}
+                  {ticket?.estado != 1 ? "Abrir Ticket" : "Cerrar Ticket"}
                 </Button>
                 <Button
                   variant="light"
@@ -167,12 +170,12 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
             )}
           >
             <span className="text-lg">{ICONS[ticket?.prioridad]}</span>
-            <span className="uppercase"> 
+            <span className="uppercase">
               prioridad {PRIORITYNAMES[ticket?.prioridad]}{" "}
             </span>
           </div>
         </div>
-        
+
         <div className="flex items-start justify-between mt-2">
           <div>
             <a
@@ -182,7 +185,9 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
               <div
                 className={clsx(
                   "w-4 h-4 rounded-full mt-1",
-                  TICKET_TYPE && ticket?.estado ? TICKET_TYPE[ticket.estado] : 'bg-gray-400'
+                  TICKET_TYPE && ticket?.estado
+                    ? TICKET_TYPE[ticket.estado]
+                    : "bg-gray-400"
                 )}
               />
               <span className="font-semibold text-xl line-clamp-1 text-black">
@@ -196,14 +201,16 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
               <br />
               <span className="text-sm text-red-600">
                 Vence: {formatDate(new Date(ticket?.fechaVencimiento))}
-                <span className="ml-1">{getVencimiento(new Date(ticket?.fechaVencimiento))}</span>
+                <span className="ml-1">
+                  {getVencimiento(new Date(ticket?.fechaVencimiento))}
+                </span>
               </span>
             </div>
           </div>
         </div>
 
         <div className="w-full border-t border-gray-200 my-3" />
-        
+
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <div className="flex gap-1 items-center text-sm text-gray-600">
@@ -229,11 +236,14 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
                 BGS[ticket?.id % BGS?.length]
               )}
             >
-              <UserInfo name={ticket?.usuarioAsignadoNombres} departamento={ticket?.departamentoNombre} />
+              <UserInfo
+                name={ticket?.usuarioAsignadoNombres}
+                departamento={ticket?.departamentoNombre}
+              />
             </div>
           </div>
         </div>
-        
+
         <div className="py-3">
           <div className="h-fit overflow-hidden text-base line-clamp-1 text-gray-700">
             {ticket?.descripcion}
@@ -259,9 +269,13 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
       {showConfirmDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white p-4 rounded-lg shadow-xl max-w-sm w-full">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirmar Acción</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Confirmar Acción
+            </h3>
             <p className="text-sm text-gray-600 m-2">
-              ¿Estás seguro de que deseas marcar el ticket <span className="font-semibold">"{ticket?.tema}"</span> como {estado}?
+              ¿Estás seguro de que deseas marcar el ticket{" "}
+              <span className="font-semibold">"{ticket?.tema}"</span> como{" "}
+              {ticket?.estado == 1 ? "Completado" : "En Proceso"}?
             </p>
             <div className="flex justify-end space-x-3 ">
               <button
@@ -276,14 +290,16 @@ const Card = ({ ticket, onTicketStatusChange, onTicketDelete }) => {
                 disabled={isCompleting}
                 className="px-4 py-2 text-sm font-medium text-white bg-green-500 hover:bg-green-600 rounded-md transition-colors disabled:opacity-50 m-2"
               >
-                {isCompleting ? <FaSpinnerSolid className="animate-spin" /> : "Confirmar"}
+                {isCompleting ? (
+                  <FaSpinnerSolid className="animate-spin" />
+                ) : (
+                  "Confirmar"
+                )}
               </button>
             </div>
           </div>
         </div>
       )}
-      
-      {/* Contenedor para el overlay */}
     </>
   );
 };

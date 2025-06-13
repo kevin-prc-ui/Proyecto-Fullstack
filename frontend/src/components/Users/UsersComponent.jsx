@@ -5,6 +5,7 @@ import { listAllDepartamentos, } from "../../services/DepartamentoService";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { listRol} from "../../services/RolService";
+import { formatUserRole, formatUserRoleWithSystem } from "../../utils/utils";
 
 const UsersComponent = (modulo) => {
   // Estados para los campos del formulario
@@ -297,7 +298,7 @@ const UsersComponent = (modulo) => {
                   <option value="">Seleccione un rol</option>
                   {roles.map((r) => (
                     <option key={r.nombre} value={r.nombre}>
-                      {r.nombre}
+                      {formatUserRoleWithSystem(r.nombre)}
                     </option>
                   ))}
                 </Form.Select>

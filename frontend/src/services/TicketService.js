@@ -1,7 +1,7 @@
 // c:\react\Proyecto\frontend\src\services\TicketService.js
 import axios from "axios";
 
-const REST_API_BASE_URL = "http://localhost:8080/api"; //update the base url
+const REST_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const token = () => localStorage.getItem("authToken");
 const getAuthToken = () => {

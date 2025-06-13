@@ -9,8 +9,25 @@ export const formatUserRole = (rol) => {
         return "Administrador";
     case 'ROLE_USER':
         return "Usuario";
-    case "ROLE_AGENTE":
+    case "ROLE_AGENT":
         return "Agente";
+    case "ROLE_SUPERVISOR":
+        return "Supervisor";
+    default:
+        return "Desconocido";
+    }
+};
+//retorna lo mismo que la funcion de arriba, solamente que con su respectivo sistema
+export const formatUserRoleWithSystem = (rol) => {
+  switch (rol) {
+    case "ROLE_ADMIN":
+        return "Administrador";
+    case 'ROLE_USER':
+        return "Usuario - Gestión documental";
+    case "ROLE_AGENT":
+        return "Agente - Mesa de ayuda";
+    case "ROLE_SUPERVISOR":
+        return "Supervisor - Ambos sistemas";
     default:
         return "Desconocido";
     }
