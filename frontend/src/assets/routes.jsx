@@ -142,16 +142,11 @@ const linkData = [
             icon: <FaFileAlt />,
             roles: ["ROLE_ADMIN"]
           },
-          {
-            label: "Logs",
-            link: "/admin/helpdesk/logs",
-            icon: <MdSettings />,
-            roles: ["ROLE_ADMIN"]
-          }
+          
         ]
       },
       {
-        label: "Usuario",
+        label: "Usuarios",
         icon: <PiFolderSimpleUser />,  
         children: [ 
           {
@@ -159,8 +154,13 @@ const linkData = [
             link: "/admin/usuarios/todos",
             icon: <FaUsers />,
             roles: ["ROLE_ADMIN"]
-            
           },
+          {
+            label: "Logs",
+            link: "/admin/usuarios/logs",
+            icon: <MdSettings />,
+            roles: ["ROLE_ADMIN"]
+          }
         ]
       }
     ],

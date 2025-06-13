@@ -136,7 +136,7 @@ function App() {
               element={<Prioridades />}
             />
             <Route path="/admin/helpdesk/motivos" element={<Motivos />} />
-            <Route path="/admin/helpdesk/logs" element={<Logs />} />
+            <Route path="/admin/usuarios/logs" element={<Logs />} />
             <Route path="/knowledge/admintools" element={<AdminTools />} />{" "}
             <Route
               path="/admin/helpdesk/departamentos/nuevo"
