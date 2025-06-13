@@ -75,6 +75,6 @@ _La elaboracion de este proyecto fue posible gracias al apoyo de_
 
 ## Agradecimientos 🎁
 
-* Agradezco profundamente al equipo de sistemas en Serdi por permitir hacer esto posible📢 
+* Agradezco profundamente al equipo de sistemas en Serdi por permitir hacer esto posible!📢 
 
 ---
