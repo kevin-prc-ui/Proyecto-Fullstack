@@ -147,18 +147,13 @@ const MisArchivos = () => {
                       <>
                         <button
                           className="btn btn-sm favorite-btn"
-                          onClick={() => toggleFavorite(item.id)}
+                        
                           title={
                             favorites.includes(item.id)
-                              ? "Quitar de favoritos"
-                              : "Añadir a favoritos"
+                              ? "Marcar a Ivan Sistemas "
+                              : "Marcar a Eduardo Sistemas"
                           }
                         >
-                          {favorites.includes(item.id) ? (
-                            <BsStarFill color="gold" />
-                          ) : (
-                            <BsStar />
-                          )}
                         </button>
                         <a
                           href={getArchivoUrl(item.id)}
