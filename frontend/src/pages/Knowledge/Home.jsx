@@ -90,7 +90,6 @@ const Home = () => {
               <option value="recent">Recientes</option>
             </select>
           </div>
-          <p>Aquí puedes gestionar tus sitios</p>
 
           <div className="mt-3">
             {sitiosFiltrados.length === 0 ? (
@@ -125,7 +124,6 @@ const Home = () => {
               <option value="all">Todos los elementos</option>
             </select>
           </div>
-          <p>Revisa y organiza tus flujos asignados.</p>
 
           <ul className="list-unstyled mt-3">
             {misWorkflows.length === 0 ? (
@@ -154,12 +152,8 @@ const Home = () => {
           <div className="filter-container">
             <select className="filter small-filter">
               <option value="Active">Tareas Activas</option>
-              <option value="Completed">Tareas Completadas</option>
-              <option value="High">Tareas de Alta Prioridad</option>
-              <option value="TasksToday">Tareas para Hoy</option>
             </select>
           </div>
-          <p>Administra tus tareas pendientes.</p>
 
           <ul className="list-unstyled mt-3">
             {misTareas.length === 0 ? (
@@ -188,7 +182,6 @@ const Home = () => {
               <option value="recently-modified">Todos los elementos</option>
             </select>
           </div>
-          <p>Accede y gestiona tus documentos.</p>
 
           <div className="mt-3">
             {misCarpetas.length === 0 ? (
