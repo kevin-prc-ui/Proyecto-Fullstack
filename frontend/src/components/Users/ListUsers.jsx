@@ -174,9 +174,9 @@ export const ListedUsers = () => {
       <div className="flex justify-between items-center p-6 border-b border-gray-100">
         <h2 className="text-xl font-bold text-gray-800">Usuarios</h2>
         <button
-          disabled={true}
+          enabled
           className="bg-blue-500 rounded hover:bg-blue-600 text-white font-medium py-2 px-4 transition-colors flex items-center"
-          onClick={() => navigate("/admin/helpdesk/add-user")}
+          onClick={() => navigate("/admin/helpdesk/users/add-user")}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
