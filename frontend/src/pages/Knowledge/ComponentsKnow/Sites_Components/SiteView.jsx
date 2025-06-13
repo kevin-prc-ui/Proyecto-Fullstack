@@ -76,7 +76,7 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
           console.error("❌ Error al cargar archivos del sitio:", err)
         );
     }
-  }, [site]);
+  }, [site, posts]);
 
   useEffect(() => {
     if (showUserModal) {
@@ -212,6 +212,8 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
       };
       setActivities((prev) => [...prev, activityWithUser]);
       setPosts((prev) => prev.filter((p) => p.id !== postId));
+      // window.location.reload(); // Recargar para mostrar el nuevo archivo en la lista de archivos del sitio
+
     }
   };
 
@@ -289,50 +291,6 @@ const SiteView = ({ site, onGoBack, usuarioId }) => {
                   Publicar
                 </Button>
               </Form>
-
-              <hr />
-
-              {posts.length === 0 ? (
-                <p>No hay publicaciones.</p>
-              ) : (
-                posts.map((post) => (
-                  <Card key={post.id} className="mb-2">
-                    <Card.Body>
-                      <Card.Text>{post.text}</Card.Text>
-                      {post.file && post.file.type === "image" && (
-                        <img
-                          src={post.file.url}
-                          alt={post.file.name}
-                          style={{ maxWidth: "100%", maxHeight: 200 }}
-                        />
-                      )}
-
-                      {post.file && post.file.type === "pdf" && (
-                        <div>
-                          <a
-                            href={post.file.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <FaFilePdf size={30} className="me-2" />
-                            {post.file.name}
-                          </a>
-                        </div>
-                      )}
-
-                      <small className="text-muted">{post.timestamp}</small>
-                      <Button
-                        variant="success"
-                        size="sm"
-                        className="float-right"
-                        onClick={() => markAsCompleted(post.id)}
-                      >
-                        <FaCheckCircle /> Revisado
-                      </Button>
-                    </Card.Body>
-                  </Card>
-                ))
-              )}
             </Card.Body>
           </Card>
         </Col>

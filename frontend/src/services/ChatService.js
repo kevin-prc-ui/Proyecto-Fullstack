@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "sonner";
 
-const REST_API_BASE_URL = "http://localhost:8080/api"; //update the base url
+const REST_API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Helper function to get the token from localStorage
 const token = () => localStorage.getItem("authToken");
