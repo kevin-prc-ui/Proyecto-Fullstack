@@ -23,12 +23,21 @@ Java 17 o superior.
 - Crear la fuente en bd Web
 - Crear estados en la bd EN-PROCESO y COMPLETADOS 
 
+
+### Dockerizar el proyecto
+_Es necesario principalmente limpiar el proyecto y generar su respectivo jar para poder crear una imagen._
+_Los archivos docker para facilitar la creación de la imagen ya existen. Solo se deberán ejecutar las_
+_siguientes instrucciones._
+- maven clean
+- maven install
+
+
 ## Autores ✒️
 
 _La elaboracion de este proyecto fue posible gracias al apoyo de_
 
-* **Kevin Lerma** - *Trabajo Inicial* - [Nemezen](https://github.com/nemezen)
-* **Alfredo Alvarado** - *Desarrollo del modulo Gestión documental* - [Fredy16177](https://github.com/fredy16177)
+* **Kevin Lerma** - *Desarrollo del módulo de Mesa de ayuda y lógica del backend* - [Nemezen](https://github.com/nemezen)
+* **Alfredo Alvarado** - *Desarrollo del módulo Gestión documental* - [Fredy16177](https://github.com/fredy16177)
 
 ## Agradecimientos 🎁
 
