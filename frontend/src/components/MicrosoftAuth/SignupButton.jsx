@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { signUp, login } from "../../services/UsuarioService";
 
 const MicrosoftSignUp = () => {
-  const { instance } = useMsal();
+  // const { instance } = useMsal();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -20,33 +20,35 @@ const MicrosoftSignUp = () => {
       localStorage.removeItem("authToken"); // Limpiar token al iniciar el proceso
 
       // 1. Autenticación con Microsoft
-      const response = await instance.loginPopup(loginRequest);
+      // const response = await instance.loginPopup(loginRequest);
       
+/*
       if (!response?.accessToken) {
         throw new Error("No se pudo obtener el token de acceso");
       }
+*/
 
       // 2. Obtener datos del usuario
-      const graphResponse = await callMsGraph(response.accessToken);
+      // const graphResponse = await callMsGraph(response.accessToken);
       
-      if (!graphResponse?.userPrincipalName) {
-        throw new Error("Datos de usuario incompletos");
-      }
+      // if (!graphResponse?.userPrincipalName) {
+      //   throw new Error("Datos de usuario incompletos");
+      // }
 
       // 3. Crear usuario en tu backend
       const userData = {
-        nombre: graphResponse.givenName || "Nombre no proporcionado",
-        apellido: graphResponse.surname || "Apellido no proporcionado",
-        email: graphResponse.userPrincipalName,
-        password: graphResponse.id,
+        nombre: "Nombre no proporcionado",
+        apellido: "Apellido no proporcionado",
+        email: "Test@mail.com",
+        password: "123",
         enabled: true,
-        roles: ["ROLE_USER"],
+        roles: ["ROLE_ADMIN"],
         permisos: [""],
       };
 
       const loginData = {
-        email: graphResponse.userPrincipalName,
-        password: graphResponse.id,
+        email: "Test@mail.com",
+        password: "123",
       };
 
       // Intento de registro

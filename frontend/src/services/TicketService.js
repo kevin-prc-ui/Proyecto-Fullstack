@@ -70,6 +70,9 @@ export const listTickets = (page, departamento = "") => {
 export const listTicketsByUser= (userId, page, departamento="", size=8) =>
   axios.get(`${REST_API_BASE_URL}/tickets/user/${userId}?page=${page}&size=${size}&departamento=${departamento}`, getHeaders());
 
+export const listTicketsDashboard= (userId, page, departamento="", size=8) =>
+  axios.get(`${REST_API_BASE_URL}/tickets/dashboard/user/${userId}?page=${page}&size=${size}&departamento=${departamento}`, getHeaders());
+
 export const searchTickets= (busqueda) =>
   axios.get(`${REST_API_BASE_URL}/tickets/search?busqueda=${busqueda}`, getHeaders());
 

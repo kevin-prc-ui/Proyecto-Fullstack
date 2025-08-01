@@ -2,8 +2,8 @@ import React from "react";
 import "../styles/index.css";
 import {
   AuthenticatedTemplate,
-  UnauthenticatedTemplate,
-  useMsal,
+  UnauthenticatedTemplate, useIsAuthenticated,
+  useMsal
 } from "@azure/msal-react";
 import { TbBulb } from "react-icons/tb";
 import { LiaUserAstronautSolid } from "react-icons/lia";
@@ -21,15 +21,17 @@ import { UseLoginHandler } from "../components/MicrosoftAuth/ButtonHandler";
 import { useEffect, useState } from "react";
 import CreateTicket from "../components/Ticket/CreateTicket";
 import { getUserId } from "../services/UsuarioService";
-import { listTicketsByUser } from "../services/TicketService";
+import { listTicketsByUser, listTicketsDashboard } from "../services/TicketService";
 
 const Dashboard = () => {
-  return (
+  const isAuthenticated = localStorage.getItem("authToken");
+  if(isAuthenticated){
+    return (<ProfileContent></ProfileContent>)
+  }
+
+  else return (
     <>
       <div className="App">
-        <AuthenticatedTemplate>
-          <ProfileContent />
-        </AuthenticatedTemplate>
         <UnauthenticatedTemplate>
           <AuthPrompt />
         </UnauthenticatedTemplate>
@@ -117,7 +119,7 @@ const ProfileContent = () => {
       setLoading(true);
       const responseUser = await getUserId(userEmail);
       const userId = responseUser.data;
-      const response = await listTicketsByUser(userId, page, "",size);
+      const response = await listTicketsDashboard(userId, page, "",size);
       console.log(response.data);
       
       setTickets(response.data.content);

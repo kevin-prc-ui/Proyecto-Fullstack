@@ -13,13 +13,13 @@ export const UseLoginHandler = () => {
   
   const handleLogin = async () => {
     // 1. Autenticación con Microsoft
-    const response = await instance.loginPopup(loginRequest);
-    const graphResponse = await callMsGraph(response.accessToken);
+    // const response = await instance.loginPopup(loginRequest);
+    // const graphResponse = await callMsGraph(response.accessToken);
     
     // 2. Preparar datos para el backend
     const loginData = {
-      email: graphResponse.userPrincipalName,
-      password: graphResponse.id,
+      email: "test@mail.com",
+      password: "123",
     };
     
     // 3. Login en tu backend

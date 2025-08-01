@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { MdSettings } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
 import { Container, Nav, Navbar, Button, Spinner } from "react-bootstrap";
