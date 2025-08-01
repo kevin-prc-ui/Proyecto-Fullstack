@@ -20,6 +20,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     Page<Ticket> findAllByEstadoNombreAndDepartamentoNombreAndIsTrashedFalse(String filtro, String departamento, Pageable pageable);
     Page<Ticket> findAllByUsuarioCreadorId(Pageable pageable, Long id);
     Page<Ticket> findAllByUsuarioCreadorIdAndDepartamentoNombre(Pageable pageable, Long id, String departamentoNombre);
+    Page<Ticket> findAllByUsuarioAsignadoId(Pageable pageable, Long id);
+    Page<Ticket> findAllByUsuarioAsignadoIdAndDepartamentoNombre(Pageable pageable, Long id, String departamentoNombre);
     //Devuelve tickets por tema o codigo.
     Page<Ticket> findAllByTemaContainsIgnoreCaseAndIsTrashedFalseOrCodigoContainsIgnoreCaseAndIsTrashedFalse(String tema, String codigo, Pageable pageable);
 }

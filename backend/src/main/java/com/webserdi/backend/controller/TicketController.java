@@ -47,6 +47,13 @@ public class TicketController {
             @RequestParam(required = false) String departamento) {
         return ResponseEntity.ok(ticketService.GetTicketsByUsuario(pageable, id, departamento));
     }
+    @GetMapping("/dashboard/user/{id}")
+    public ResponseEntity<Page<TicketDto>> getTicketsDashboard(
+            @PageableDefault(size = 8, sort = "fechaCreacion") Pageable pageable,
+            @PathVariable Long id,
+            @RequestParam(required = false) String departamento) {
+        return ResponseEntity.ok(ticketService.GetTicketsDashboard(pageable, id, departamento));
+    }
     @PutMapping("/restore/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void restoreTicket(@PathVariable Long id) {
@@ -59,7 +66,6 @@ public class TicketController {
             @RequestParam String busqueda) {
         return ResponseEntity.ok(ticketService.getTicketsByTema(pageable, busqueda));
     }
-
                     /**
                      * Obtiene una lista paginada de tickets activos, filtrados por estado y opcionalmente por departamento.
                      * @param pageable Configuración de paginación.
